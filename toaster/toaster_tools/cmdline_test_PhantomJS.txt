@@ -1,0 +1,1 @@
+c:\xampp\htdocs\toaster\toaster_tools\phantomjs2.1 --disk-cache=true c:\xampp\htdocs\toaster\js\netsniff_cache.js http://www.google.com 1600 1200 tst "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0" outtst.txt

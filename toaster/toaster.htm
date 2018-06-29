@@ -1,0 +1,468 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>THE WEBPAGE TOASTER</title>
+<link rel="stylesheet" type="text/css" href="css/toaster.css">
+</head>
+<body>
+<meta charset="UTF-8">
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+<div id="titlebar">
+  <span class="titlebarmain">The Webpage Toaster:</span>
+  <span class="titlebarsub">Webpage Tool for Optimisation and Analysis thru Static Testing and Enhanced Reporting</span>
+</div>
+<form enctype="multipart/form-data" id="form" name="input" action="" method="post">
+<!--<a href="toasted.php" target="_blank"><img class="mg" src="/toaster/images/magglass.png"alt="View Toasted Pages" title="View Toasted Pages"></img></a>-->
+<label>Page URL</label><input type="text" name="url" id="urlfield" size="70" maxlength="10000" value="" class="long" required autofocus>
+<label>Real(*WPT)/Emulated Device</label><select name="ua">
+  <option value="Chrome">Chrome Desktop*</option>
+  <option value="Firefox">Firefox Desktop*</option>
+  <option value="Edge">Edge Desktop</option>
+  <option value="IE">IE11 Desktop*</option>
+  <option value="iPhone iOS5">iPhone Safari iOS5</option>
+  <option value="iPhone iOS6">iPhone Safari iOS6</option>
+  <option value="iPhone iOS7">iPhone Safari iOS7</option>
+  <option value="iPhone iOS8">iPhone Safari iOS8</option>
+  <option value="iPhone iOS9">iPhone Safari iOS9</option>
+  <option value="iPhone iOS10">iPhone Safari iOS10</option>
+  <option value="iPhone iOS11">iPhone Safari iOS11*</option>
+  <option value="iPad iOS5">iPad Safari iOS5</option>
+  <option value="iPad iOS6">iPad Safari iOS6</option>
+  <option value="iPad iOS7">iPad Safari iOS7</option>
+  <option value="iPad iOS8">iPad Safari iOS8</option>
+  <option value="iPad iOS9">iPad Safari iOS9</option>
+  <option value="iPad iOS10">iPad Safari iOS10</option>
+  <option value="iPad iOS11">iPad Safari iOS11*</option>
+  <option value="Android5.0M">Android 5.0 MotoG Phone*</option>
+  <option value="Android5.1N7">Android 5.0 Nexus7 Tablet*</option>
+  <option value="Android5.0N5">Android 5.0 Nexus5 Tablet</option>
+  <option value="Android5.0N6">Android 5.0 Nexus6 Phone</option>
+  <option value="Android5.0N9">Android 5.0 Nexus9 Tablet</option>
+  <option value="Android6.0S6">Android 6.0 Samsung Galaxy S6 Phone</option>
+  <option value="Android7.0PC">Android 7.0 Google Pixel C Tablet</option>
+  <option value="Googlebot">Googlebot</option>
+  <option value="Custom">Googlebot Custom</option>
+</select>
+<div class="checkbox">
+<label for="cssimgs">Get All Available Objects</label>
+<input id="cssimgs" type="checkbox" name="cssimgs" value="cssimgs">
+<!--<label for="links3p">Get 3P Descs.</label>
+<input id="links3p" type="checkbox" name="links3p" value="links3p">-->
+<label for="links">Show Page Links</label>
+<input id="links" type="checkbox" name="chklinks" value="links">
+<label for="dbusage">Use 3rd Party DB</label>
+<input id="dbusage" type="checkbox" hidden checked name="dbusage" value="dbusage">
+<label for="debug">Show Debug Msgs</label>
+<input id="debug" type="checkbox" name="chkdebug" value="chkdebug">
+<label for="akdebug">Get Akamai Debug Hdrs</label>
+<input id="akdebug" type="checkbox" name="akdebug" value="akdebug">
+<label for="3pchain">Get 3rd Party Call Chain</label>
+<input id="3pchain" type="checkbox" hidden checked name="3pchain" value="3pchain" title="CAUTION - This can take a while!">
+</div>
+<div class="radios">
+<label for="ip">Geo IP Location Lookup</label>
+<input type="radio" name="ip" value="none">None&nbsp;
+<input type="radio" name="ip" value="domain">Domain&nbsp;
+<input type="radio" name="ip" value="all" checked>All
+<br>
+<label for="ipapi">Geo IP API Provider</label>
+<input type="radio" name="ipapi" value="dbip" title="Best option - Cities - limit of 2,000 requests per day">db-IP&nbsp;
+<input type="radio" name="ipapi" value="freegeoip" title="2nd option - Countries - limit of 10,000 requests per hour" checked>Freegeoip
+<input type="radio" name="ipapi" value="hackertarget" title="3rd option - good for US and Australian locations">HackerTarget
+<br>
+<label for="wbengine" title="Web Browser Engine - use timings with caution!">Web Browser Engine</label>
+<!--<input type="radio" name="wbengine" value="pjs1.9" title="PhantomJS v1.9.8">Webkit v1.9&nbsp;-->
+<input type="radio" name="wbengine" value="pjs2.0" title="PhantomJS v2">Webkit v2.0&nbsp;
+<input type="radio" name="wbengine" value="pjs2.1" checked title="PhantomJS v2.1">Webkit v2.1&nbsp;
+<input type="radio" name="wbengine" value="sjs0.10" title="SlimerJS v0.10">Gecko v0.10
+<input type="radio" name="wbengine" value="wpt_local" title="WPT Local">WPT
+<input type="radio" name="wbengine" value="ch_headless" title="Chrome Headless">CH Headless
+</div>
+<label>Auth Username</label><input type="text" name="username" size="60" width="60" value="">
+<label>Auth Password</label><input type="text" name="password" size="60" width="60" value="">
+<label>Notes</label><textarea id="comment" name="comment" placeholder="Enter text here..."></textarea>
+<!-- The data encoding type, enctype, MUST be specified as below -->
+<!-- MAX_FILE_SIZE must precede the file input field -->
+<label for="fileupload">Upload HAR</label>
+<input type="hidden" name="MAX_FILE_SIZE" value="26214400" />
+<!-- Name of input element determines name in $_FILES array -->
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="harfile" name="fileupload" type="file" />&nbsp;
+<div class="checkbox">
+<label for="harex">Exclusive HAR Content</label>
+<input id="harex" type="checkbox" name="harex" value="harex">
+</div>
+<div id="centerbuttons">
+<!--<button id="reset" type="reset" value="Reset!">Reset</button>-->
+<button id="submit" type="submit" value="Toast It!"><img src="/toaster/images/toastslice.png" height="36"/>Toast it!</button>
+</div>
+</form>
+<!--<textarea rows="4" cols="50" name="comment" form="form">Enter multiple URLs here...</textarea>-->
+<div align="center" id="toastingurl" class="statusupdates"><span id="toasturl"></span></div>
+<div align="center" id="statusupdate" class="statusupdates">&nbsp;<span id="status">Ready to Toast</span></div>
+<div align="center" id="fileupdate" class="statusupdates"><span id="statusdetail">&nbsp;</span></div>
+<!-- <div align="center" id="fileupdate" class="statusupdates"><img src="" height="64" width="64" class="imgicon"></img><span id="statusdetail">&nbsp;</span></div> -->
+<!-- <button id="stop">Stop</button> -->
+<div id="response">
+    <pre></pre>
+</div>
+<div id="toastingnow"></div>
+<div id="boxlinks">
+<span id="timeval"></span>
+<a class="tpdb" href="toasted.php/" target="_blank" title="View History">View History</a>&nbsp;
+<div></clear>
+<a class="tpdb" href="https://ui.tagdb.nccgroup-webperf.com/" target="_blank" title="Third Party Database">3P DB Admin</a>&nbsp;
+</div>
+<script type="text/javascript" charset="utf8" src="/toaster/js/jquery.min.js"></script>
+<script type="text/javascript">
+var toastedfilename = '';
+$(document).ready(function()
+  {
+    // //ajaxTime.php is called every second to get time from server
+    // var refreshTimer = setInterval(function()
+    //   {
+    //      $('#timeval').load('getdatetime.php');
+    //   }, 1000
+    // );
+
+
+function getTime(formatted){
+    var currentTime = new Date()
+    var hours = currentTime.getHours()
+    var minutes = currentTime.getMinutes()
+    var seconds = currentTime.getSeconds()
+    if (minutes < 10){
+        minutes = "0" + minutes;
+    }
+    if (seconds < 10){
+        seconds = "0" + seconds;
+    }
+    var t_str = hours + ":" + minutes + ":" + seconds;
+    if(hours > 11){
+        t_str += "<small>PM</small>";
+    } else {
+        t_str += "AM";
+    }
+
+    changeQuote(seconds);
+
+    if(formatted)
+      return t_str;
+    else
+      return currentTime;
+}
+function updateTime(){
+    t_str = getTime(true);
+    //console.log(t_str);
+    document.getElementById('timeval').innerHTML = t_str;
+}
+setInterval(updateTime, 1000);
+
+function changeQuote(seconds)
+{
+  //console.log(seconds);
+  var bartext = '';
+  var boolChange = false;
+  if(seconds == 0)
+  {
+    bartext = "Webpage Tool for Optimisation and Analysis thru Static Testing and Enhanced Reporting";
+    boolChange = true; 
+  }
+  else
+  {
+    if(seconds == 30)
+    {
+    bartext = "The best thing since sliced bread!";
+    boolChange = true;
+    }
+  }
+  if(boolChange == true)
+  {
+    $('.titlebarsub').fadeOut('slow', function() {
+      $('.titlebarsub').text(bartext);
+      $('.titlebarsub').fadeIn('slow');
+    });
+  }
+}
+
+    var refreshStatus = setInterval(function()
+      {
+
+        $.ajax(
+          {
+
+          type: "GET",
+          url: "getstatus.php",
+            //data: '',
+          dataType: 'json',
+          success: function(obj) {
+              //$('#status').html(msg);
+
+              //console.log(JSON.stringify(obj));
+
+              if(obj.status == 'Ready to Toast')
+              {
+                $('#submit').removeAttr('disabled');
+                $('#submit').removeClass("grey");
+                $('#statusdetail').html("&nbsp;");
+                $('#toasturl').html("&nbsp;");
+                $('#fileupload').html("");
+                $('div#toastingnow > img').remove();
+                var imgpath;
+              }
+              else
+              {
+                $('#status').text(decodeURI(obj.status));
+                if(obj.status.substr(0, 11) == "Downloading" || obj.status.substr(0, 9) == "Analysing" || obj.status.substr(0,11) == "Identifying" || obj.status.substr(0,6) == "iframe")
+                {
+                  var statusToDisplay = decodeURI(obj.object);
+                  if(statusToDisplay.length > 50)
+                  {
+                    statusToDisplay = statusToDisplay.substr(1,25) + ".." + statusToDisplay.slice(-25);
+                  }
+                  else
+
+                  $('#statusdetail').text(statusToDisplay);
+                  //if (obj.mimetype == '')
+                  //  obj.mimetype = 'application_x_mswinurl';
+                  //var loc = 'images/mimetypes128x128/' + obj.mimetype + '.png';
+                  //console.log("src " + obj.object + "; mt = " + obj.mimetype);
+
+                  //$('#fileupdate img').attr("src",loc);
+                }
+                else
+                {
+                  $('#statusdetail').html("&nbsp;");
+                  //$('#fileupdate img').attr("src",'');
+                }
+
+                if(obj.imagepath !='')
+                {
+                    imgpath = obj.imagepath;
+                    var src = $('#theImg').attr('src');
+                    if(src != imgpath)
+                    {
+                        //console.log("image = " + obj.imagepath);
+                        $('div#toastingnow > img').remove();
+                        $('#toastingnow').prepend('<img id="theImg" src="' + imgpath + '" />');
+                    }
+                }
+
+                if(obj.toastedfile != '')
+                {
+                    toastedfilename = obj.toastedfile;
+                    //console.log('status toastedfilename: ' + toastedfilename);
+                }
+              }
+
+            } // end success
+
+          }
+        ); // Ajax Call
+
+      }, 300
+    );
+
+  }
+);
+
+(function($)
+  {
+
+    var listfurls = '';
+    var splitlistofurls = new Array();
+    var urlcount = 0;
+    var pagecount = 0;
+    var pgcounter = 0;
+
+
+    function sendURL(thisd) {
+      pgcounter = pagecount + 1;
+      // update the form url pne url at a time
+      $('#urlfield').val(splitlistofurls[pagecount]);
+      $('#toasturl').text("Toasting "+ pgcounter + ' of ' + urlcount + ': '+decodeURI(splitlistofurls[pagecount]));
+      //console.log(pagecount + ": "+ splitlistofurls[pagecount]);
+
+      $.ajax(
+        {
+        url: 'main.php',
+        beforeSend: function() {
+            $('body').addClass('busy');
+          },
+        dataType: 'text',
+        type: 'post',
+        async: true,
+        contentType: false,
+        processData: false,
+        data: new FormData(thisd),
+        success: function(data, textStatus, jQxhr) {
+            //$('html').html(data);
+
+            if(urlcount == 1 || pgcounter == urlcount)
+            {
+              // only open in new windows if running single slice of toast
+              //var x = window.open();
+              //x.document.open();
+              //x.document.write(data);
+              //x.document.close();
+              //console.log("toasted page = " + toastedfilename);
+              var win=window.open(toastedfilename, '_blank');
+              win.focus();
+            }
+            //$('#response pre').html( data );
+            //$('#stop').click();
+            //console.log(thisd);
+            //console.log("pagecount:" + pagecount);
+            //console.log("urlcount: " + urlcount);
+   
+            if(pgcounter < urlcount)
+            {
+              var win=window.open(toastedfilename, '_blank');
+              win.focus();
+              win.addEventListener('load', function() { win.close(); } , false);
+
+              $('div#toastingnow > img').remove();
+              //console.log("done a page... next");
+              $('#status').text('Ready to Toast');
+              toastedfilename = '';
+              pagecount = pagecount + 1;
+              sendURL(thisd);
+            }
+            else
+            {
+              //console.log("done - resetting");
+              pagecount = 0;
+              urlcount = 0;
+              $('#urlfield').val('');
+              $('#toasturl').text('');
+              $('body').removeClass('busy');
+              $('#comment').val('');
+              $('#harfile').val('');
+              $('#status').text('Ready to Toast');
+              return(false);
+            }
+          
+
+          },
+        error: function(jqXhr,textStatus,errorThrown) {
+            //alert("Error: Either PHP code has an error or URL is invalid!");
+            //console.log(textStatus);
+            //console.log(jqXhr.responseText);
+            var x =jqXhr.responseText;
+            var aError = x.split(',');
+console.log("Toasting error: returned data = " + aError);
+console.log("Toasting error: end of returned data");
+
+            if(Array.isArray(aError) == true)
+            {
+            var amessage = '';
+            var message = '';
+            var adebug = '';
+            var debug = '';
+            if (typeof aError[1] !== "undefined")
+                {
+                amessage = aError[1].split(':');
+
+                console.log("message = " + amessage[1]);
+                message = amessage[1];
+              }
+
+            if (typeof aError[2] !== "undefined")
+            {
+               adebug = aError[2].split(':');
+               console.log("debug info = " + adebug[1]);
+               debug = adebug[1];
+            }
+            else
+            {
+                console.log("Status = " + textStatus);
+            }
+
+
+            }
+            //alert($('#urlfield').val() + ": " + textStatus + ": " + message);
+console.log(errorThrown + ": " +$('#urlfield').val() + ": " +" " + message + ": " + debug);
+            // pagecount = 0;
+            // urlcount = 0;
+            $('#urlfield').val('');
+            $('#toasturl').text('');
+            $('#status').text('Ready to Toast');
+            $('#statusdetail').html("&nbsp;");
+            $('body').removeClass('busy');
+            $('#submit').removeAttr('disabled');
+            $('#submit').removeClass("grey");
+            $('#fileupdate img').attr("src",'');
+            $('#comment').val('');
+            $('#harfile').val('');
+            pagecount = pagecount + 1;
+            sendURL(thisd);
+          },
+        complete: function() {
+            $('#status').text('Ready to Toast');
+            $('#statusdetail').html("&nbsp;");
+            $('#fileupdate img').attr("src",'');
+            $('#comment').val('');
+            $('#harfile').val('');
+            $('body').removeClass('busy');
+            $('#submit').removeAttr('disabled');
+            $('#urlfield').val('');
+            $('#submit').removeAttr('disabled');
+            $('#submit').removeClass("grey");
+            $('#statusdetail').html("&nbsp;");
+          }
+        }
+      );
+
+    }
+
+    function processForm(e) {
+
+      if(pagecount == 0)
+      {
+        e.preventDefault();
+        $('#submit').attr("disabled", "true");
+        $('#submit').addClass("grey");
+        //console.log("submit pressed");
+        // get full list of urls from input field
+        listofurls = $('#urlfield').val();
+        //console.log(listofurls);
+
+        if($('#comment').val() != '')
+            $('#comment').val($('#comment').val() + '; ');
+        if ($('#cssimgs').is(':checked'))
+            $('#comment').val($('#comment').val() + 'All available objects; ');
+        if ($('#3pchain').is(':checked'))
+            $('#comment').val($('#comment').val() + 'Third party call chain; ');
+        if ($('#dbusage').is(':checked'))
+            $('#comment').val($('#comment').val() + 'Third party database used; ');
+        if ($('#debug').is(':checked'))
+            $('#comment').val($('#comment').val() + 'Debug mode; ');
+        if ($('#akdebug').is(':checked'))
+            $('#comment').val($('#comment').val() + 'Akamai debug headers;');
+
+        splitlistofurls = listofurls.split(/,\s*/);
+        urlcount = splitlistofurls.length;
+
+        if(urlcount > 1)
+        {
+          $('#toasturl').text("Multi Page");
+          //console.log("Multi Page: "+ urlcount);
+        }
+        else
+        {
+          $('#toasturl').text("Single Page");
+          //console.log("Single Page: " + urlcount);
+        }
+
+      }
+      sendURL(this);
+
+
+    } // end function processForm
+
+    // MAIN jQUERY
+    $('#form').submit(processForm);
+  }
+)(jQuery);
+</script>
+</body>
+</html>

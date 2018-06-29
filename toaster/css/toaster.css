@@ -1,0 +1,313 @@
+@charset "utf-8";
+/* CSS Document */
+
+body
+{
+	background-color:#1E1E1E;
+	color:#FFFFFF;
+}
+h1,h2 {
+text-align: center;	
+}
+form {
+background: -webkit-gradient(linear, bottom, left 175px, from(#CCCCCC), to(#EEEEEE));
+position:relative;
+top: 10px;
+width:800px;
+height:530px;
+font-family: Tahoma, Geneva, sans-serif;
+font-size: 14px;
+line-height: 30px;
+font-weight: bold;
+/*color: #69F;*/
+background-color: #333;
+text-decoration: none;
+-webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+border-radius: 10px;
+padding:10px;
+-webkit-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+-moz-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+/*background-image:url('/toaster/images/toaster_t.png');
+background-repeat:no-repeat;
+background-position:center;*/
+}
+form.db{
+width:1000px;
+height: 220px;
+}
+input[type=checkbox] {
+  display:block;
+	margin-left: 120px;
+	margin-top: -21px;
+}
+.checkbox label:before {
+    border-radius: 3px;
+}
+.radios label:before {
+    border-radius: 3px;
+}
+​input[type=checkbox]:checked + label:before {
+    content: "\2713";
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, .2);
+    font-size: 15px;
+    color: #f3f3f3;
+    text-align: center;
+    line-height: 15px;
+}
+label, input, button, select,textarea{
+    /* in order to define widths */
+    display: inline-block;
+}
+textarea {
+    border: 1px solid #CCC;
+    -webkit-border-radius: 5px;
+    -moz-border-radius : 5px;
+    border-radius: 5px;
+}
+label {
+    width: 30%;
+    /* positions the label text beside the input */
+    text-align: right;
+}
+label + input {
+    width: 40%;
+    /* large margin-right to force the next element to the new-line
+       and margin-left to create a gutter between the label and input */
+    margin: 0 15% 0 4%;
+}
+label + input[type=radio] {
+	width: 3%;
+	margin: 0 5px 0 3%;
+}
+label + input[type="file"] {
+	width: 3%;
+	margin: 0 5px 0 3%;
+}
+label + select {
+    width: 40%;
+    /* large margin-right to force the next element to the new-line
+       and margin-left to create a gutter between the label and input */
+    margin: 0 20% 0 4%;
+}
+label + textarea {
+    width: 40%;
+    /* large margin-right to force the next element to the new-line
+       and margin-left to create a gutter between the label and input */
+    margin: 1% 20% 0 4%;
+}
+/* only the submit button is matched by this selector,
+   but to be sure you could use an id or class for that button */
+button + submit	{
+    float: right;
+    width: 100%
+}
+.long {
+	width: 315px;
+}
+button{
+display: table-cell;
+margin: 20px 5px 5px 20px;
+color: #000;
+cursor:pointer;
+vertical-align: middle;
+width: 95%;
+background-color: green;
+font-size: 36px;
+}
+.grey{
+  background-color: grey;
+}
+button img{
+  vertical-align: top;
+}
+img.mg
+{
+position: absolute;
+top: 40px;
+right: 5px;
+}
+#table-wrapper {
+  position:relative;
+  margin-bottom: 20px;
+}
+#table-scroll {
+  height:300px;
+  overflow:auto;
+  margin-top:20px;
+}
+#table-wrapper table {
+  width:95%;
+}
+#table-wrapper table th{
+  color:white;
+  border: aliceblue solid 1px;
+}
+#table-wrapper table tr{
+  color:black;
+}
+#table-wrapper table thead th .text {
+  position:absolute;   
+  top:-20px;
+  z-index:2;
+  height:20px;
+  width:35%;
+  border:1px solid red;
+}
+#table-wrapper table .highlightedrow
+{
+color:#FF0;
+background:#006;
+}
+#dbmsg{
+	color:#00FF00;
+}
+#tools{
+	list-style:none;
+	
+}
+#tools li{
+float: left;
+background:#666;
+color: #FFFFFF;
+border:thick #900;
+padding: 10px;
+margin: 5px;
+width: 200px;
+height: 200px;
+ /* fallback and gradients*/
+background-color: #1a82f7;
+background: url(images/linear_bg_2.png);
+background-repeat: repeat-x;
+/* Safari 4-5, Chrome 1-9 */
+background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#1a82f7), to(#2F2727));
+/* Safari 5.1, Chrome 10+ */
+background: -webkit-linear-gradient(top, #2F2727, #1a82f7);
+/* Firefox 3.6+ */
+background: -moz-linear-gradient(top, #2F2727, #1a82f7);
+/* IE 10 */
+background: -ms-linear-gradient(top, #2F2727, #1a82f7);
+/* Opera 11.10+ */
+background: -o-linear-gradient(top, #2F2727, #1a82f7);
+text-wrap: normal;
+word-break:normal;
+font-size:36px;
+display: block;
+text-align: center;
+font-size: 48px;
+height: 200px;
+}
+#tools A:link {text-decoration: none; color:white;}
+#tools A:visited {text-decoration: none;color:white;}
+#tools A:active {text-decoration: none;color:white;}
+#tools A:hover {text-decoration: underline; color: yellow;}
+.statusupdates{
+left: 50px;
+width: 800px;
+margin-top: 5px;
+font-size: 200%;
+background-color: #1C2033;
+color: silver;
+padding: 10px;
+}
+.busy * {
+    cursor: wait !important;
+}
+#toastingnow{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  max-width: 400px;
+  max-height: 800px;
+  overflow: hidden;
+}
+#theImg{
+  margin-top: 32px;
+  width: 100%;
+}
+.imgicon{
+  border: none;
+}
+#boxlinks{
+  position: absolute;
+  top: 40px;
+  left: 850px;
+  background-color: #333;
+-webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+border-radius: 10px;
+padding:20px;
+border: 1px solid #999;
+border: inset 1px solid #333;
+-webkit-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+-moz-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+background-position:center;
+  padding: 5px;
+  margin: 5px;
+  text-align: center;
+}
+a.tpdb{
+    text-decoration: none; font: menu;
+    display: inline-block;
+    margin: 10px;
+    width: 60%;
+    padding: 10px 10px 10px 10px;
+    background: ButtonFace; color: ButtonText;
+    border-style: solid; border-width: 2px;
+    border-color: ButtonHighlight ButtonShadow ButtonShadow ButtonHighlight;
+}
+#db{
+margin-left:auto;
+margin-right:auto;
+width: 1100;
+}
+#db td{
+padding: 10px;
+}
+#dbtable{
+-webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+border-radius: 10px;
+padding:10px;
+border: 1px solid #999;
+border: inset 1px solid #333;
+-webkit-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+-moz-box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  padding: 5px;
+  margin: 5px;
+  text-align: center;
+}
+#titlebar{
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 24px;
+  color: white;
+background-color: #1C2033;
+}
+#timeval{
+  color: white;
+  top: 5px;
+  left: 5px;
+}
+.titlebarmain{
+  margin-left: 20px;
+}
+.titlebarsub{
+  font-size: 20px;
+  font-style: italic;
+}
+blockquote {
+  font-size: 16px;
+  color:#CCC;
+  border-left: 10px solid #ccc;
+  margin: 5em 10px;
+  padding: 0.5em 10px;
+  quotes: "\201C""\201D""\2018""\2019";
+  text-align: center;
+  margin-top: 5px;
+}
+blockquote p {
+  display: inline;
+}

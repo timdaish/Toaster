@@ -1,0 +1,4 @@
+<br />
+<b>Warning</b>:  mysql_connect(): A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.
+ in <b>C:\xampp2\htdocs\toaster\3pSH_download.php</b> on line <b>19</b><br />
+Could not connect: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.
