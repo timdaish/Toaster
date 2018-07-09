@@ -1,4 +1,5 @@
 <?php
+include "api-config.php";
 function convertAbsoluteURLtoLocalFileName($sourcefile)
 {
 	global $filepath_domainsavedir, $filepath_domainsaverootdir,$host_domain,$debug;
@@ -2563,9 +2564,9 @@ function lookupIPforDomain($inDomain)
 }
 function lookupLocationforIP($inIP)
 {
-	global $geoIPLookupMethod,$OS;
+	global $geoIPLookupMethod,$OS,$apikey_dbip;
 	$addr = 'addr='.$inIP;
-	$api_key= 'api_key=2dc7401e92ee741dbac53a4be849e571c7d0af65';
+	$api_key= 'api_key=' . $apikey_dbip;
 	$parameters = '?'.$addr . '&' . $api_key;
 	$response = '';
 //echo (__FUNCTION__ . " - IP lookup using " . $geoIPLookupMethod);
@@ -2767,6 +2768,7 @@ echo ('lookupLocationforIP lat & long: '.$lat.' '.$long.'<br/><br/>');
 }
 function lookupLatLongForLocation($inAddr)
 {
+	global $apikey_googlemaps;
     if($inAddr == '')
     {
         error_log("error: lookupLatLongForLocation: '". $inAddr ."'");
@@ -2776,7 +2778,7 @@ function lookupLatLongForLocation($inAddr)
 	$xlat = '';
 	$xlong = '';
 	$inAddr = str_replace(' ','+',$inAddr);	
-	$parameters = "address=".$inAddr . "&key=AIzaSyCSP9nBZ1aRvIZRc4tQbXznyrISL7Gt6d8";
+	$parameters = "address=".$inAddr . "&key=" . $apikey_googlemaps;
 	$response = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?'.$parameters);
 	$response = json_decode($response);
 	$status = $response->{'status'}[0];
@@ -2833,9 +2835,10 @@ function isthisAddressLatLong($inaddr)
 }
 function lookupLocationForLatLong($lat,$long)
 {
+	global $apikey_googlemaps;
 	//echo("Geocode API  lookuplocation call for: ".$lat. ", ".$long."<br/>");
 	$latlng = $lat.",".$long;	
-	$parameters = "latlng=".$latlng . "&key=AIzaSyCSP9nBZ1aRvIZRc4tQbXznyrISL7Gt6d8";
+	$parameters = "latlng=".$latlng . "&key=" .$apikey_googlemaps;
 	$response = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?'.$parameters);
 	$response = json_decode($response);
 	//echo("Geocode API response:<pre>");
