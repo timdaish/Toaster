@@ -2733,7 +2733,7 @@ function downloadObject($key,$valuearray)
                             if($xmpbytes > 0)
     						{
     						   //$res = array();
-    							//exec('toaster_tools\webpmux -get xmp '. $lfn . ' -o '.$filepath_basesavedir.'gifxmp.xml',$res);
+    							//exec('win_tools\webpmux -get xmp '. $lfn . ' -o '.$filepath_basesavedir.'gifxmp.xml',$res);
     							//$resstr = implode("\r\n",$res);
     							//echo("webpmux xmp result: ".$resstr."<br/>");
 
@@ -2741,9 +2741,9 @@ function downloadObject($key,$valuearray)
 
     							$res = array();
                                 if($OS == "Windows")
-    							    exec($perlbasedir . 'perl toaster_tools\ExifToolPerl\exiftool.pl -xmp -b ' . $lfn,$res);
+    							    exec($perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl -xmp -b ' . $lfn,$res);
                                 else
-                                        exec('exiftool -xmp -b ' . $lfn,$res);
+                                        exec('exiftool -xmp -b ' . $lfn,$res); // or path in lnx_tools/ExifTool
     							$xmpinfo = $res;
 
     							//echo("webpmux xmp data: ".$xmpstr."<br/>");
@@ -2787,7 +2787,7 @@ function downloadObject($key,$valuearray)
 						{
 							$res = array();
                             if($OS == "Windows")
-							    exec('toaster_tools\webpmux -get xmp '. $lfn . ' -o '.$filepath_basesavedir.'webpxmp.xml',$res);
+							    exec('win_tools\webpmux -get xmp '. $lfn . ' -o '.$filepath_basesavedir.'webpxmp.xml',$res);
                             else
                                 exec('webpmux -get xmp '. $lfn . ' -o '.$filepath_basesavedir.'webpxmp.xml',$res);
 							$resstr = implode("\r\n",$res);
@@ -2797,7 +2797,7 @@ function downloadObject($key,$valuearray)
 
 							$res = array();
                             if($OS == "Windows")
-							    exec($perlbasedir . 'perl toaster_tools\ExifToolPerl\exiftool.pl -xmp -b ' . $lfn,$res);
+							    exec($perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl -xmp -b ' . $lfn,$res);
                             else
                                 exec('exiftool -xmp -b ' . $lfn,$res);
 							$xmpinfo = $res;
@@ -2847,9 +2847,9 @@ function downloadObject($key,$valuearray)
 
 							$res = array();
                             if($OS == "Windows")
-							    exec('toaster_tools\exiv2 -feX extract  '. $lfn,$res);
+							    exec('win_tools\exiv2 -feX extract  '. $lfn,$res);
                             else
-                                exec('exiv2 -feX extract  '. $lfn,$res);
+                                exec('linux/bin/exiv2 -feX extract  '. $lfn,$res);
 							$resstr = implode("\r\n",$res);
 							//echo("png exiv2 xmp result: ".$resstr."<br/>");
                             $modlfn = str_replace('.png','.xmp',$lfn);
@@ -2978,9 +2978,9 @@ function downloadObject($key,$valuearray)
 						// estimate quality
 						$res = array();
                         if($OS == "Windows")
-						    exec('toaster_tools\jpegquality '. $lfn,$res);
+						    exec('win_tools\jpegquality '. $lfn,$res);
                         else
-                            exec('jpegquality '. $lfn,$res);
+                            exec('./lnx_tools/jpegq '. $lfn,$res);
 
 						$resstr = implode($res);
 						if(strpos($resstr,'%'))
@@ -3032,7 +3032,7 @@ function downloadObject($key,$valuearray)
 						{
 							$res = array();
                             if($OS == "Windows")
-							    exec($perlbasedir . 'perl toaster_tools\ExifToolPerl\exiftool.pl -icc_profile -b ' . $lfn,$res);
+							    exec($perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl -icc_profile -b ' . $lfn,$res);
                             else
                                 exec('exiftool -icc_profile -b ' . $lfn,$res);
 							$iccinfo = $res;
@@ -3079,7 +3079,7 @@ function downloadObject($key,$valuearray)
 
 							// EXIFTOOL - exif
 							//$res = array();
-							//exec($perlbasedir . 'perl toaster_tools\ExifToolPerl\exiftool.pl -E ' . $filepathnameofsaveobject,$res);
+							//exec($perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl -E ' . $filepathnameofsaveobject,$res);
 							//$exifinfo = $res;
 							//addImageData($sourcefile,"EXIF",$exifinfo);
 
@@ -3140,9 +3140,9 @@ function downloadObject($key,$valuearray)
     							//echo($iptcstr."<br/>");
     							//echo('Analysing image IPTC data via EXIV2: '.$filepathnameofsaveobject."<br/>");
                                 if($OS == "Windows")
-    							    exec('toaster_tools\exiv2 -PInt ' . $lfn,$res);
+    							    exec('win_tools\exiv2 -PInt ' . $lfn,$res);
                                 else
-                                    exec('exiv2 -PInt ' . $lfn,$res);
+                                    exec('linux/bin/exiv2 -PInt ' . $lfn,$res);
     							//echo("IPTC: <pre>");
     							//print_r($res);
     							//echo("</pre><br/>");

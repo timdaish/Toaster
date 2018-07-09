@@ -319,7 +319,7 @@ function decodeWEBP($content,$lf)
 		// get basic infi using Googles webpmux
 		$res = array();
         if($OS == "Windows")
-		    exec('toaster_tools\webpmux -info '. escapeshellarg($lf),$res);
+		    exec('win_tools\webpmux -info '. escapeshellarg($lf),$res);
         else
             exec('webpmux -info '. escapeshellarg($lf),$res);
 		$resstr = implode($res);
@@ -1702,9 +1702,9 @@ function decodeJPEG($content,$lf)
 
 					$res = array();
                     if($OS == "Windows")
-					    exec($perlbasedir . 'perl toaster_tools\ExifToolPerl\exiftool.pl -xmp -b ' . escapeshellarg($lf),$res);
+					    exec($perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl -xmp -b ' . escapeshellarg($lf),$res);
                     else
-                        exec('exiftool -xmp -b ' . escapeshellarg($lf),$res);
+                        exec('./lnx_tools/ExifTool/exiftool -xmp -b ' . escapeshellarg($lf),$res);
 					$xmpinfo = $res;
 					$xmpinfo = str_replace("> <",">\r\n<",$xmpinfo);
 					//echo ($lf. ' xmpinfo: ' . $xmpinfo."<br/>");
@@ -2793,10 +2793,10 @@ function decodeGIF($content,$lf)
 
     $res = array();
     if($OS == "Windows")
-        exec($perlbasedir . 'perl toaster_tools\ExifToolPerl\exiftool.pl -j '. escapeshellarg($lf),$rawgifdata);
+        exec($perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl -j '. escapeshellarg($lf),$rawgifdata);
     else
-        exec('exiftool -j '. escapeshellarg($lf),$rawgifdata);
-    //eval('$gifdata=' . 'toaster_toolsexiftool -php -q '.$lf);
+        exec('./lnx_tools/ExifTool/exiftool -j '. escapeshellarg($lf),$rawgifdata);
+    //eval('$gifdata=' . 'win_toolsexiftool -php -q '.$lf);
     $jsondata  = implode('',$rawgifdata);
     $gdata = json_decode($jsondata);
     $gifdata = $gdata[0];
@@ -2827,9 +2827,9 @@ function decodeGIF($content,$lf)
         {
             $res = array();
             if($OS == "Windows")
-    		    exec($perlbasedir . 'perl toaster_tools\ExifToolPerl\exiftool.pl -xmp -b ' . escapeshellarg($lf),$res);
+    		    exec($perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl -xmp -b ' . escapeshellarg($lf),$res);
             else
-                exec('exiftool -xmp -b ' . escapeshellarg($lf),$res);
+                exec('./lnx_tools/ExifTool/exiftool -xmp -b ' . escapeshellarg($lf),$res);
     		$xmpinfo = implode('',$res);
 
             $gifxmpbytes = strlen($xmpinfo);
@@ -2838,9 +2838,9 @@ function decodeGIF($content,$lf)
 
     $res = array();
     if($OS == "Windows")
-        exec($perlbasedir . 'perl toaster_tools\ExifToolPerl\exiftool.pl -verbose '. escapeshellarg($lf),$rawgifinfo);
+        exec($perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl -verbose '. escapeshellarg($lf),$rawgifinfo);
     else
-        exec('exiftool -verbose '. escapeshellarg($lf),$rawgifinfo);
+        exec('./lnx_tools/ExifTool/exiftool -verbose '. escapeshellarg($lf),$rawgifinfo);
 
     $rowcnt = 0;
     foreach($rawgifinfo as $row)
@@ -2922,8 +2922,8 @@ function decodePNG($content,$lf)
 
   //pngcrush -n -v <img> to identify text chunnks
 
-    $windows_cmd = $perlbasedir . 'perl toaster_tools\ExifToolPerl\exiftool.pl' .' -v ' .escapeshellarg($lf);
-    $linux_cmd = "exiftool" .' -v ' .escapeshellarg($lf);
+    $windows_cmd = $perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl' .' -v ' .escapeshellarg($lf);
+    $linux_cmd = "./lnx_tools/ExifTool/exiftool" .' -v ' .escapeshellarg($lf);
     //echo 'cmd = '.$windows_cmd;
     $res = array();
     if($OS == "Windows")
@@ -3017,9 +3017,9 @@ function decodePNG($content,$lf)
 
   $res = array();
   if($OS == "Windows")
-    exec($perlbasedir . 'perl toaster_tools\ExifToolPerl\exiftool.pl -j '. escapeshellarg($lf),$rawpngdata);
+    exec($perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl -j '. escapeshellarg($lf),$rawpngdata);
   else
-    exec('exiftool -j '. escapeshellarg($lf),$rawpngdata);
+    exec('./lnx_tools/ExifTool/exiftool -j '. escapeshellarg($lf),$rawpngdata);
   $jsondata  = implode('',$rawpngdata);
   $pdata = json_decode($jsondata);
   $pngdata = $pdata[0];
@@ -3088,9 +3088,9 @@ function decodePNG($content,$lf)
       {
         $res = array();
         if($OS == "Windows")
-  		    exec($perlbasedir . 'perl toaster_tools\ExifToolPerl\exiftool.pl -xmp -b ' . escapeshellarg($lf),$res);
+  		    exec($perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl -xmp -b ' . escapeshellarg($lf),$res);
         else
-            exec('exiftool -xmp -b ' . escapeshellarg($lf),$res);
+            exec('./lnx_tools/ExifTool/exiftool -xmp -b ' . escapeshellarg($lf),$res);
   		$xmpinfo = implode('',$res);
 
           $xmpbytes = strlen($xmpinfo);
@@ -3098,11 +3098,11 @@ function decodePNG($content,$lf)
 
 
     $res = array();
-    //exec('toaster_tools\pngcheck -v '. $lf,$pngstructure);
+    //exec('win_tools\pngcheck -v '. $lf,$pngstructure);
     if($OS == "Windows")
-        exec($perlbasedir . 'perl toaster_tools\ExifToolPerl\exiftool.pl -v '. escapeshellarg($lf),$pngstructure);
+        exec($perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl -v '. escapeshellarg($lf),$pngstructure);
     else
-        exec('exiftool -v '. escapeshellarg($lf),$pngstructure);
+        exec('./lnx_tools/ExifTool/exiftool -v '. escapeshellarg($lf),$pngstructure);
     $png_structure = implode('<br/>',$pngstructure);
     $ne = strpos($png_structure,'PNG IHDR');
     $png_structure = substr($png_structure,$ne);

@@ -16,17 +16,19 @@ The Webpage Toaster's History of Optimisation and Analysis Reports</h2>
 <?php
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
   $windows = defined('PHP_WINDOWS_VERSION_MAJOR');
-    //echo 'This is a server using Windows! '. $windows."<br/>";
+//echo 'This is a server using Windows! '. $windows."<br/>";
     $OS = "Windows";
 }
 else {
-    //echo 'This is a server not using Windows!'."<br/>";
+//echo 'This is a server not using Windows!'."<br/>";
     $OS = PHP_OS;
 }
 ini_set("auto_detect_line_endings", false);
+if($OS == "Windows")
 $fn = "/toast/toasted.csv";
+else
+    $fn = '/usr/share/toast/toasted.csv';
 $arrToasted = array ();
-
 
 function array_sort($array, $on, $order=SORT_ASC)
 {
@@ -63,12 +65,10 @@ function array_sort($array, $on, $order=SORT_ASC)
     return $new_array;
 }
 
-if($OS != "Windows")
-    $fn = '/usr/local/'.$fn;
 $f = fopen($fn, "r");
 //echo "fopen result: ".$f." for $fn<br/>";
-//if($f == false)
-//    die("can't open file");
+if($f == false)
+   die("can't open file");
 $runnotes = '';
 
 while (($line = fgetcsv($f)) !== false) {

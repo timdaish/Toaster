@@ -104,8 +104,11 @@ if (system.args.length === 1) {
     console.log('Usage: netsniff.js <some URL>');
     phantom.exit(1);
 } else {
-
-    page.address = system.args[1];
+    if(system.args[1].indexOf("http") === 0)
+        page.address = system.args[1];
+    else
+        page.address = "http://"+system.args[1];
+    
 	var viewportheight = system.args[2];
 	var viewportwidth = system.args[3];
 	var fname = system.args[4];
@@ -116,16 +119,21 @@ if (system.args.length === 1) {
     var outfilePD = '';
     if(brout.substr(0,5) != '/usr/')
     {
+//console.log("Windows");
         outfile = 'tmp/'+system.args[6]; // windows
         outfileCK = 'tmp/CK'+system.args[6]; // windows
         outfilePD = 'tmp/PD'+system.args[6]; // windows
     }
     else
     {
+//console.log("Linux");
         outfile = system.args[6]; // linux
         outfileCK = system.args[6]+"CK"; // linux
         outfilePD = system.args[6]+"PD"; // linux
     }
+//console.log("PJS outfile: " + outfile);
+//console.log("PJS outfileck: " + outfileCK);
+//console.log("PJS outfilepd: " + outfilePD);
     var username = system.args[7];
 	var password = system.args[8];
     var fspd = require('fs');
@@ -210,8 +218,9 @@ if (system.args.length === 1) {
                 return document.title;
             });
             har = createHAR(page.address, page.title, page.startTime, page.resources,domloadeventtime);
-            console.log(JSON.stringify(har, undefined, 4));
-			page.render(fname);
+console.log(JSON.stringify(har, undefined, 4));
+//console.log("saving image to " + fname);
+			page.render(fname, {format: 'png'},{quality: 100});
 
       var fs = require('fs');
       //console.log(fs.workingDirectory);
@@ -221,6 +230,8 @@ if (system.args.length === 1) {
       var pathPD = outfilePD;
       //fs.remove(path);`
       var content = page.content;
+//console.log("writing content  " + content);
+//console.log("writing content to path " + outfile);
       fs.write(path, content, 'a');
       fspd.write(pathPD, JSON.stringify(postData),'a');
       saveCookies(outfileCK);

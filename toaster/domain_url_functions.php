@@ -1940,9 +1940,9 @@ function lookupIATAAirportCode($code)
 //echo ("checking in airportscitiesstates.json" . PHP_EOL);
         // lookup locally
         if($OS == "Windows")
-            $str = file_get_contents("toaster_tools\airportscitiesstates.json");
+            $str = file_get_contents("win_tools\airportscitiesstates.json");
         else
-            $str = file_get_contents("toaster_tools/airportscitiesstates.json");
+            $str = file_get_contents("lnx_tools/airportscitiesstates.json");
 
 		$found = false;
 		$json = json_decode($str);
@@ -1969,9 +1969,9 @@ function lookupIATAAirportCode($code)
         {
 //echo ("checking in airports.dat" . PHP_EOL);
 			if($OS == "Windows")
-            	$str = file_get_contents("toaster_tools\airports.dat");
+            	$str = file_get_contents("win_tools\airports.dat");
         	else
-				$str = file_get_contents("toaster_tools/airports.dat");
+				$str = file_get_contents("lnx_tools/airports.dat");
 			
 			// Loop through our array, show HTML source as HTML source; and line numbers too.
 			foreach ($str as $line_num => $line) {
@@ -2092,7 +2092,7 @@ function metricsCheckSameDomainsForSubDomains($domain,$host_domain)
 
 function lookup3PDescriptionDirect($domain)
 {
-	global $host_domain;
+	global $host_domain, $b3pdbPublic;
     $domaindesc = '';
     $domainprovider = '';
     $domaincat = '';
@@ -2118,10 +2118,11 @@ function lookup3PDescriptionDirect($domain)
     // make a curl request to the API directly
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_URL, 'https://tagdb.nccgroup-webperf.com/2/find?host='.$domainnoqs);
-//	curl_setopt($ch, CURLOPT_URL, 'http://localhost/toaster/lookup3pdb.php?host=//'.$domainnoqs.'/');
-//	curl_setopt($ch, CURLOPT_URL, 'https://ncctagdb.herokuapp.com/2/find?host='.$domainnoqs);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	if($b3pdbPublic)
+		curl_setopt($ch, CURLOPT_URL, 'https://www.webpagetoaster.com/lookup3pdb.php?host=//'.$domainnoqs.'/'); // public 3pdb
+	else
+		curl_setopt($ch, CURLOPT_URL, 'https://tagdb.nccgroup-webperf.com/2/find?host='.$domainnoqs); // private database - internal NCC Group/Eggplant use only
 	
     $result = curl_exec($ch);
     curl_close($ch);
@@ -2684,9 +2685,9 @@ function lookupLocationforIP($inIP)
 //Latitude: 45.778801
 //Longitude: -119.528999
         if($OS == "Windows")
-            $names = json_decode(file_get_contents("toaster_tools/countrynames.json"), true);
+            $names = json_decode(file_get_contents("win_tools/countrynames.json"), true);
         else
-            $names = json_decode(file_get_contents("toaster_tools/countrynames.json"), true);
+            $names = json_decode(file_get_contents("lnx_tools/countrynames.json"), true);
         //echo "names ". $names;
         $lat = '';
         $long = '';

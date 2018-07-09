@@ -10,12 +10,13 @@ if ($OS == "Windows")
 }
 else
 {
-    $cookie_jar = tempnam("/usr/local/", "cky");
-    $drv = '/usr/local';
+    $cookie_jar = tempnam("/usr/share/toast/", "cky");
+    $drv = '/usr/share';
     $filepath_basesavedir = $drv . "/toast/";
 }
 define ( CURL_HTTP_VERSION_2TLS , 4);
 //echo "cookie jar file: ". $cookie_jar."<br/>" ;
+$b3pdbPublic = true;
 $filepath_domainsavedir = '';
 $filepath_domainsaverootdir = '';
 $filepathname_rootobject_headersandbody = '';
@@ -1123,7 +1124,7 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
 
 
                         // get WPT values for timings
-                        if($browserengine == 6)
+                        if($browserengine == 6 or $browserengine == 8)
                         {
                             $requestStartMS = $value['_ttfb_start'];
                             $ttfbMS = $value['_ttfb_ms'];
@@ -1241,7 +1242,7 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
 // print_r($responseContentText);
 // echo "</code>";
 
-                            if($browserengine == 6) // WPT
+                            if($browserengine == 6 or $browserengine == 8) // WPT
                             {
                                 // webpagetest stores text content outside of HAR and images are at the normal url
                                 // get content from URL
@@ -2396,7 +2397,7 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
 //$tempi = tempnam("c:\\temp\\", "bri");
 //$tempo = tempnam("c:\\temp\\", "bro");
                                         file_put_contents($fni, $body);
-                                        exec('toaster_tools\bro64 -d -i ' . $fni . " -o " . escapeshellarg($fno), $res);
+                                        exec('win_tools\bro64 -d -i ' . $fni . " -o " . escapeshellarg($fno), $res);
                                         $body = file_get_contents($fno);
                                         unlink($fni);
                                         unlink($fno);
@@ -5142,7 +5143,7 @@ addUpdatePageObject($arr);
 //echo($key.": ".$value."; extension = ".$ext."<br/>");
             $bIsHTMLFile = strpos(strtolower($ext), "htm");
 
-            if ($bIsHTMLFile !== false and $browserengine != 6) // dont run iframe tests for WPT
+            if ($bIsHTMLFile !== false and $browserengine != 6 and $browserengine != 8) // dont run iframe tests for WPT
             {
 //echo($key.": ".$value."; extension = ".$ext."<br/>");
 //echo "extension includes htm =" .$bIsHTMLFile."<br/>";
@@ -5168,7 +5169,7 @@ addUpdatePageObject($arr);
                         $_SESSION['object'] = $value;
                         session_write_close();
                         if ($OS == "Windows")
-                            exec('toaster_tools\phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
+                            exec('win_tools\phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         else
                             exec('phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         break;
@@ -5179,7 +5180,7 @@ addUpdatePageObject($arr);
                         $_SESSION['object'] = $value;
                         session_write_close();
                         if ($OS == "Windows")
-                            exec('toaster_tools\phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
+                            exec('win_tools\phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         else
                             exec('phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         break;
@@ -5190,7 +5191,7 @@ addUpdatePageObject($arr);
                         $_SESSION['object'] = $value;
                         session_write_close();
                         if ($OS == "Windows")
-                            exec('toaster_tools\slimerjs.bat js\netsniff_sjs.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
+                            exec('win_tools\slimerjs.bat js\netsniff_sjs.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         else
                             exec('slimerjs.bat js/netsniff_sjs.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         break;
@@ -5201,7 +5202,7 @@ addUpdatePageObject($arr);
                         $_SESSION['object'] = $value;
                         session_write_close();
                         if ($OS == "Windows")
-                            exec('toaster_tools\slimerjs-0.10.3\slimerjs.bat js\netsniff_sjs.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
+                            exec('win_tools\slimerjs-0.10.3\slimerjs.bat js\netsniff_sjs.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         else
                             exec('slimerjs.bat js/netsniff_sjs.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         break;
@@ -5211,11 +5212,12 @@ addUpdatePageObject($arr);
                         $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
                         session_write_close();
                         if ($OS == "Windows")
-                            exec('toaster_tools\phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
+                            exec('win_tools\phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         else
                             exec('phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         break;
-                    case 6 :
+                    case 6:
+                    case 8:
                         // WPT - no repeat required
 //                         $browserEngineVer = 'WebpageTest';
 //                         session_start();
@@ -5250,7 +5252,7 @@ addUpdatePageObject($arr);
                     // {	
                     //     // use psexec to start in background, pipe stderr to stdout to capture pid
                     //     $command = '"c:\program files (x86)\google\chrome\application\chrome.exe" --headless --disable-gpu --enable-logging --remote-debugging-port=9222';
-                    //     exec("toaster_tools\pstools\PsExec -d $command 2>&1", $output);
+                    //     exec("win_tools\pstools\PsExec -d $command 2>&1", $output);
                     //     // capture pid on the 6th line
                     //     preg_match('/ID (\d+)/', $output[5], $matches);
                     //     $pid = $matches[1];
@@ -5261,21 +5263,21 @@ addUpdatePageObject($arr);
                     //     echo "Google Chrome launched with PID "  . $pid . "<br/>";
                     //     // get screenshot
                     //     //echo "getting screenshot<br/>";
-                    //     exec("node toaster_tools/chromeremote/take_screenshot.js --url " . $urlforbrowserengine . " --pathname " . $imgname . ".png --viewportHeight " . $height . " --viewportWidth " . $width. " 2>&1", $output, $rv);
+                    //     exec("node win_tools/chromeremote/take_screenshot.js --url " . $urlforbrowserengine . " --pathname " . $imgname . ".png --viewportHeight " . $height . " --viewportWidth " . $width. " 2>&1", $output, $rv);
                     //     //echo implode("\n", $output);
                     //     //echo $imgname.  " - rv = " . $rv . "<br/>";
         
         
                     //     // get har
                     //     //echo "generating HAR file to " . $harname . "<br/>";
-                    //     exec("node toaster_tools/chromeremote/node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --output " . $harname . " --height " . $height . " --width " . $width . " --agent \"" . $uar . "\" 2>&1", $output2, $rv);
+                    //     exec("node win_tools/chromeremote/node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --output " . $harname . " --height " . $height . " --width " . $width . " --agent \"" . $uar . "\" 2>&1", $output2, $rv);
                     //     //echo implode("\n", $output2);
                     //     //echo "rv = " . $rv. "<br/>";
         
         
                     //     // get HTML DOM, after age end with injections
                     //     //echo "dumping HTML after page load to " . $browserengineoutput. "<br/>";
-                    //     exec("node toaster_tools/chromeremote/dump.js --url " . $urlforbrowserengine. " --pathname tmp/" . $browserengineoutput. " 2>&1", $output2, $rv);
+                    //     exec("node win_tools/chromeremote/dump.js --url " . $urlforbrowserengine. " --pathname tmp/" . $browserengineoutput. " 2>&1", $output2, $rv);
                     //     //echo implode("\n", $output2);
                     //     //echo "rv = " . $rv. "<br/>";
         
@@ -5285,7 +5287,7 @@ addUpdatePageObject($arr);
                     //     $uploadedHAR = true;
         
                     //     // kill remote chrome headless instance
-                    //     exec("toaster_tools\pstools\PsKill -t $pid", $output);
+                    //     exec("win_tools\pstools\PsKill -t $pid", $output);
                     // }
                     // else
                     // {
@@ -6233,13 +6235,16 @@ addUpdatePageObject($arr);
     function createDomainSaveDir($path)
     {
 //echo "Func: CreateBasePath<br>";
+debug ("creating basefilepath ",$path);
 //echo("creating basefilepath: ".$path."<br/>");
 //encode hyphen
         if (is_dir($path))
+        {
             return true;
+        }
         $prev_path = substr($path, 0, strrpos($path, DIRECTORY_SEPARATOR, - 2) + 1);
         $return = createDomainSaveDir($prev_path);
-        return ($return && is_writable($prev_path)) ? mkdir($path) : false;
+        return ($return && is_writable($prev_path)) ? mkdir($path, 0777, true) : false;
     }
 
 
@@ -6248,10 +6253,12 @@ addUpdatePageObject($arr);
         debug("creating filepath", $path);
 //echo("creating filepath: ".$path."<br/>");
         if (is_dir($path))
+        {
             return true;
+        }
         $prev_path = substr($path, 0, strrpos($path, DIRECTORY_SEPARATOR, - 2) + 1);
         $return = createDomainSavePath($prev_path);
-        return ($return && is_writable($prev_path)) ? mkdir($path) : false;
+        return ($return && is_writable($prev_path)) ? mkdir($path, 0777, true) : false;
     }
 
 
@@ -6759,7 +6766,7 @@ addUpdatePageObject($arr);
                 $nooffiles = $objectDownloadCount;
             session_start();
             if($loadContentFromHAR == false)
-                $_SESSION['status'] = 'Downloading &amp; Analysing Object ' . $objectDownloadCount . " of " . $nooffiles;
+                $_SESSION['status'] = 'Downloading and Analysing Object ' . $objectDownloadCount . " of " . $nooffiles;
             else
             $_SESSION['status'] = 'Analysing Object ' . $objectDownloadCount . " of " . $nooffiles;
             $_SESSION['object'] = html_entity_decode($fname);

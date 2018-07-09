@@ -19,13 +19,13 @@ if( $_REQUEST["name"] )
    {
       case "JavaScript":
        if($OS == "Windows")
-            exec('toaster_tools\jsbeautify ' . $url ,$res);
+            exec('win_tools\jsbeautify ' . $url ,$res);
        $data = implode(PHP_EOL,$res);
        break;
 
       case "StyleSheet":
        if($OS == "Windows")
-            exec('toaster_tools\cssbeautify ' . $url ,$res);
+            exec('win_tools\cssbeautify ' . $url ,$res);
        $data = implode(PHP_EOL,$res);
        break;
 

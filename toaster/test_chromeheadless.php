@@ -28,7 +28,7 @@ $url = "http://www.bbc.co.uk";
 
 				// use psexec to start in background, pipe stderr to stdout to capture pid
 				$command = '"c:\program files (x86)\google\chrome\application\chrome.exe" --headless --disable-gpu --enable-logging --remote-debugging-port=9222';
-				exec("toaster_tools\pstools\PsExec -d $command 2>&1", $output);
+				exec("win_tools\pstools\PsExec -d $command 2>&1", $output);
 				// capture pid on the 6th line
 				preg_match('/ID (\d+)/', $output[5], $matches);
 				$pid = $matches[1];
@@ -39,21 +39,21 @@ $url = "http://www.bbc.co.uk";
 echo "Google Chrome launched with PID "  . $pid . "<br/>";
 				// get screenshot
 				//echo "getting screenshot<br/>";
-//				exec("node toaster_tools/chromeremote/take_screenshot.js --url " . $urlforbrowserengine . " --pathname " . $imgname . " --viewportHeight " . $height . " --viewportWidth " . $width. " 2>&1", $output, $rv);
+//				exec("node win_tools/chromeremote/take_screenshot.js --url " . $urlforbrowserengine . " --pathname " . $imgname . " --viewportHeight " . $height . " --viewportWidth " . $width. " 2>&1", $output, $rv);
 				//echo implode("\n", $output);
 				//echo $imgname.  " - rv = " . $rv . "<br/>";
 
 
 				// get har
 				//echo "generating HAR file to " . $harname . "<br/>";
-//				exec("node toaster_tools/chromeremote/node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --output " . $harname . " --height " . $height . " --width " . $width . " --agent \"" . $uar . "\" 2>&1", $output2, $rv);
+//				exec("node winr_tools/chromeremote/node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --output " . $harname . " --height " . $height . " --width " . $width . " --agent \"" . $uar . "\" 2>&1", $output2, $rv);
 				//echo implode("\n", $output2);
 				//echo "rv = " . $rv. "<br/>";
 
 
 				// get HTML DOM, after age end with injections
 				//echo "dumping HTML after page load to " . $browserengineoutput. "<br/>";
-//				exec("node toaster_tools/chromeremote/dump.js --url " . $urlforbrowserengine. " --pathname tmp/" . $browserengineoutput. " 2>&1", $output2, $rv);
+//				exec("node win_tools/chromeremote/dump.js --url " . $urlforbrowserengine. " --pathname tmp/" . $browserengineoutput. " 2>&1", $output2, $rv);
 				//echo implode("\n", $output2);
 				//echo "rv = " . $rv. "<br/>";
 
@@ -63,6 +63,6 @@ echo "Google Chrome launched with PID "  . $pid . "<br/>";
 				$uploadedHAR = true;
 
 				// kill remote chrome headless instance
-				//exec("toaster_tools\pstools\PsKill -t $pid", $output);
+				//exec("win_tools\pstools\PsKill -t $pid", $output);
 
 ?>

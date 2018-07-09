@@ -743,7 +743,7 @@ function fnFormatDetails(oTable, nTr) {
                 fonthtml += charset256;
             fonthtml + - '</span></p>';
             var allfonthtml = fontdef + fontfamily + fonthtml;
-            var fontinfo_phenx = '<iframe class="phenx_font" src="/toaster/toaster_tools/phenx/www/font_info.php?fontfile=' + objLocFileurl + '"></iframe>';
+            var fontinfo_phenx = '<iframe class="phenx_font" src="/toaster/win_tools/phenx/www/font_info.php?fontfile=' + objLocFileurl + '"></iframe>';
             sOut += '<tr>';
             sOut += '<td colspan=\"100%\">' + allfonthtml + '</td>';
             sOut += '</tr>';
@@ -786,7 +786,7 @@ function fnFormatDetails(oTable, nTr) {
                 fonthtml += charset256;
                 fonthtml + - '</span></p>';
                 //var allfonthtml = fontdef + fontfamily + fonthtml;
-                var fontinfo_phenx = '<iframe class="phenx_font" src="/toaster/toaster_tools/phenx/www/font_info.php?fontfile=' + objLocFileurl + '"></iframe>';
+                var fontinfo_phenx = '<iframe class="phenx_font" src="/toaster/win_tools/phenx/www/font_info.php?fontfile=' + objLocFileurl + '"></iframe>';
                 sOut += '<tr>';
                 sOut += '<td colspan=\"100%\">' + fonthtml + '</td>';
                 sOut += '</tr>';
@@ -798,7 +798,7 @@ function fnFormatDetails(oTable, nTr) {
             case "svg":
                 console.log("expanding SVG font");
                  //var allfonthtml = fontdef + fontfamily + fonthtml;
-                var fontinfo_viewsvg = '<iframe class="svg_font" src="/toaster/toaster_tools/viewsvg/font_info.php?fontfile=' + objLocFileCnv + '"></iframe>';
+                var fontinfo_viewsvg = '<iframe class="svg_font" src="/win/win_tools/viewsvg/font_info.php?fontfile=' + objLocFileCnv + '"></iframe>';
                 //console.log("fileext = '" + fileext + "'");
                 sOut += fontinfo_viewsvg;
                 break;

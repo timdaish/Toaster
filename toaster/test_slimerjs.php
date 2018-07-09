@@ -13,10 +13,10 @@
 // 0.10.0pre
 
 // 0.10.1
-$cmd = 'toaster_tools\slimerjs-0.10.1\slimerjs.bat js\netsniff_raw.js http://www.bbc.co.uk';
+$cmd = 'win_tools\slimerjs-0.10.1\slimerjs.bat js\netsniff_raw.js http://www.bbc.co.uk';
 
 
-//$cmd = 'toaster_tools\test_bf.bat'; // works as a test
+//$cmd = 'win_tools\test_bf.bat'; // works as a test
 
 exec($cmd,$res);
 

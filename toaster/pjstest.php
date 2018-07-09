@@ -5,7 +5,7 @@
 <body>
 <?php
 echo "<h1>Testing of PhantomJS via PHP shell command</h1>";
-$data = shell_exec('toaster_tools\phantomjs.exe js\netlog.js http://www.bbc.co.uk'); //responses
+$data = shell_exec('win_tools\phantomjs.exe js\netlog.js http://www.bbc.co.uk'); //responses
 ?>
 
 <img src="tmp/test.png"></img>

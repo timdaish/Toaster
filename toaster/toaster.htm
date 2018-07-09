@@ -12,6 +12,16 @@
   <span class="titlebarsub">Webpage Tool for Optimisation and Analysis thru Static Testing and Enhanced Reporting</span>
 </div>
 <form enctype="multipart/form-data" id="form" name="input" action="" method="post">
+  <div class="radios">
+    <label for="wbengine" title="Web Browser Engine - use timings with caution!">Web Browser Engine</label>
+<!--<input type="radio" name="wbengine" value="pjs1.9" title="PhantomJS v1.9.8">Webkit v1.9&nbsp;-->
+<!--<input type="radio" name="wbengine" value="pjs2.0" title="PhantomJS v2">Webkit v2.0&nbsp;-->
+<input type="radio" name="wbengine" value="pjs2.1" checked title="PhantomJS v2.1">Webkit v2.1&nbsp;
+<!--<input type="radio" name="wbengine" value="sjs0.10" title="SlimerJS v0.10">Gecko v0.10-->
+<input type="radio" name="wbengine" id="wpt_private" value="wpt_local" title="WPT Local">WPT Private
+<input type="radio" name="wbengine" id="wpt_public" value="wpt_public" title="WPT Public - not available">WPT Public
+<input type="radio" name="wbengine" id="chromeheadless" value="ch_headless" title="Chrome Headless">Chrome Headless
+  </div>
 <!--<a href="toasted.php" target="_blank"><img class="mg" src="/toaster/images/magglass.png"alt="View Toasted Pages" title="View Toasted Pages"></img></a>-->
 <label>Page URL</label><input type="text" name="url" id="urlfield" size="70" maxlength="10000" value="" class="long" required autofocus>
 <label>Real(*WPT)/Emulated Device</label><select name="ua">
@@ -50,14 +60,14 @@
 <input id="links3p" type="checkbox" name="links3p" value="links3p">-->
 <label for="links">Show Page Links</label>
 <input id="links" type="checkbox" name="chklinks" value="links">
-<label for="dbusage">Use 3rd Party DB</label>
-<input id="dbusage" type="checkbox" hidden checked name="dbusage" value="dbusage">
+<!--<label for="dbusage">Use 3rd Party DB</label>
+<input id="dbusage" type="checkbox" hidden checked name="dbusage" value="dbusage">-->
 <label for="debug">Show Debug Msgs</label>
 <input id="debug" type="checkbox" name="chkdebug" value="chkdebug">
 <label for="akdebug">Get Akamai Debug Hdrs</label>
 <input id="akdebug" type="checkbox" name="akdebug" value="akdebug">
-<label for="3pchain">Get 3rd Party Call Chain</label>
-<input id="3pchain" type="checkbox" hidden checked name="3pchain" value="3pchain" title="CAUTION - This can take a while!">
+<!--<label for="3pchain">Get 3rd Party Call Chain</label>
+<input id="3pchain" type="checkbox" hidden name="3pchain" value="3pchain" title="CAUTION - This can take a while!">-->
 </div>
 <div class="radios">
 <label for="ip">Geo IP Location Lookup</label>
@@ -69,14 +79,6 @@
 <input type="radio" name="ipapi" value="dbip" title="Best option - Cities - limit of 2,000 requests per day">db-IP&nbsp;
 <input type="radio" name="ipapi" value="freegeoip" title="2nd option - Countries - limit of 10,000 requests per hour" checked>Freegeoip
 <input type="radio" name="ipapi" value="hackertarget" title="3rd option - good for US and Australian locations">HackerTarget
-<br>
-<label for="wbengine" title="Web Browser Engine - use timings with caution!">Web Browser Engine</label>
-<!--<input type="radio" name="wbengine" value="pjs1.9" title="PhantomJS v1.9.8">Webkit v1.9&nbsp;-->
-<input type="radio" name="wbengine" value="pjs2.0" title="PhantomJS v2">Webkit v2.0&nbsp;
-<input type="radio" name="wbengine" value="pjs2.1" checked title="PhantomJS v2.1">Webkit v2.1&nbsp;
-<input type="radio" name="wbengine" value="sjs0.10" title="SlimerJS v0.10">Gecko v0.10
-<input type="radio" name="wbengine" value="wpt_local" title="WPT Local">WPT
-<input type="radio" name="wbengine" value="ch_headless" title="Chrome Headless">CH Headless
 </div>
 <label>Auth Username</label><input type="text" name="username" size="60" width="60" value="">
 <label>Auth Password</label><input type="text" name="password" size="60" width="60" value="">
@@ -110,7 +112,7 @@
 <span id="timeval"></span>
 <a class="tpdb" href="toasted.php/" target="_blank" title="View History">View History</a>&nbsp;
 <div></clear>
-<a class="tpdb" href="https://ui.tagdb.nccgroup-webperf.com/" target="_blank" title="Third Party Database">3P DB Admin</a>&nbsp;
+<a class="tpdb" href="#" target="_blank" title="Help">Help</a>&nbsp;
 </div>
 <script type="text/javascript" charset="utf8" src="/toaster/js/jquery.min.js"></script>
 <script type="text/javascript">
@@ -123,6 +125,16 @@ $(document).ready(function()
     //      $('#timeval').load('getdatetime.php');
     //   }, 1000
     // );
+
+   $('input[name="wbengine"]').change(function(){
+        if($('#wpt_public').prop('checked')){
+            alert('wpt public is checked!');
+            // change url label
+          
+        }else{
+          //  alert('wpt public is unchecked!');
+        }
+    });
 
 
 function getTime(formatted){
@@ -221,7 +233,7 @@ function changeQuote(seconds)
                   }
                   else
 
-                  $('#statusdetail').text(statusToDisplay);
+                  $('#statusdetail').html(statusToDisplay);
                   //if (obj.mimetype == '')
                   //  obj.mimetype = 'application_x_mswinurl';
                   //var loc = 'images/mimetypes128x128/' + obj.mimetype + '.png';

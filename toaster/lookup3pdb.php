@@ -6,6 +6,7 @@ header('Content-type: application/json');
 
 $subject =  $_GET['host'];
 $matchedpriority = 0;
+//echo "3p lookup: " . $subject . PHP_EOL;
 
 // check for Adobe Analytics override
 if((strpos($subject,"metrics.") !== false or strpos($subject,"metric.") !== false))
@@ -32,12 +33,12 @@ if((strpos($subject,"metrics.") !== false or strpos($subject,"metric.") !== fals
         if ($result->num_rows > 0) {
             // output data of each row
             while($row = $result->fetch_assoc()) {
-               // echo "domain id: " . $row["iddomain"]. " - regex: " . $row["regex"] ."<br>";
+//echo "domain id: " . $row["iddomain"]. " - regex: " . $row["regex"] .PHP_EOL;
 
                 $pattern = "$" . $row["regex"] . "$";
 
                 if(preg_match($pattern,$subject)){
-                    //echo "domain matched to priority " . $row["priority"]  . ": " . $row["domain"    ]. "<br/>";
+//echo "domain matched to priority " . $row["priority"]  . ": " . $row["domain"    ]. "<br/>";
                     // set match if a higher priority
                     if($row["priority"] > $matchedpriority)
                     {
@@ -53,9 +54,9 @@ if((strpos($subject,"metrics.") !== false or strpos($subject,"metric.") !== fals
                    // echo "fail to match";   
                 }
             }
-        //    echo ( "domain " . $domain ." found: " . $used_id. "</br>"); 
+//echo ( "domain " . $domain ." found: " . $used_id. PHP_EOL); 
         } else {
-            echo ("0 results found for domainurl " . $domainurl . "</br>");
+//echo ("0 results found for domainurl " . $domainurl . PHP_EOL);
         }
 
         if ($matchedpriority > 0)
@@ -66,7 +67,7 @@ if((strpos($subject,"metrics.") !== false or strpos($subject,"metric.") !== fals
             list($groupname,$groupcolor) = lookupGroup($groupid);
             //$groupname = 'test';
 
-            //echo ($matchedpriority . " result:" . $companyname . " " . $productname . " " . $groupname . " " . $categoryname);
+//echo ($matchedpriority . " result:" . $companyname . " " . $productname . " " . $groupname . " " . $categoryname);
             // create return JSON
             $companyarr = array ('name' => $companyname);
             $grouparr = array ('name' => $groupname, 'color' => $groupcolor);

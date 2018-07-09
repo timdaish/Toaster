@@ -10,7 +10,7 @@ $entrycount = 0;
 
 //print_r($json_data);
 echo("<html><body>");
-//Traverse array and get the data for students aged less than 20
+//Traverse array and get the data 
 foreach ($json_data as $key1 => $value1) {
     $entrycount++;
 
@@ -146,6 +146,14 @@ function mysql_insertProduct($productname,$companyid,$categoryid,$desc)
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     } 
+
+    // sanitise description:
+    // remove double quotes
+    $desc = str_replace('\"','',$desc);
+    $desc = str_replace('"','',$desc);
+    // decode any html entities already present and then replace all applicable chars with htmlentities
+    $desc = html_entity_decode ($desc);
+    $desc = htmlentities($desc);
 
     $sql = 'INSERT IGNORE INTO product (productname,company_idcompany,category_idcategory,product_description)
     VALUES ("'.$productname.'",'.$companyid.','. $categoryid . ',"'.$desc.'")';

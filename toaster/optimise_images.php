@@ -130,7 +130,7 @@ function optimisePNG($savepath, $lfn)
 
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
+        $os_cmd = 'win_tools\exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
     else
         $os_cmd = 'exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
     //echo 'cmd = '.$os_cmd;
@@ -171,7 +171,7 @@ function optimisePNG($savepath, $lfn)
         mkdir($SaveImgfolder, 0777, true);
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\pngquant ' .escapeshellarg($PNGImgfileUnoptimised) .' -o '.escapeshellarg($PNGImgfile);
+        $os_cmd = 'win_tools\pngquant ' .escapeshellarg($PNGImgfileUnoptimised) .' -o '.escapeshellarg($PNGImgfile);
     else
         $os_cmd = 'pngquant ' .escapeshellarg($PNGImgfileUnoptimised) .' -o '.escapeshellarg($PNGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -198,7 +198,7 @@ function optimisePNG($savepath, $lfn)
         $pngcrushtool = "pngcrush_w32";
 
     if($OS == 'Windows')
-        $os_cmd = "toaster_tools".DIRECTORY_SEPARATOR . $pngcrushtool .' ' .escapeshellarg($PNGImgfileUnoptimised) .' ' .escapeshellarg($PNGImgfile);
+        $os_cmd = "win_tools".DIRECTORY_SEPARATOR . $pngcrushtool .' ' .escapeshellarg($PNGImgfileUnoptimised) .' ' .escapeshellarg($PNGImgfile);
     else
         $os_cmd = 'pngcrush ' .escapeshellarg($PNGImgfileUnoptimised) .' ' .escapeshellarg($PNGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -226,7 +226,7 @@ function optimisePNG($savepath, $lfn)
         $pngcrushtool = "pngcrush_w32";
 
     if($OS == 'Windows')
-        $os_cmd = "toaster_tools".DIRECTORY_SEPARATOR . $pngcrushtool .' -brute ' .escapeshellarg($PNGImgfileUnoptimised) .' ' .escapeshellarg($PNGImgfile);
+        $os_cmd = "win_tools".DIRECTORY_SEPARATOR . $pngcrushtool .' -brute ' .escapeshellarg($PNGImgfileUnoptimised) .' ' .escapeshellarg($PNGImgfile);
     else
         $os_cmd = 'pngcrush -brute ' .escapeshellarg($PNGImgfileUnoptimised) .' ' .escapeshellarg($PNGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -250,7 +250,7 @@ function optimisePNG($savepath, $lfn)
         mkdir($SaveImgfolder, 0777, true);
 
     if($OS == 'Windows')
-        $os_cmd = "toaster_tools\optipng" .' -o 1 -out ' .escapeshellarg($PNGImgfile) .' ' .escapeshellarg($PNGImgfileUnoptimised);
+        $os_cmd = "win_tools\optipng" .' -o 1 -out ' .escapeshellarg($PNGImgfile) .' ' .escapeshellarg($PNGImgfileUnoptimised);
     else
         $os_cmd = "optipng" .' -o 1 -out ' .escapeshellarg($PNGImgfile) .' ' .escapeshellarg($PNGImgfileUnoptimised);
     //echo 'cmd = '.$os_cmd;
@@ -274,7 +274,7 @@ function optimisePNG($savepath, $lfn)
         mkdir($SaveImgfolder, 0777, true);
 
     if($OS == 'Windows')
-        $os_cmd = "toaster_tools\pngnq-s9" .' -f -d ' . $SaveImgfolder . ' -e .png ' .escapeshellarg($PNGImgfileUnoptimised);
+        $os_cmd = "win_tools\pngnq-s9" .' -f -d ' . $SaveImgfolder . ' -e .png ' .escapeshellarg($PNGImgfileUnoptimised);
     else
         $os_cmd = "pngnq-s9" .' -f -d ' . $SaveImgfolder . ' -e .png ' .escapeshellarg($PNGImgfileUnoptimised);
     //echo 'cmd = '.$os_cmd;
@@ -299,7 +299,7 @@ function optimisePNG($savepath, $lfn)
         mkdir($SaveImgfolder, 0777, true);
 
 
-    $os_cmd = "toaster_tools\pngout "  .escapeshellarg($PNGImgfileUnoptimised) .' '. escapeshellarg($PNGImgfile);
+    $os_cmd = "win_tools\pngout "  .escapeshellarg($PNGImgfileUnoptimised) .' '. escapeshellarg($PNGImgfile);
     //echo 'cmd = '.$os_cmd;
     $res = array();
 	exec($os_cmd,$res);
@@ -320,7 +320,7 @@ function optimisePNG($savepath, $lfn)
     $JPGImgfile = $SaveImgfolder . $filename . '.jpg';
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cjpeg -optimize ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
+        $os_cmd = 'win_tools\cjpeg -optimize ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
     else
         $os_cmd = 'cjpeg -optimize ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -347,7 +347,7 @@ function optimisePNG($savepath, $lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cwebp ' .escapeshellarg($ImgWithoutMetadata). ' -o ' . escapeshellarg($WEBPImgfile);
+        $os_cmd = 'win_tools\cwebp ' .escapeshellarg($ImgWithoutMetadata). ' -o ' . escapeshellarg($WEBPImgfile);
     else
         $os_cmd = 'cwebp ' .escapeshellarg($ImgWithoutMetadata). ' -o ' . escapeshellarg($WEBPImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -374,7 +374,7 @@ function optimisePNG($savepath, $lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\bpgenc -o ' . escapeshellarg($BPGImgfile). '  ' .escapeshellarg($ImgWithoutMetadata);
+        $os_cmd = 'win_tools\bpgenc -o ' . escapeshellarg($BPGImgfile). '  ' .escapeshellarg($ImgWithoutMetadata);
     else
         $os_cmd = 'bpgenc -o ' . escapeshellarg($BPGImgfile). '  ' .escapeshellarg($ImgWithoutMetadata);
     //echo 'cmd = '.$os_cmd;
@@ -436,7 +436,7 @@ function optimiseJPG($savepath,$lfn)
 
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\exiftool -all= -o '.escapeshellarg($JPGImgfile). ' ' . escapeshellarg($lfn);
+        $os_cmd = 'win_tools\exiftool -all= -o '.escapeshellarg($JPGImgfile). ' ' . escapeshellarg($lfn);
     else
         $os_cmd = 'exiftool -all= -o '.escapeshellarg($JPGImgfile). ' ' . escapeshellarg($lfn);
     error_log('cmd = '.$os_cmd);
@@ -463,7 +463,7 @@ function optimiseJPG($savepath,$lfn)
     $JPGImgfile = $SaveImgfolder . $filename . '.jpg';
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\djpeg '.escapeshellarg($ImgWithoutMetadata). ' '. escapeshellarg($decoded_pixmap);
+        $os_cmd = 'win_tools\djpeg '.escapeshellarg($ImgWithoutMetadata). ' '. escapeshellarg($decoded_pixmap);
     else
         $os_cmd = 'djpeg '.escapeshellarg($ImgWithoutMetadata). ' > '. escapeshellarg($decoded_pixmap);
     //echo 'cmd = '.$os_cmd;
@@ -472,7 +472,7 @@ function optimiseJPG($savepath,$lfn)
 	exec($os_cmd,$res);
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cjpeg -optimize ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
+        $os_cmd = 'win_tools\cjpeg -optimize ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
     else
         $os_cmd = 'cjpeg -optimize ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -498,7 +498,7 @@ function optimiseJPG($savepath,$lfn)
 
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cjpeg -optimize -progressive ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
+        $os_cmd = 'win_tools\cjpeg -optimize -progressive ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
     else
         $os_cmd = 'cjpeg -optimize -progressive ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -523,7 +523,7 @@ function optimiseJPG($savepath,$lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cjpeg -optimize -quality 85 ' .escapeshellarg($decoded_pixmap). ' ' . escapeshellarg($JPGImgfile);
+        $os_cmd = 'win_tools\cjpeg -optimize -quality 85 ' .escapeshellarg($decoded_pixmap). ' ' . escapeshellarg($JPGImgfile);
     else
         $os_cmd = 'cjpeg -optimize -quality 85 ' .escapeshellarg($decoded_pixmap). ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -548,7 +548,7 @@ function optimiseJPG($savepath,$lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cjpeg -optimize -progressive -quality 85 ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
+        $os_cmd = 'win_tools\cjpeg -optimize -progressive -quality 85 ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
     else
         $os_cmd = 'cjpeg -optimize -progressive -quality 85 ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -573,7 +573,7 @@ function optimiseJPG($savepath,$lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cjpeg -optimize -quality 65 ' .escapeshellarg($decoded_pixmap). ' ' . escapeshellarg($JPGImgfile);
+        $os_cmd = 'win_tools\cjpeg -optimize -quality 65 ' .escapeshellarg($decoded_pixmap). ' ' . escapeshellarg($JPGImgfile);
     else
         $os_cmd = 'cjpeg -optimize -quality 65 ' .escapeshellarg($decoded_pixmap). ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -598,7 +598,7 @@ function optimiseJPG($savepath,$lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cjpeg -optimize -progressive -quality 65 ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
+        $os_cmd = 'win_tools\cjpeg -optimize -progressive -quality 65 ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
     else
         $os_cmd = 'cjpeg -optimize -progressive -quality 65 ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -623,7 +623,7 @@ function optimiseJPG($savepath,$lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cjpeg -optimize -quality 55 ' .escapeshellarg($decoded_pixmap). ' ' . escapeshellarg($JPGImgfile);
+        $os_cmd = 'win_tools\cjpeg -optimize -quality 55 ' .escapeshellarg($decoded_pixmap). ' ' . escapeshellarg($JPGImgfile);
     else
         $os_cmd = 'cjpeg -optimize -quality 55 ' .escapeshellarg($decoded_pixmap). ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -648,7 +648,7 @@ function optimiseJPG($savepath,$lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cjpeg -optimize -progressive -quality 55 ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
+        $os_cmd = 'win_tools\cjpeg -optimize -progressive -quality 55 ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
     else
         $os_cmd = 'cjpeg -optimize -progressive -quality 55 ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -673,7 +673,7 @@ function optimiseJPG($savepath,$lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\jpegtran -copy none -optimize'  . ' -outfile ' . escapeshellarg($JPGImgfile) . ' ' .escapeshellarg($ImgWithoutMetadata);
+        $os_cmd = 'win_tools\jpegtran -copy none -optimize'  . ' -outfile ' . escapeshellarg($JPGImgfile) . ' ' .escapeshellarg($ImgWithoutMetadata);
     else
         $os_cmd = 'jpegtran -copy none -optimize '  . escapeshellarg($ImgWithoutMetadata) . ' > ' .escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;1011
@@ -699,7 +699,7 @@ function optimiseJPG($savepath,$lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\jpegtran -copy none -optimize -progressive' . ' -outfile ' . escapeshellarg($JPGImgfile) .' ' .escapeshellarg($ImgWithoutMetadata);
+        $os_cmd = 'win_tools\jpegtran -copy none -optimize -progressive' . ' -outfile ' . escapeshellarg($JPGImgfile) .' ' .escapeshellarg($ImgWithoutMetadata);
     else
         $os_cmd = 'jpegtran -copy none -optimize -progressive ' . escapeshellarg($ImgWithoutMetadata) .' > ' .escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -727,7 +727,7 @@ function optimiseJPG($savepath,$lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cwebp ' .escapeshellarg($ImgWithoutMetadata). ' -o ' . escapeshellarg($WEBPImgfile);
+        $os_cmd = 'win_tools\cwebp ' .escapeshellarg($ImgWithoutMetadata). ' -o ' . escapeshellarg($WEBPImgfile);
     else
         $os_cmd = 'cwebp ' .escapeshellarg($ImgWithoutMetadata). ' -o ' . escapeshellarg($WEBPImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -771,7 +771,7 @@ function optimiseJPG($savepath,$lfn)
         mkdir($SaveImgfolder, 0777, true);
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\pngquant ' .escapeshellarg($PNGImgfileUnoptimised) .' -o '.escapeshellarg($PNGImgfile);
+        $os_cmd = 'win_tools\pngquant ' .escapeshellarg($PNGImgfileUnoptimised) .' -o '.escapeshellarg($PNGImgfile);
     else
         $os_cmd = 'pngquant ' .escapeshellarg($PNGImgfileUnoptimised) .' -o '.escapeshellarg($PNGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -797,7 +797,7 @@ function optimiseJPG($savepath,$lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\bpgenc -o ' . escapeshellarg($BPGImgfile). '  ' .escapeshellarg($ImgWithoutMetadata);
+        $os_cmd = 'win_tools\bpgenc -o ' . escapeshellarg($BPGImgfile). '  ' .escapeshellarg($ImgWithoutMetadata);
     else
         $os_cmd = 'bpgenc -o ' . escapeshellarg($BPGImgfile). '  ' .escapeshellarg($ImgWithoutMetadata);
     //echo 'cmd = '.$os_cmd;
@@ -884,7 +884,7 @@ function optimiseGIF($savepath, $lfn)
 
     //echo "optimising GIF as: ".$GIFImgfile."</br>";
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
+        $os_cmd = 'win_tools\exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
     else
         $os_cmd = 'exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
     //echo 'cmd = '.$os_cmd;
@@ -938,7 +938,7 @@ function optimiseGIF($savepath, $lfn)
         mkdir($SaveImgfolder, 0777, true);
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\pngquant ' .escapeshellarg($PNGImgfileUnoptimised) .' -o '.escapeshellarg($PNGImgfile);
+        $os_cmd = 'win_tools\pngquant ' .escapeshellarg($PNGImgfileUnoptimised) .' -o '.escapeshellarg($PNGImgfile);
     else
         $os_cmd = 'pngquant ' .escapeshellarg($PNGImgfileUnoptimised) .' -o '.escapeshellarg($PNGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -962,7 +962,7 @@ function optimiseGIF($savepath, $lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cjpeg -optimize ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
+        $os_cmd = 'win_tools\cjpeg -optimize ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
     else
         $os_cmd = 'cjpeg -optimize ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -986,7 +986,7 @@ function optimiseGIF($savepath, $lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\bpgenc -o ' . escapeshellarg($BPGImgfile). '  ' .escapeshellarg($JPGImgfile);
+        $os_cmd = 'win_tools\bpgenc -o ' . escapeshellarg($BPGImgfile). '  ' .escapeshellarg($JPGImgfile);
     else
         $os_cmd = 'bpgenc -o ' . escapeshellarg($BPGImgfile). '  ' .escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -1012,7 +1012,7 @@ function optimiseGIF($savepath, $lfn)
     //echo "optimising JPG as: ".$JPGImgfile."</br>";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\cwebp ' .escapeshellarg($JPGImgfile). ' -o ' . escapeshellarg($WEBPImgfile);
+        $os_cmd = 'win_tools\cwebp ' .escapeshellarg($JPGImgfile). ' -o ' . escapeshellarg($WEBPImgfile);
     else
         $os_cmd = 'cwebp ' .escapeshellarg($JPGImgfile). ' -o ' . escapeshellarg($WEBPImgfile);
     //echo 'cmd = '.$os_cmd;
@@ -1069,7 +1069,7 @@ function optimiseGIFAnimation($savepath, $lfn)
 
     //echo "optimising GIF as: ".$GIFImgfile."</br>";
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools\exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
+        $os_cmd = 'win_tools\exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
     else
         $os_cmd = 'exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
     //echo 'cmd = '.$os_cmd;
@@ -1099,7 +1099,7 @@ function optimiseGIFAnimation($savepath, $lfn)
         $gifsicletool = "gifsicle32";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools'.DIRECTORY_SEPARATOR. $gifsicletool.' -O1 '. escapeshellarg($ImgWithoutMetadata) . ' -o ' .escapeshellarg($gifsicleanim) ;
+        $os_cmd = 'win_tools'.DIRECTORY_SEPARATOR. $gifsicletool.' -O1 '. escapeshellarg($ImgWithoutMetadata) . ' -o ' .escapeshellarg($gifsicleanim) ;
     else
         $os_cmd = 'gifsicle -O1 '. escapeshellarg($ImgWithoutMetadata) . ' -o ' .escapeshellarg($gifsicleanim) ;
     //echo 'cmd = '.$os_cmd;
@@ -1128,7 +1128,7 @@ function optimiseGIFAnimation($savepath, $lfn)
         $gifsicletool = "gifsicle32";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools'.DIRECTORY_SEPARATOR. $gifsicletool.' -O2 '. escapeshellarg($ImgWithoutMetadata) . ' -o ' .escapeshellarg($gifsicleanim) ;
+        $os_cmd = 'win_tools'.DIRECTORY_SEPARATOR. $gifsicletool.' -O2 '. escapeshellarg($ImgWithoutMetadata) . ' -o ' .escapeshellarg($gifsicleanim) ;
     else
         $os_cmd = 'gifsicle -O2 '. escapeshellarg($ImgWithoutMetadata) . ' -o ' .escapeshellarg($gifsicleanim) ;
     //echo 'cmd = '.$os_cmd;
@@ -1158,7 +1158,7 @@ function optimiseGIFAnimation($savepath, $lfn)
         $gifsicletool = "gifsicle32";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools'.DIRECTORY_SEPARATOR. $gifsicletool.' -O3 '. escapeshellarg($ImgWithoutMetadata) . ' -o ' .escapeshellarg($gifsicleanim) ;
+        $os_cmd = 'win_tools'.DIRECTORY_SEPARATOR. $gifsicletool.' -O3 '. escapeshellarg($ImgWithoutMetadata) . ' -o ' .escapeshellarg($gifsicleanim) ;
     else
         $os_cmd = 'gifsicle -O3 '. escapeshellarg($ImgWithoutMetadata) . ' -o ' .escapeshellarg($gifsicleanim) ;
     //echo 'cmd = '.$os_cmd;
@@ -1185,7 +1185,7 @@ function optimiseGIFAnimation($savepath, $lfn)
     $giftool = "gif2apng";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools'.DIRECTORY_SEPARATOR. $giftool.' '. escapeshellarg($ImgWithoutMetadata). ' ' .escapeshellarg($gifsicleanim) ;
+        $os_cmd = 'win_tools'.DIRECTORY_SEPARATOR. $giftool.' '. escapeshellarg($ImgWithoutMetadata). ' ' .escapeshellarg($gifsicleanim) ;
     else
         $os_cmd = $giftool.' '. escapeshellarg($ImgWithoutMetadata). ' ' .escapeshellarg($gifsicleanim) ;
     //echo 'cmd = '.$os_cmd;
@@ -1211,7 +1211,7 @@ function optimiseGIFAnimation($savepath, $lfn)
     $giftool = "gif2apng";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools'.DIRECTORY_SEPARATOR. $giftool.' -q '. escapeshellarg($ImgWithoutMetadata). ' ' .escapeshellarg($gifanim) ;
+        $os_cmd = 'win_tools'.DIRECTORY_SEPARATOR. $giftool.' -q '. escapeshellarg($ImgWithoutMetadata). ' ' .escapeshellarg($gifanim) ;
     else
         $os_cmd = $giftool.' -q '. escapeshellarg($ImgWithoutMetadata). ' ' .escapeshellarg($gifanim) ;
     //echo 'cmd = '.$os_cmd;
@@ -1239,7 +1239,7 @@ function optimiseGIFAnimation($savepath, $lfn)
     $giftool = "gif2webp";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools'.DIRECTORY_SEPARATOR. $giftool.' '. escapeshellarg($ImgWithoutMetadata). ' -o ' .escapeshellarg($gifanim) ;
+        $os_cmd = 'win_tools'.DIRECTORY_SEPARATOR. $giftool.' '. escapeshellarg($ImgWithoutMetadata). ' -o ' .escapeshellarg($gifanim) ;
     else
         $os_cmd = $giftool.' '. escapeshellarg($ImgWithoutMetadata). ' -o ' .escapeshellarg($gifanim) ;
     //echo 'cmd = '.$os_cmd;
@@ -1266,7 +1266,7 @@ function optimiseGIFAnimation($savepath, $lfn)
     $giftool = "gif2webp";
 
     if($OS == 'Windows')
-        $os_cmd = 'toaster_tools'.DIRECTORY_SEPARATOR. $giftool.' -q80 '. escapeshellarg($ImgWithoutMetadata). ' -o ' .escapeshellarg($gifanim) ;
+        $os_cmd = 'win_tools'.DIRECTORY_SEPARATOR. $giftool.' -q80 '. escapeshellarg($ImgWithoutMetadata). ' -o ' .escapeshellarg($gifanim) ;
     else
         $os_cmd = $giftool.' -q80 '. escapeshellarg($ImgWithoutMetadata). ' -o ' .escapeshellarg($gifanim) ;
     //echo 'cmd = '.$os_cmd;
@@ -1302,7 +1302,7 @@ curl_setopt_array($request, array(
   CURLOPT_HEADER => true,
   /* Uncomment below if you have trouble validating our SSL certificate.
      Download cacert.pem from: http://curl.haxx.se/ca/cacert.pem */
-  CURLOPT_CAINFO => __DIR__ . DIRECTORY_SEPARATOR."toaster_tools".DIRECTORY_SEPARATOR."cacert.pem",
+  CURLOPT_CAINFO => __DIR__ . DIRECTORY_SEPARATOR."win_tools".DIRECTORY_SEPARATOR."cacert.pem",
   CURLOPT_SSL_VERIFYPEER => false
 ));
 
@@ -1317,7 +1317,7 @@ if (curl_getinfo($request, CURLINFO_HTTP_CODE) === 201) {
         CURLOPT_URL => substr($header, 10),
         CURLOPT_RETURNTRANSFER => true,
         /* Uncomment below if you have trouble validating our SSL certificate. */
-        CURLOPT_CAINFO => __DIR__ . DIRECTORY_SEPARATOR."toaster_tools".DIRECTORY_SEPARATOR."cacert.pem",
+        CURLOPT_CAINFO => __DIR__ . DIRECTORY_SEPARATOR."win_tools".DIRECTORY_SEPARATOR."cacert.pem",
         CURLOPT_SSL_VERIFYPEER => false
       ));
       file_put_contents($output, curl_exec($request));

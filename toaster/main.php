@@ -2,11 +2,11 @@
 $serverName = 'http://'.$_SERVER['SERVER_NAME'];
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
   $windows = defined('PHP_WINDOWS_VERSION_MAJOR');
-    //echo 'This is a server using Windows! '. $windows."<br/>";
+//echo 'This is a server using Windows! '. $windows."<br/>";
     $OS = "Windows";
 }
 else {
-    //echo 'This is a server not using Windows!'."<br/>";
+//echo 'This is a server not using Windows!'."<br/>";
     $OS = PHP_OS;
 }
 session_start();
@@ -42,7 +42,7 @@ if($OS == "Windows")
     $debuglog = "c:\\temp\\debug.txt";
 }
 else
-    $debuglog = "/usr/local/debug.txt";
+    $debuglog = "/usr/share/toast/debug.txt";
 file_put_contents($debuglog, "DEBUG LOG started" . PHP_EOL);
 ini_set("log_errors", 1);
 ini_set("error_log", $debuglog);
@@ -82,45 +82,48 @@ ob_start();
 </a>The Webpage Toaster's Report for <q><span id="pagetitle">page</span></q></h2>
 <div id="activitystatus" class="status"></div>
 <?php
-//print_r($_POST);
+//print_r($_REQUEST);
 addInitialRules();
 //echo 'This web server runs on '. $OS .'<br/>';
 $wptHAR = false;
 $loadContentFromHAR = false;
-if ($_FILES['fileupload']['size']==0)
-            {
-             //echo "Problem: uploaded file is zero length";
-             //print_r( $_FILES );
-             //exit;
-            }
-else
+if(!empty($_FILES))
 {
-    // check that uploaded file is a HAR file
-  $uploadedHAR = True;
-  //echo 'uploading file - temp name = '.basename($_FILES['fileupload']['name']).'<br/>';
-  $uploaddir = '/toast/uploads/';
-  $uploadfile = $uploaddir . basename($_FILES['fileupload']['name']);
-  $uploadedHARFileName = $uploadfile;
-  // print_r( $_FILES );
-  //echo  $uploadfile.'<pre>';
-  if (move_uploaded_file($_FILES['fileupload']['tmp_name'], $uploadfile)) {
-//echo ("Reading objects from HAR File: " . basename($_FILES['fileupload']['name']));
-    } else {
-        echo "HAR file upload failed<br/>";
-       }
-  //echo '</pre>';
-  // if HAR file uploaded, take URL from it
-	//$_POST["url"] = substr(basename($_FILES['userfile']['name']),0,-4);
+	if ($_FILES['fileupload']['size']==0)
+				{
+				//echo "Problem: uploaded file is zero length";
+				//print_r( $_FILES );
+				//exit;
+				}
+	else
+	{
+		// check that uploaded file is a HAR file
+	$uploadedHAR = True;
+	//echo 'uploading file - temp name = '.basename($_FILES['fileupload']['name']).'<br/>';
+	$uploaddir = '/toast/uploads/';
+	$uploadfile = $uploaddir . basename($_FILES['fileupload']['name']);
+	$uploadedHARFileName = $uploadfile;
+	// print_r( $_FILES );
+	//echo  $uploadfile.'<pre>';
+	if (move_uploaded_file($_FILES['fileupload']['tmp_name'], $uploadfile)) {
+	//echo ("Reading objects from HAR File: " . basename($_FILES['fileupload']['name']));
+		} else {
+			echo "HAR file upload failed<br/>";
+		}
+	//echo '</pre>';
+	// if HAR file uploaded, take URL from it
+		//$_REQUEST["url"] = substr(basename($_FILES['userfile']['name']),0,-4);
+	}
 }
-if (isset($_POST["harex"]))
+if (isset($_REQUEST["harex"]))
 {
 	$loadContentFromHAR = true;
 //echo ("HAR file exclusive content only". PHP_EOL);
 }
 $basescheme = 'http';
-if (isset($_POST["url"]))
+if (isset($_REQUEST["url"]))
 {
-	$url = trim($_POST["url"]);
+	$url = trim($_REQUEST["url"]);
 	// detect if url is secure of not and set basescheme
 	if(strpos($url,'https') !== false)
 		$basescheme = "https";
@@ -143,7 +146,7 @@ if (isset($_POST["url"]))
 	  {
 	  //echo "URL is valid";
 	  }
-	$i = $_POST["ua"];
+	$i = $_REQUEST["ua"];
     $wptbrowser = $i;
 	switch ($i) {
     case "Chrome":
@@ -303,7 +306,7 @@ if (isset($_POST["url"]))
     $width = $reswh[0];
     $height = $reswh[1];
     //echo $height."<br/>";
-	if (isset($_POST["chklinks"]))
+	if (isset($_REQUEST["chklinks"]))
 	{
 		$getlinks = true;
 		//echo "get links status true<br/>";
@@ -313,7 +316,8 @@ if (isset($_POST["url"]))
 		$getlinks = false;
 		//echo "get links status false<br/>";
 	}
-	if (isset($_POST["dbusage"]))
+	// always use 3rd party database
+	//if (isset($_REQUEST["dbusage"])) 
 	{
         session_start();
         $_SESSION['status'] = 'Reading local shard data';
@@ -325,15 +329,15 @@ if (isset($_POST["url"]))
         readSelfHosted3PDescriptionsFromFile();
         readShardsFromFile();
 	}
-	else
-	{
-		$dbusage = false;
-		read3PDescriptionsFromFile();
-        readSelfHosted3PDescriptionsFromFile();
-        readShardsFromFile();
-		//echo "dbusage status false<br/>";
-	}
-	if (isset($_POST["chkdebug"]) and $_POST["chkdebug"] == true)
+	// else
+	// {
+	// 	$dbusage = false;
+	// 	read3PDescriptionsFromFile();
+    //     readSelfHosted3PDescriptionsFromFile();
+    //     readShardsFromFile();
+	// 	//echo "dbusage status false<br/>";
+	// }
+	if (isset($_REQUEST["chkdebug"]) and $_REQUEST["chkdebug"] == true)
 	{
 		$debug = true;
 		//echo "debug status true<br/>";
@@ -343,7 +347,7 @@ if (isset($_POST["url"]))
 		$debug = false;
 		//echo "debug status false<br/>";
 	}
-	if (isset($_POST["akdebug"]) and $_POST["akdebug"] == true)
+	if (isset($_REQUEST["akdebug"]) and $_REQUEST["akdebug"] == true)
 	{
 		$boolakamaiDebug = true;
 		//echo "debug status true<br/>";
@@ -353,17 +357,17 @@ if (isset($_POST["url"]))
 		$boolakamaiDebug = false;
 		//echo "debug status false<br/>";
 	}
-	if (isset($_POST["3pchain"]) and $_POST["3pchain"] == true)
+//	if (isset($_REQUEST["3pchain"]) and $_REQUEST["3pchain"] == true)
 	{
 		$thirdpartychain = true;
 		//echo "debug status true<br/>";
 	}
-	else
-	{
-		$thirdpartychain = false;
-		//echo "debug status false<br/>";
-	}
-	if (isset($_POST["cssimgs"]))
+	// else
+	// {
+	// 	$thirdpartychain = false;
+	// 	//echo "debug status false<br/>";
+	// }
+	if (isset($_REQUEST["cssimgs"]))
 	{
 		$cssimgs = true;
 		$jsfiles = true;
@@ -375,14 +379,14 @@ if (isset($_POST["url"]))
 		$jsfiles = false;
 		//echo "cssimgs status false<br/>";
 	}
-	if (isset($_POST["ip"]))
+	if (isset($_REQUEST["ip"]))
 	{
-		$getipgeo = $_POST["ip"];
+		$getipgeo = $_REQUEST["ip"];
 		//echo "get geo IP status: ".$getipgeo."<br/>";
 	}
-	if (isset($_POST["ipapi"]))
+	if (isset($_REQUEST["ipapi"]))
 	{
-		switch ($_POST["ipapi"])
+		switch ($_REQUEST["ipapi"])
 		{
 			case 'dbip':
 				$geoIPLookupMethod = 1;
@@ -399,9 +403,9 @@ if (isset($_POST["url"]))
 		}
 //echo "geo IP API provider: ".$geoIPLookupMethod."<br/>";
 	}
-	if (isset($_POST["wbengine"]))
+	if (isset($_REQUEST["wbengine"]))
 	{
-		switch ($_POST["wbengine"])
+		switch ($_REQUEST["wbengine"])
 		{
 			case 'pjs1.9':
 				$browserengine = 1;
@@ -418,8 +422,11 @@ if (isset($_POST["url"]))
             case "sjs0.10":
 				$browserengine = 4;
 				break;
-            case "wpt_local":
+            case "wpt_private":
 				$browserengine = 6;
+				break;
+			case "wpt_public":
+				$browserengine = 8;
 				break;
 			case "ch_headless":
 				$browserengine = 7;
@@ -428,27 +435,26 @@ if (isset($_POST["url"]))
             	$browserengine = 5;
 				break;
 		}
-		//echo "Browser Engine selected: ".$browserengine . ": " . $_POST["wbengine"] ."<br/>";
+//echo "Browser Engine selected: ".$browserengine . ": " . $_REQUEST["wbengine"] ."<br/>";
 	}
-	if (isset($_POST["username"]))
-		$username = $_POST["username"];
+	if (isset($_REQUEST["username"]))
+		$username = $_REQUEST["username"];
 	else
 		$username = '';
-	if (isset($_POST["password"]))
-		$password = $_POST["password"];
+	if (isset($_REQUEST["password"]))
+		$password = $_REQUEST["password"];
 	else
 		$password = '';
 	//echo("username: " .$username. " - password: ". $password);
-if(isset($_POST["comment"]))
+if(isset($_REQUEST["comment"]))
 {
-    $runnotes = $_POST["comment"];
+    $runnotes = $_REQUEST["comment"];
 //echo "passed comments: " .$runnotes ."<br/>";
     if( $runnotes == 'Enter text here...')
         $runnotes = '';
 }
     // get current working dir
-  //echo "Request uri is: ".$_SERVER['REQUEST_URI'];
-  //echo "<br>";
+echo "Request uri is: ".$_SERVER['REQUEST_URI']. "<br>";
   $curdir = dirname($_SERVER['REQUEST_URI'])."/";
   if(!isset($_SESSION['userIP']))
   {
@@ -458,7 +464,7 @@ if(isset($_POST["comment"]))
 	//$externalIp = $m[1];
     $externalContent = file_get_contents('https://api.ipify.org');
 	$externalIp = $externalContent;
-    //echo ("ipify: my external ip: ".$externalIp."<br/>");
+echo ("ipify: my external ip: ".$externalIp."<br/>");
     // check for office location by ip
     switch ($externalIp)
     {
@@ -474,17 +480,26 @@ if(isset($_POST["comment"]))
             $stateprov = "Surrey";
             $country = "England";
             $geoExtLoc = "Leatherhead, Surrey, England";
-            $externalloc = "Leatherhead, Surrey, England";
-            // Manchester
-            // lat 53.4887,
-            // long -2.2099
+			$externalloc = "Leatherhead, Surrey, England";
+			$b3pdbPublic = false; // forces use of the internal third party database, not the public one
             break;
         default:
-        	list($externalloc,$city,$stateprov,$country,$lat,$long) = lookupLocationforIP($externalIp);
-            $geoExtLocStaticMarker = "&markers=color:red%7Clabel:U%7CUser".$city.",".$stateprov.",".$country;
-            $geoExtLoc = $city.", ".$stateprov.", ".$country;
-            $geoMarkerLetter = "U";
-//echo ("my location: ".$externalloc. ' lat='.$lat. '; long='.$long."<br/>");
+        	// list($externalloc,$city,$stateprov,$country,$lat,$long) = lookupLocationforIP($externalIp);
+            // $geoExtLocStaticMarker = "&markers=color:red%7Clabel:U%7CUser".$city.",".$stateprov.",".$country;
+            // $geoExtLoc = $city.", ".$stateprov.", ".$country;
+			// $geoMarkerLetter = "U";
+			
+			$lat = "51.6667";
+            $long = "-0.8333";
+            $city = "Slough";
+            $stateprov = "Berkshire";
+            $country = "England";
+            $geoExtLoc = "Slough, Berkshire, England";
+			$externalloc = "Slough, Berkshire, England";
+			$geoMarkerLetter = "S";
+			$b3pdbPublic = true;
+
+echo ("toaster server location: ".$externalloc. '; lat='.$lat. '; long='.$long."<br/>");
     }
     $extlatlong = $lat.",".$long;
     $userlat = $lat;
@@ -694,13 +709,26 @@ error_log("Toasting " . $url .  PHP_EOL);
     //error_log(__LINE__ .  'thispagename - '.$thispagename);
 	// define system filepaths, adding a trailing slash
 	$filepath_domainsavedir = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
-	$jsfilepath_domainsavedir = joinURLPaths('/toast',$uastr,$host_domain,$sourceurlparts["dirs"]);
+	$filepath_domainsavedirlnx1 = joinFilePaths($filepath_basesavedir,$uastr,DIRECTORY_SEPARATOR);
+	$filepath_domainsavedirlnx2 = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
+	// create the save directory before it is needed by PhantomJS
+	debug ("main: creating basefilepath ",$filepath_domainsavedir);
+	createDomainSaveDir($filepath_domainsavedir);
+	// set up the linux path to the save dir.
+	if($OS != "Windows")
+	{
+		chmod($filepath_domainsavedirlnx1, 0777);
+		chmod($filepath_domainsavedirlnx2, 0777);
+		chmod($filepath_domainsavedir, 0777);
+		$filepath_domainsavedirLnx = "/usr/share/toast/". $uastr. "/".$host_domain;
+	}
+		$jsfilepath_domainsavedir = joinURLPaths('/toast',$uastr,$host_domain,$sourceurlparts["dirs"]);
 	$filepath_domainsaverootdir = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
 	$localvpath = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
 	$lc = substr($jsfilepath_domainsavedir,-1);
 	if($lc == '/')
     {
-        if($browserengine != 6)
+        if($browserengine != 6 and $browserengine != 8)
         {
 		    $imgname = $filepath_domainsavedir."_screencapture_". $uastr .".png";
 			$jsimgname = $jsfilepath_domainsavedir."_screencapture_". $uastr .".png";
@@ -717,7 +745,7 @@ error_log("Toasting " . $url .  PHP_EOL);
     }
     else
     {
-        if($browserengine != 6)
+        if($browserengine != 6 and $browserengine != 8)
         {
 		    $imgname = $filepath_domainsavedir."/_screencapture_". $uastr .".png";
 			$jsimgname = $jsfilepath_domainsavedir."/_screencapture_". $uastr .".png";
@@ -731,7 +759,8 @@ error_log("Toasting " . $url .  PHP_EOL);
 			$harname = $filepath_domainsavedir."/_harfile_". $uastr .".har";
 			$dumpname = $filepath_domainsavedir."/_domafter_". $uastr .".txt";
         }
-    }
+	}
+	
     if($OS == 'Windows')
     {
         $browserengineoutput = "out".generateRandomString().".txt";
@@ -740,12 +769,14 @@ error_log("Toasting " . $url .  PHP_EOL);
     }
     else
     {
-        $browserengineoutput = tempnam(sys_get_temp_dir(),'out');
-    }
-    //echo($browserengineoutput."<br/.");
+        $browserengineoutput = $filepath_domainsavedirLnx."/out".generateRandomString().".txt";
+	}
+
+	debug("browserengineoutput" , $browserengineoutput);
+
 	//echo("save path dir = $filepath_domainsavedir<br/>");
 	//echo("save screenshot = $imgname<br/>");
-    // delete the previous debug log
+	// delete the previous debug log
     @unlink($filepath_domainsavedir.DIRECTORY_SEPARATOR."debug.txt");
 	//echo("save path img =$imgname<br/>");
 	//echo("save path rootdir=$filepath_domainsavedir<br/>");
@@ -830,7 +861,7 @@ error_log("Toasting " . $url .  PHP_EOL);
 	//echo "saved as: ".$localfilename."<br/>";
 	//echo "Files saved to directory: " .$filepath_domainsavedir."<br>";
 	//echo "Root Page saved as: ".$filepathname_rootobject_headersandbody."<br/>";
-	createDomainSaveDir($filepath_domainsavedir);
+//	createDomainSaveDir($filepath_domainsavedir);
       session_start();
       $_SESSION['status'] = 'Retrieving Root Object';
       $_SESSION['toastedfile'] = $toastedwebname; //$toastedfilepathname;
@@ -1169,9 +1200,9 @@ $retbodylen = strlen($body);
 //echo (__FILE__ . "/" . __FUNCTION__ . "/" . __LINE__ . ": MAIN rootURL; scheme = " . $basescheme.  " for url: " . $url. "<br/>");
     // set up optimisation folder for minifying the HTML
     $folder = '_Optimised_HTML'.DIRECTORY_SEPARATOR;
-    $baseTextfolder =  $filepath_domainsavedir.$folder;
+	$baseTextfolder =  $filepath_domainsavedir.$folder;
     if (!file_exists($baseTextfolder))
-        mkdir($baseTextfolder, 0777, true);
+		mkdir($baseTextfolder, 0777, true);
     $path_parts = pathinfo($localfilename);
     $optfilename =  $baseTextfolder.$path_parts['filename'].".min.htm";
     //echo"saving as : ".$optfilename."<br/>";
@@ -1206,7 +1237,7 @@ $retbodylen = strlen($body);
     //$_SESSION['status'] = 'Checking for uploaded HAR file';
     //session_write_close();
  debug ("MAIN: checking for uploaded HAR","");
-    if(($uploadedHAR == false or $browserengine == 7 or $loadContentFromHAR == false) and $browserengine != 6)
+    if(($uploadedHAR == false or $browserengine == 7 or $loadContentFromHAR == false) and $browserengine != 6 and $browserengine != 8)
     {
     	//getCSSJSOrdering();
     	getListOfStyleLinks("before DOM load");
@@ -1237,6 +1268,7 @@ $retbodylen = strlen($body);
 	$ListOfObjects = getArrayOfObjects();
 	$ListOfErrors = getArrayOfErrors();
  debug ("MAIN: start PhantomJS / SlimerJS","");
+ 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                 PHANTOM JS / Slimer JS / WPT
@@ -1246,10 +1278,10 @@ $retbodylen = strlen($body);
 	// outputs the username that owns the running php/httpd process
 	// (on a system with the "whoami" executable in the path)
 	$res = array();
-	//exec('toaster_tools\phantomjs --web-security=no netlogresponses.js '. $url,$res); // responses only
+	//exec('win_tools\phantomjs --web-security=no netlogresponses.js '. $url,$res); // responses only
 	//echo("PhantomJS sniffing network traffic with ".$ua."<br/>");
-	//exec('toaster_tools\phantomjs --cookies-file=c:\temp\cookies.txt --proxy=127.0.0.1:8888 --ignore-ssl-errors=true --ssl-protocol=tlsv1 netsniff.js '. $originalurl . " " . $height . " " . $width . " " . $imgname . " '" . $ua ."'" ." ".$username. " ". $password ,$res); //responses & sniff
-    //echo("invoking JavaScript Engine via option ".$browserengine." for ". $originalurl."</br>");
+	//exec('win_tools\phantomjs --cookies-file=c:\temp\cookies.txt --proxy=127.0.0.1:8888 --ignore-ssl-errors=true --ssl-protocol=tlsv1 netsniff.js '. $originalurl . " " . $height . " " . $width . " " . $imgname . " '" . $ua ."'" ." ".$username. " ". $password ,$res); //responses & sniff
+    //echo("invoking JavaScript Engine via option ".2." for ". $originalurl."</br>");
     // set url for browser engine - if redirections detected, use latest URl else use the original
     if($boolRootRedirect == true)
     {
@@ -1281,9 +1313,9 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             $_SESSION['status'] = 'Running ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
-                exec('toaster_tools\phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('win_tools\phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             else
-                exec('phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('./lnx_tools/phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             break;
         case 2:
             $browserEngineVer = 'Webkit (PhantomJS v2.0.0)';
@@ -1291,9 +1323,9 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             $_SESSION['status'] = 'Running ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
-                exec('toaster_tools\phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('win_tools\phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             else
-                exec('phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('./lnx_tools/phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             break;
         case 3:
             $browserEngineVer = 'Gecko (SlimerJS v0.9.5)';
@@ -1301,9 +1333,9 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             $_SESSION['status'] = 'Running ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
-                exec('toaster_tools\slimerjs.bat js\netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('win_tools\slimerjs.bat js\netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             else
-                exec('slimerjs.bat js/netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('./lnx_tools/slimerjs.bat js/netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             break;
         case 4:
             $browserEngineVer = 'Gecko (SlimerJS v0.10)';
@@ -1311,9 +1343,9 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             $_SESSION['status'] = 'Running ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
-                exec('toaster_tools\slimerjs-0.10.3\slimerjs.bat js\netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('win_tools\slimerjs-0.10.3\slimerjs.bat js\netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             else
-                exec('slimerjs.bat js/netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('./lnx_tools/slimerjs.bat js/netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             break;
         case 5:
             $browserEngineVer = 'Webkit (PhantomJS v2.1.1)';
@@ -1321,11 +1353,20 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             $_SESSION['status'] = 'Running ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
-                exec('toaster_tools\phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
-            else
-                exec('phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
-            break;
-        case 6:
+                exec('win_tools\phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+			else
+			{
+				$cmd = './lnx_tools/phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password . " 2>&1";
+				error_log($cmd);
+				
+				exec('whoami',$who);
+				error_log("whoami: ".implode($who));
+				exec($cmd,$res); //responses & sniff
+				error_log(implode($res));
+			}
+	
+				break;
+		case 6: // private instance WPT
             $browserEngineVer = 'WebpageTest';
             session_start();
             $_SESSION['status'] = 'Running ' . $browserEngineVer;
@@ -1333,9 +1374,11 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             $urlenc = urlencode($urlforbrowserengine);
             $testId = "";
             list ($testId,$jsonResult,$summaryCSV,$detailCSV ) = submitWPTTest($wptbrowser,$urlenc,$uar,$width,$height,$username,$password);
-            $statusCode = 0;
-            while (intval($statusCode) != 200) {
-                $statusCode = checkWPTTestStatus($testId);
+			$statusCode = 0;
+			$timoutcounter = 0;
+            while (intval($statusCode) != 200 and $timoutcounter < 600) {
+				$statusCode = checkWPTTestStatus($testId);
+				$timoutcounter++;
                 sleep(1);
              }
             // get testresults as HAR
@@ -1359,7 +1402,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 			{	
 				// use psexec to start in background, pipe stderr to stdout to capture pid
 				$command = '"c:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --enable-logging --remote-debugging-port=9222';
-				$res = exec("toaster_tools\pstools\PsExec64 -s -d -accepteula $command 2>&1", $output);
+				$res = exec("win_tools\pstools\PsExec64 -s -d -accepteula $command 2>&1", $output);
 				//echo $res . "<br/>";
 				// capture pid on the 6th line
 				preg_match('/ID (\d+)/', $output[6], $matches);
@@ -1372,14 +1415,14 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 //echo "Google Chrome launched with PID "  . $pid . "<br/>";
 				// get screenshot
 				//echo "getting screenshot<br/>";
-				exec("node toaster_tools/chromeremote/take_screenshot.js --url " . $urlforbrowserengine . " --pathname " . $imgname . " --viewportHeight " . $height . " --viewportWidth " . $width. " 2>&1", $output, $rv);
+				exec("node win_tools/chromeremote/take_screenshot.js --url " . $urlforbrowserengine . " --pathname " . $imgname . " --viewportHeight " . $height . " --viewportWidth " . $width. " 2>&1", $output, $rv);
 				//echo implode("\n", $output);
 				//echo $imgname.  " - rv = " . $rv . "<br/>";
 
 
 				// get har
 				//echo "generating HAR file to " . $harname . "<br/>";
-				exec("node toaster_tools/chromeremote/node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --output " . $harname . " --height " . $height . " --width " . $width . " --agent \"" . $uar . "\" 2>&1", $output2, $rv);
+				exec("node win_tools/chromeremote/node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --output " . $harname . " --height " . $height . " --width " . $width . " --agent \"" . $uar . "\" 2>&1", $output2, $rv);
 				//echo implode("\n", $output2);
 				//echo "rv = " . $rv. "<br/>";
 
@@ -1387,7 +1430,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 				// get HTML DOM, after age end with injections
 				$outpath = realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput;
 				//echo "dumping HTML after page load to " . $outpath . "<br/>";
-				exec("node toaster_tools/chromeremote/dump.js --url " . $urlforbrowserengine. " --pathname " . $outpath . " 2>&1", $output2, $rv);
+				exec("node win_tools/chromeremote/dump.js --url " . $urlforbrowserengine. " --pathname " . $outpath . " 2>&1", $output2, $rv);
 				//echo implode("\n", $output2);
 				//echo "rv = " . $rv. "<br/>";
 
@@ -1397,13 +1440,57 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 				$uploadedHAR = true;
 
 				// kill remote chrome headless instance
-				exec("toaster_tools\pstools\PsKill -t $pid", $output);
+				exec("win_tools\pstools\PsKill -t $pid", $output);
 			}
 			else
-			{
-				exec('phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " /tmp".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+			{ // linux
+
+                // set port
+                $port = "9221";
+				// launch headless chrome on a given port
+				$res = exec("google-chrome --remote-debugging-port=" . $port . " --headless > /dev/null 2>&1 & echo $!", $output);
+                // capture pid
+				$pid = (int)$output[0];
+				echo "Chrome process id = " . $pid . "<br/>";
+				print_r($output);
+
+                //get har
+                // $harname = '/usr/share/toast/test.har';
+                // $height = 800;
+                // $width = 1200;
+                // $urlforbrowserengine = 'http://www.daish.net';
+                $uar = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
+
+				echo "generating HAR file to " . $harname . "<br/>";
+				exec("node node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --port " . $port . " --output " . $harname . " 2>&1", $output2, $rv);
+				echo implode("\n", $output2);
+				echo "rv = " . $rv. "<br/>";
+
+                sleep (1);
+				// get screenshot and dpm dump
+				echo "getting screenshot<br/>";
+				exec('node node_modules/cri-toaster.js --url ' . $urlforbrowserengine . " --fullPage true --width " . $width . " --height " . $height . " --imgpath " . $imgname . " --port " . $port . " 2>&1", $output, $rv);
+				echo implode("\n", $output);
+				echo $imgname.  " - rv = " . $rv . "<br/>";
+
+                sleep (1);
+				// // kill chrome headless
+				$command = 'kill -9 ' . $pid ;
+				$res = exec($command . " 2>&1", $output);
+                print_r($output);
+                
+
+
+                echo PHP_EOL . " all done";
+			  
+				// get testresults as HAR
+				$uploadedHARFileName = $harname;
+				$wptHAR = false;
+				$uploadedHAR = true;
+
 			}
 				break;
+			case 8: // public wpt - to do - get har file
 
     } // end switch
     // save thumnbnail of $imgname
@@ -1425,12 +1512,12 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 		}
 		else
 		{
-            $pjsckfile = $browserengineoutput."CK";
-			$pjspdfile = $browserengineoutput."PD";
+            $pjsckfile = $browserengineoutput."txtCK";
+			$pjspdfile = $browserengineoutput."txtPD";
 		}
-//if(file_exists($pjsckfile) == true)
+// if(file_exists($pjsckfile) == true)
 //    echo("pjs cookie file: ".$pjsckfile." found<br/>");
-//else
+// else
 //    echo("pjs cookie file: ".$pjsckfile." not found<br/>");
 // if(file_exists($pjspdfile) == true)
 // 	echo("pjs parameter file: ".$pjspdfile." found<br/>");
@@ -1528,7 +1615,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
                     //echo "startedDateTime: ".$value['startedDateTime']."<br/>";
 					//echo "render: ".$value['_render']."<br/>";
 					// add render time to array
-					if($browserengine == 6) // WPT only
+					if($browserengine == 6 or $browserengine == 8) // WPT only
 					{
 						$rst = $value['_render'];
 						$onLoad = $value['_docTime'];
@@ -1577,7 +1664,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
                     $pageref = $value['pageref'];
 					$requestheaders = $request['headers'];
 					// get WPT values for timings
-					if($browserengine == 6)
+					if($browserengine == 6 or $browserengine == 8)
 					{
 						$requestStartMS = $value['_ttfb_start'];
 						$ttfbMS = $value['_ttfb_ms'];
@@ -1733,7 +1820,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             				$pjsObjCntExisting += 1;
 							// UPDATE HARFile stats
 							// update existing  object timing
-							if($browserengine == 6)
+							if($browserengine == 6 or $browserengine == 8)
 							{
 							$requestStartMS = $value['_ttfb_start'];
 							$ttfbMS = $value['_ttfb_ms'];
@@ -1928,7 +2015,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 						@$debugTiming = $ObjURL . "; allms: " . $value['_all_ms']. "<br/>";
 						//echo("root: " . $debugTiming);
 						// update object timings if they exist (in WPT test)
-						if($browserengine == 6)
+						if($browserengine == 6 or $browserengine == 8)
 						{
 							$arr = array(
             				"Object source" => $ObjURL,
@@ -1966,7 +2053,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
     getCSSJSOrdering('source');
     // extra processing of HTML document for modified DOM - use output from PhantomJS or SlimerJS
 //error_log("browser engine ver = " . $browserEngineVer);
-	if($browserengine != 6) // don't run for WPT
+	if($browserengine != 6 and $browserengine != 8) // don't run for WPT
 	{
 		//$modrootfilepath = "output.txt";
 		if($OS == 'Windows')
@@ -1997,7 +2084,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
     {
      debug("Main: 2nd parseRootBodytoDOM being called to check html content: ","html is not empty");
 //echo (__FUNCTION__.' '. __LINE__." Main: 2nd parseRootBodytoDOM being called to check html content: "."html is not empty");
-	if(($uploadedHAR == false or $browserengine == 7 or $loadContentFromHAR == false) and $browserengine != 6)
+	if(($uploadedHAR == false or $browserengine == 7 or $loadContentFromHAR == false) and $browserengine != 6 and $browserengine != 8)
       {
         getListOfStyleLinks("after DOM load");
     	getListOfScriptLinks();
@@ -2586,7 +2673,10 @@ if($OS == 'Windows')
         }
      if (file_exists(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR."CK".$browserengineoutput)) {
         unlink(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR."CK".$browserengineoutput);
-        }
+		}
+	if (file_exists(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR."PD".$browserengineoutput)) {
+		unlink(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR."PD".$browserengineoutput);
+		}
 }
 else
 {
@@ -2595,7 +2685,10 @@ else
         }
     if (file_exists("CK".$browserengineoutput)) {
         unlink("CK".$browserengineoutput);
-        }
+		}
+		if (file_exists("PD".$browserengineoutput)) {
+			unlink("PD".$browserengineoutput);
+			}
 }
     session_start();
     $_SESSION['status'] = 'Formatting Page (JavaScript)';

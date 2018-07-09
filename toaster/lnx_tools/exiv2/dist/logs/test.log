@@ -1,0 +1,59 @@
+++ addmoddel.sh ++
+all testcases passed.
+++ bugfixes-test.sh ++
+426 440 443 444 445 447 452 460 479 480 495 498 501 528 540 554 662 666 683 711 726 751 769 784 799 800 812 816 825 831 (836 skipped) 841 855 876 884 922 935 937 937a 1024 1026 1040 1043 1044 1053 1054 1058 1062 1080 1074 1108 1112 1114 1122 1137 1140 1144 1145 1153 1155 1166 1167 1170 1179 1202 1223 1225 1229 1242 1247 
+Files /home/rmills/gnu/exiv2/buildserver/test/tmp/bugfixes-test.out and /home/rmills/gnu/exiv2/buildserver/test/data/bugfixes-test.out differ
+1029d1028
+< Warning: Updating namespace URI for imageapp from orig/ to dest/
+1034c1033
+<     xmlns:imageapp="dest/"
+---
+>     xmlns:imageapp="orig/"
+1041a1041
+> Warning: Updating namespace URI for imageapp from dest/ to orig/
+1046c1046
+<     xmlns:imageapp="dest/"
+---
+>     xmlns:imageapp="orig/"
+++ exifdata-test.sh ++
+all testcases passed.
+++ exiv2-test.sh ++
+all testcases passed.
+++ imagetest.sh ++
+
+Erase all tests..................
+Copy all tests.........
+Copy iptc tests.........
+---------------------------------------------------------
+All test cases passed
+++ iotest.sh ++
+
+Io tests...
+---------------------------------------------------------
+All test cases passed
+++ iptctest.sh ++
+
+Read tests..................
+Remove tests..................
+Add/Mod tests..................
+Extended tests..................
+---------------------------------------------------------
+All test cases passed
+++ modify-test.sh ++
+all testcases passed.
+++ path-test.sh ++
+++ preview-test.sh ++
+.....................................
+All testcases passed.
+++ stringto-test.sh ++
+all testcases passed.
+++ tiff-test.sh ++
+all testcases passed.
+++ write-test.sh ++
+all testcases passed.
+++ write2-test.sh ++
+all testcases passed.
+++ xmpparser-test.sh ++
+all testcases passed.
+++ conversions.sh ++
+all testcases passed.

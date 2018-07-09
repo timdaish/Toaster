@@ -1214,7 +1214,7 @@ function brotli_decode($bytes)
 //$tempi = tempnam("c:\\temp\\", "bri");
 //$tempo = tempnam("c:\\temp\\", "bro");
         file_put_contents($fni, $bytes);
-        exec('toaster_tools\bro64 -d -f -i ' . $fni . " -o " . escapeshellarg($fno), $res);
+        exec('win_tools\bro64 -d -f -i ' . $fni . " -o " . escapeshellarg($fno), $res);
         $body = file_get_contents($fno);
         //unlink($fni);
         //unlink($fno);

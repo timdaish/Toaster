@@ -8,7 +8,7 @@ if (isset($_GET['iatacode'])) {
     return;
 }
 
-$str = file_get_contents("toaster_tools\airportscitiesstates.json");
+$str = file_get_contents("win_tools\airportscitiesstates.json");
 
 $found = false;
 $json = json_decode($str);

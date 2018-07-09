@@ -10,7 +10,7 @@ if (isset($_GET['iatacode'])) {
 
 $found = false;
 
-$filename = file("toaster_tools\airports.dat");
+$filename = file("win_tools\airports.dat");
 
 // Loop through our array, show HTML source as HTML source; and line numbers too.
 foreach ($filename as $line_num => $line) {

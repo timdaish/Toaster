@@ -1,0 +1,754 @@
+-- The C compiler identification is GNU 4.9.3
+-- The CXX compiler identification is GNU 4.9.3
+-- Check for working C compiler: /usr/bin/cc
+-- Check for working C compiler: /usr/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Check for working CXX compiler: /usr/bin/c++
+-- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Compiler:c++ Major:4 Minor:9
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Looking for pthread_create
+-- Looking for pthread_create - not found
+-- Check if compiler accepts -pthread
+-- Check if compiler accepts -pthread - yes
+-- Found Threads: TRUE  
+-- Looking for iconv_open
+-- Looking for iconv_open - found
+-- Performing Test ICONV_COMPILES
+-- Performing Test ICONV_COMPILES - Success
+-- Found ICONV: In glibc  
+-- Performing Test ICONV_ACCEPTS_NONCONST_INPUT
+-- Performing Test ICONV_ACCEPTS_NONCONST_INPUT - Success
+-- Performing Test ICONV_ACCEPTS_CONST_INPUT
+-- Performing Test ICONV_ACCEPTS_CONST_INPUT - Failed
+-- Found ZLIB: /usr/local/lib/libz.so (found version "1.2.8") 
+-- Found EXPAT: /usr/local/lib/libexpat.so  
+-- Program msgfmt found (/usr/bin/msgfmt)
+-- Looking for inttypes.h
+-- Looking for inttypes.h - found
+-- Looking for libintl.h
+-- Looking for libintl.h - found
+-- Looking for malloc.h
+-- Looking for malloc.h - found
+-- Looking for memory.h
+-- Looking for memory.h - found
+-- Looking for iconv.h
+-- Looking for iconv.h - found
+-- Looking for stdbool.h
+-- Looking for stdbool.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stdlib.h
+-- Looking for stdlib.h - found
+-- Looking for string.h
+-- Looking for string.h - found
+-- Looking for strings.h
+-- Looking for strings.h - found
+-- Looking for unistd.h
+-- Looking for unistd.h - found
+-- Looking for wchar.h
+-- Looking for wchar.h - found
+-- Looking for sys/stat.h
+-- Looking for sys/stat.h - found
+-- Looking for sys/time.h
+-- Looking for sys/time.h - found
+-- Looking for sys/types.h
+-- Looking for sys/types.h - found
+-- Looking for sys/mman.h
+-- Looking for sys/mman.h - found
+-- Looking for process.h
+-- Looking for process.h - not found
+-- Looking for regex.h
+-- Looking for regex.h - found
+-- Looking for alarm
+-- Looking for alarm - found
+-- Looking for gmtime_r
+-- Looking for gmtime_r - found
+-- Looking for malloc
+-- Looking for malloc - found
+-- Looking for memset
+-- Looking for memset - found
+-- Looking for mmap
+-- Looking for mmap - found
+-- Looking for munmap
+-- Looking for munmap - found
+-- Looking for realloc
+-- Looking for realloc - found
+-- Looking for strchr
+-- Looking for strchr - found
+-- Looking for strchr_r
+-- Looking for strchr_r - not found
+-- Looking for strerror
+-- Looking for strerror - found
+-- Looking for strerror_r
+-- Looking for strerror_r - found
+-- Looking for strtol
+-- Looking for strtol - found
+-- Looking for timegm
+-- Looking for timegm - found
+-- Looking for vprintf
+-- Looking for vprintf - found
+-- None:              -m64 
+-- Debug:             -g
+-- Release:           -O3 -DNDEBUG
+-- RelWithDebInfo:    -O2 -g -DNDEBUG
+-- MinSizeRel:        -Os -DNDEBUG
+-- Looking for _Bool
+-- Looking for _Bool - not found
+-- Performing Test TM_IN_SYS_TIME
+-- Performing Test TM_IN_SYS_TIME - Failed
+-- Performing Test STRERROR_R_CHAR_P
+-- Performing Test STRERROR_R_CHAR_P - Success
+-- Performing Test TIME_WITH_SYS_TIME
+-- Performing Test TIME_WITH_SYS_TIME - Success
+-- ------------------------------------------------------------------
+-- exiv2 0.26 configure results        <http://www.exiv2.org>
+-- Building PNG support:               YES
+-- Building shared library:            YES
+-- XMP metadata support:               YES
+-- Building static libxmp:             YES
+-- Native language support:            NO
+-- Conversion of Windows XP tags:      YES
+-- Nikon lens database:                YES
+-- Commercial build:                   NO
+-- Build the unit tests:               YES
+-- Building translations files:        NO
+-- Building video support:             NO
+-- Building webready support:          NO
+-- ------------------------------------------------------------------
+-- SVN version:  4772
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/rmills/gnu/exiv2/buildserver/build
+Scanning dependencies of target xmp
+[  1%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/ExpatAdapter.cpp.o
+[  1%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/MD5.cpp.o
+[  2%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/ParseRDF.cpp.o
+[  3%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/UnicodeConversions.cpp.o
+[  3%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/WXMPIterator.cpp.o
+[  4%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/WXMPMeta.cpp.o
+[  5%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/WXMPUtils.cpp.o
+[  5%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/XML_Node.cpp.o
+[  6%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/XMPCore_Impl.cpp.o
+[  7%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/XMPIterator.cpp.o
+[  7%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/XMPMeta-GetSet.cpp.o
+[  8%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/XMPMeta-Parse.cpp.o
+[  9%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/XMPMeta-Serialize.cpp.o
+[  9%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/XMPMeta.cpp.o
+[ 10%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/XMPUtils-FileInfo.cpp.o
+[ 11%] Building CXX object xmpsdk/CMakeFiles/xmp.dir/src/XMPUtils.cpp.o
+[ 11%] Linking CXX static library libxmp.a
+[ 11%] Built target xmp
+Scanning dependencies of target exiv2lib
+[ 11%] Building CXX object src/CMakeFiles/exiv2lib.dir/asfvideo.cpp.o
+[ 12%] Building CXX object src/CMakeFiles/exiv2lib.dir/basicio.cpp.o
+[ 13%] Building CXX object src/CMakeFiles/exiv2lib.dir/bmpimage.cpp.o
+[ 13%] Building CXX object src/CMakeFiles/exiv2lib.dir/canonmn.cpp.o
+[ 14%] Building CXX object src/CMakeFiles/exiv2lib.dir/casiomn.cpp.o
+[ 15%] Building CXX object src/CMakeFiles/exiv2lib.dir/convert.cpp.o
+[ 15%] Building CXX object src/CMakeFiles/exiv2lib.dir/cr2image.cpp.o
+[ 16%] Building CXX object src/CMakeFiles/exiv2lib.dir/crwedit.cpp.o
+[ 17%] Building CXX object src/CMakeFiles/exiv2lib.dir/crwimage.cpp.o
+[ 17%] Building CXX object src/CMakeFiles/exiv2lib.dir/datasets.cpp.o
+[ 18%] Building CXX object src/CMakeFiles/exiv2lib.dir/easyaccess.cpp.o
+[ 19%] Building CXX object src/CMakeFiles/exiv2lib.dir/epsimage.cpp.o
+[ 19%] Building CXX object src/CMakeFiles/exiv2lib.dir/error.cpp.o
+[ 20%] Building CXX object src/CMakeFiles/exiv2lib.dir/exif.cpp.o
+[ 21%] Building CXX object src/CMakeFiles/exiv2lib.dir/futils.cpp.o
+[ 21%] Building CXX object src/CMakeFiles/exiv2lib.dir/fujimn.cpp.o
+[ 22%] Building CXX object src/CMakeFiles/exiv2lib.dir/gifimage.cpp.o
+[ 23%] Building CXX object src/CMakeFiles/exiv2lib.dir/http.cpp.o
+[ 23%] Building CXX object src/CMakeFiles/exiv2lib.dir/image.cpp.o
+[ 24%] Building CXX object src/CMakeFiles/exiv2lib.dir/ini.cpp.o
+[ 25%] Building CXX object src/CMakeFiles/exiv2lib.dir/iptc.cpp.o
+[ 25%] Building CXX object src/CMakeFiles/exiv2lib.dir/jp2image.cpp.o
+[ 26%] Building CXX object src/CMakeFiles/exiv2lib.dir/jpgimage.cpp.o
+[ 27%] Building CXX object src/CMakeFiles/exiv2lib.dir/makernote.cpp.o
+[ 28%] Building CXX object src/CMakeFiles/exiv2lib.dir/matroskavideo.cpp.o
+[ 28%] Building CXX object src/CMakeFiles/exiv2lib.dir/metadatum.cpp.o
+[ 29%] Building CXX object src/CMakeFiles/exiv2lib.dir/minoltamn.cpp.o
+[ 30%] Building CXX object src/CMakeFiles/exiv2lib.dir/mrwimage.cpp.o
+[ 30%] Building CXX object src/CMakeFiles/exiv2lib.dir/nikonmn.cpp.o
+[ 31%] Building CXX object src/CMakeFiles/exiv2lib.dir/olympusmn.cpp.o
+[ 32%] Building CXX object src/CMakeFiles/exiv2lib.dir/orfimage.cpp.o
+[ 32%] Building CXX object src/CMakeFiles/exiv2lib.dir/panasonicmn.cpp.o
+[ 33%] Building CXX object src/CMakeFiles/exiv2lib.dir/pentaxmn.cpp.o
+[ 34%] Building CXX object src/CMakeFiles/exiv2lib.dir/pgfimage.cpp.o
+[ 34%] Building CXX object src/CMakeFiles/exiv2lib.dir/preview.cpp.o
+[ 35%] Building CXX object src/CMakeFiles/exiv2lib.dir/properties.cpp.o
+[ 36%] Building CXX object src/CMakeFiles/exiv2lib.dir/psdimage.cpp.o
+[ 36%] Building CXX object src/CMakeFiles/exiv2lib.dir/quicktimevideo.cpp.o
+[ 37%] Building CXX object src/CMakeFiles/exiv2lib.dir/rafimage.cpp.o
+[ 38%] Building CXX object src/CMakeFiles/exiv2lib.dir/riffvideo.cpp.o
+[ 38%] Building CXX object src/CMakeFiles/exiv2lib.dir/rw2image.cpp.o
+[ 39%] Building CXX object src/CMakeFiles/exiv2lib.dir/samsungmn.cpp.o
+[ 40%] Building CXX object src/CMakeFiles/exiv2lib.dir/sigmamn.cpp.o
+[ 40%] Building CXX object src/CMakeFiles/exiv2lib.dir/sonymn.cpp.o
+[ 41%] Building CXX object src/CMakeFiles/exiv2lib.dir/tags.cpp.o
+[ 42%] Building CXX object src/CMakeFiles/exiv2lib.dir/tgaimage.cpp.o
+[ 42%] Building CXX object src/CMakeFiles/exiv2lib.dir/tiffcomposite.cpp.o
+[ 43%] Building CXX object src/CMakeFiles/exiv2lib.dir/tiffimage.cpp.o
+[ 44%] Building CXX object src/CMakeFiles/exiv2lib.dir/tiffvisitor.cpp.o
+[ 45%] Building CXX object src/CMakeFiles/exiv2lib.dir/types.cpp.o
+[ 45%] Building CXX object src/CMakeFiles/exiv2lib.dir/utilsvideo.cpp.o
+[ 46%] Building CXX object src/CMakeFiles/exiv2lib.dir/value.cpp.o
+[ 47%] Building CXX object src/CMakeFiles/exiv2lib.dir/version.cpp.o
+[ 47%] Building CXX object src/CMakeFiles/exiv2lib.dir/webpimage.cpp.o
+[ 48%] Building CXX object src/CMakeFiles/exiv2lib.dir/xmp.cpp.o
+[ 49%] Building CXX object src/CMakeFiles/exiv2lib.dir/xmpsidecar.cpp.o
+[ 49%] Building CXX object src/CMakeFiles/exiv2lib.dir/pngchunk.cpp.o
+[ 50%] Building CXX object src/CMakeFiles/exiv2lib.dir/pngimage.cpp.o
+[ 51%] Linking CXX shared library libexiv2.so
+[ 51%] Built target exiv2lib
+Scanning dependencies of target conntest
+[ 52%] Building CXX object src/CMakeFiles/conntest.dir/__/samples/conntest.cpp.o
+[ 52%] Linking CXX executable ../bin/conntest
+[ 52%] Built target conntest
+Scanning dependencies of target exiv2
+[ 52%] Building CXX object src/CMakeFiles/exiv2.dir/exiv2.cpp.o
+[ 53%] Building CXX object src/CMakeFiles/exiv2.dir/actions.cpp.o
+[ 54%] Building CXX object src/CMakeFiles/exiv2.dir/utils.cpp.o
+[ 54%] Linking CXX executable ../bin/exiv2
+[ 54%] Built target exiv2
+Scanning dependencies of target remotetest
+[ 55%] Building CXX object src/CMakeFiles/remotetest.dir/__/samples/remotetest.cpp.o
+[ 56%] Linking CXX executable ../bin/remotetest
+[ 56%] Built target remotetest
+Scanning dependencies of target addmoddel
+[ 56%] Building CXX object samples/CMakeFiles/addmoddel.dir/addmoddel.cpp.o
+[ 57%] Linking CXX executable ../bin/addmoddel
+[ 57%] Built target addmoddel
+Scanning dependencies of target convert-test
+[ 58%] Building CXX object samples/CMakeFiles/convert-test.dir/convert-test.cpp.o
+[ 59%] Linking CXX executable ../bin/convert-test
+[ 59%] Built target convert-test
+Scanning dependencies of target easyaccess-test
+[ 59%] Building CXX object samples/CMakeFiles/easyaccess-test.dir/easyaccess-test.cpp.o
+[ 60%] Linking CXX executable ../bin/easyaccess-test
+[ 60%] Built target easyaccess-test
+Scanning dependencies of target exifcomment
+[ 61%] Building CXX object samples/CMakeFiles/exifcomment.dir/exifcomment.cpp.o
+[ 61%] Linking CXX executable ../bin/exifcomment
+[ 61%] Built target exifcomment
+Scanning dependencies of target exifdata
+[ 62%] Building CXX object samples/CMakeFiles/exifdata.dir/exifdata.cpp.o
+[ 63%] Linking CXX executable ../bin/exifdata
+[ 63%] Built target exifdata
+Scanning dependencies of target exifdata-test
+[ 63%] Building CXX object samples/CMakeFiles/exifdata-test.dir/exifdata-test.cpp.o
+[ 64%] Linking CXX executable ../bin/exifdata-test
+[ 64%] Built target exifdata-test
+Scanning dependencies of target exifprint
+[ 65%] Building CXX object samples/CMakeFiles/exifprint.dir/exifprint.cpp.o
+[ 65%] Linking CXX executable ../bin/exifprint
+[ 65%] Built target exifprint
+Scanning dependencies of target exifvalue
+[ 66%] Building CXX object samples/CMakeFiles/exifvalue.dir/exifvalue.cpp.o
+[ 67%] Linking CXX executable ../bin/exifvalue
+[ 67%] Built target exifvalue
+Scanning dependencies of target exiv2json
+[ 68%] Building CXX object samples/CMakeFiles/exiv2json.dir/exiv2json.cpp.o
+[ 69%] Building CXX object samples/CMakeFiles/exiv2json.dir/Jzon.cpp.o
+[ 70%] Linking CXX executable ../bin/exiv2json
+[ 70%] Built target exiv2json
+Scanning dependencies of target geotag
+[ 70%] Building CXX object samples/CMakeFiles/geotag.dir/geotag.cpp.o
+[ 71%] Linking CXX executable ../bin/geotag
+[ 71%] Built target geotag
+Scanning dependencies of target ini-test
+[ 72%] Building CXX object samples/CMakeFiles/ini-test.dir/ini-test.cpp.o
+[ 72%] Linking CXX executable ../bin/ini-test
+[ 72%] Built target ini-test
+Scanning dependencies of target iotest
+[ 73%] Building CXX object samples/CMakeFiles/iotest.dir/iotest.cpp.o
+[ 74%] Linking CXX executable ../bin/iotest
+[ 74%] Built target iotest
+Scanning dependencies of target iptceasy
+[ 74%] Building CXX object samples/CMakeFiles/iptceasy.dir/iptceasy.cpp.o
+[ 75%] Linking CXX executable ../bin/iptceasy
+[ 75%] Built target iptceasy
+Scanning dependencies of target iptcprint
+[ 76%] Building CXX object samples/CMakeFiles/iptcprint.dir/iptcprint.cpp.o
+[ 76%] Linking CXX executable ../bin/iptcprint
+[ 76%] Built target iptcprint
+Scanning dependencies of target iptctest
+[ 77%] Building CXX object samples/CMakeFiles/iptctest.dir/iptctest.cpp.o
+[ 78%] Linking CXX executable ../bin/iptctest
+[ 78%] Built target iptctest
+Scanning dependencies of target key-test
+[ 78%] Building CXX object samples/CMakeFiles/key-test.dir/key-test.cpp.o
+[ 79%] Linking CXX executable ../bin/key-test
+[ 79%] Built target key-test
+Scanning dependencies of target largeiptc-test
+[ 80%] Building CXX object samples/CMakeFiles/largeiptc-test.dir/largeiptc-test.cpp.o
+[ 81%] Linking CXX executable ../bin/largeiptc-test
+[ 81%] Built target largeiptc-test
+Scanning dependencies of target metacopy
+[ 81%] Building CXX object samples/CMakeFiles/metacopy.dir/metacopy.cpp.o
+[ 82%] Building CXX object samples/CMakeFiles/metacopy.dir/__/src/utils.cpp.o
+[ 83%] Linking CXX executable ../bin/metacopy
+[ 83%] Built target metacopy
+Scanning dependencies of target mmap-test
+[ 83%] Building CXX object samples/CMakeFiles/mmap-test.dir/mmap-test.cpp.o
+[ 84%] Linking CXX executable ../bin/mmap-test
+[ 84%] Built target mmap-test
+Scanning dependencies of target pathtest
+[ 85%] Building CXX object samples/CMakeFiles/pathtest.dir/path-test.cpp.o
+[ 85%] Building CXX object samples/CMakeFiles/pathtest.dir/__/src/utils.cpp.o
+[ 86%] Linking CXX executable ../bin/path-test
+[ 86%] Built target pathtest
+Scanning dependencies of target prevtest
+[ 87%] Building CXX object samples/CMakeFiles/prevtest.dir/prevtest.cpp.o
+[ 87%] Linking CXX executable ../bin/prevtest
+[ 87%] Built target prevtest
+Scanning dependencies of target stringto-test
+[ 87%] Building CXX object samples/CMakeFiles/stringto-test.dir/stringto-test.cpp.o
+[ 88%] Linking CXX executable ../bin/stringto-test
+[ 88%] Built target stringto-test
+Scanning dependencies of target taglist
+[ 89%] Building CXX object samples/CMakeFiles/taglist.dir/taglist.cpp.o
+[ 89%] Linking CXX executable ../bin/taglist
+[ 89%] Built target taglist
+Scanning dependencies of target tiff-test
+[ 90%] Building CXX object samples/CMakeFiles/tiff-test.dir/tiff-test.cpp.o
+[ 91%] Linking CXX executable ../bin/tiff-test
+[ 91%] Built target tiff-test
+Scanning dependencies of target werror-test
+[ 91%] Building CXX object samples/CMakeFiles/werror-test.dir/werror-test.cpp.o
+[ 92%] Linking CXX executable ../bin/werror-test
+[ 92%] Built target werror-test
+Scanning dependencies of target write-test
+[ 93%] Building CXX object samples/CMakeFiles/write-test.dir/write-test.cpp.o
+[ 93%] Linking CXX executable ../bin/write-test
+[ 93%] Built target write-test
+Scanning dependencies of target write2-test
+[ 94%] Building CXX object samples/CMakeFiles/write2-test.dir/write2-test.cpp.o
+[ 95%] Linking CXX executable ../bin/write2-test
+[ 95%] Built target write2-test
+Scanning dependencies of target xmpparse
+[ 96%] Building CXX object samples/CMakeFiles/xmpparse.dir/xmpparse.cpp.o
+[ 97%] Linking CXX executable ../bin/xmpparse
+[ 97%] Built target xmpparse
+Scanning dependencies of target xmpparser-test
+[ 97%] Building CXX object samples/CMakeFiles/xmpparser-test.dir/xmpparser-test.cpp.o
+[ 98%] Linking CXX executable ../bin/xmpparser-test
+[ 98%] Built target xmpparser-test
+Scanning dependencies of target xmpsample
+[ 99%] Building CXX object samples/CMakeFiles/xmpsample.dir/xmpsample.cpp.o
+[100%] Linking CXX executable ../bin/xmpsample
+[100%] Built target xmpsample
+[ 11%] Built target xmp
+[ 51%] Built target exiv2lib
+[ 52%] Built target conntest
+[ 54%] Built target exiv2
+[ 56%] Built target remotetest
+[ 57%] Built target addmoddel
+[ 59%] Built target convert-test
+[ 60%] Built target easyaccess-test
+[ 61%] Built target exifcomment
+[ 63%] Built target exifdata
+[ 64%] Built target exifdata-test
+[ 65%] Built target exifprint
+[ 67%] Built target exifvalue
+[ 70%] Built target exiv2json
+[ 71%] Built target geotag
+[ 72%] Built target ini-test
+[ 74%] Built target iotest
+[ 75%] Built target iptceasy
+[ 76%] Built target iptcprint
+[ 78%] Built target iptctest
+[ 79%] Built target key-test
+[ 81%] Built target largeiptc-test
+[ 83%] Built target metacopy
+[ 84%] Built target mmap-test
+[ 86%] Built target pathtest
+[ 87%] Built target prevtest
+[ 88%] Built target stringto-test
+[ 89%] Built target taglist
+[ 91%] Built target tiff-test
+[ 92%] Built target werror-test
+[ 93%] Built target write-test
+[ 95%] Built target write2-test
+[ 97%] Built target xmpparse
+[ 98%] Built target xmpparser-test
+[100%] Built target xmpsample
+Install the project...
+-- Install configuration: ""
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/exv_conf.h
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/svn_version.h
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/lib/pkgconfig/exiv2.pc
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/lib/pkgconfig/exiv2.lsm
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/lib/libxmp.a
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/lib/libexiv2.so.26.0.0
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/lib/libexiv2.so.26
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/lib/libexiv2.so
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/lib/libexiv2.so.26.0.0"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exiv2
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exiv2"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/asfvideo.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/basicio.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/bmpimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/config.h
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/convert.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/cr2image.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/crwimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/datasets.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/easyaccess.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/epsimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/error.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/exif.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/exiv2.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/futils.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/gifimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/http.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/image.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/ini.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/iptc.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/jp2image.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/jpgimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/matroskavideo.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/metadatum.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/mrwimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/orfimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/pgfimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/preview.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/properties.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/psdimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/quicktimevideo.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/rafimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/riffvideo.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/rwlock.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/rw2image.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/tags.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/tgaimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/tiffimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/types.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/utilsvideo.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/value.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/version.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/webpimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/xmp.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/xmpsidecar.hpp
+-- Up-to-date: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/utilsvideo.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/include/exiv2/pngimage.hpp
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/share/man/man1/exiv2.1
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/addmoddel
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/addmoddel"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/convert-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/convert-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/easyaccess-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/easyaccess-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exifcomment
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exifcomment"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exifdata-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exifdata-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exifdata
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exifdata"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exifprint
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exifprint"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exifvalue
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exifvalue"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/ini-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/ini-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/iotest
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/iotest"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/iptceasy
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/iptceasy"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/iptcprint
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/iptcprint"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/iptctest
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/iptctest"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/key-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/key-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/largeiptc-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/largeiptc-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/mmap-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/mmap-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/prevtest
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/prevtest"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/stringto-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/stringto-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/taglist
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/taglist"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/tiff-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/tiff-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/werror-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/werror-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/write-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/write-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/write2-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/write2-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/xmpparse
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/xmpparse"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/xmpparser-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/xmpparser-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/xmpsample
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/xmpsample"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/metacopy
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/metacopy"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/path-test
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/path-test"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exiv2json
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exiv2json"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/geotag
+-- Removed runtime path from "/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/geotag"
+-- Installing: /home/rmills/gnu/exiv2/buildserver/build/dist/linux/share/man/man1/exiv2samples.1
+++ addmoddel.sh ++
+all testcases passed.
+++ bugfixes-test.sh ++
+426 440 443 444 445 447 452 460 479 480 495 498 501 528 540 554 662 666 683 711 726 751 769 784 799 800 812 816 825 831 (836 skipped) 841 855 876 884 922 935 937 937a 1024 1026 1040 1043 1044 1053 1054 1058 1062 1080 1074 1108 1112 1114 1122 1137 1140 1144 1145 1153 1155 1166 1167 1170 1179 1202 1223 1225 1229 1242 1247 
+Files /home/rmills/gnu/exiv2/buildserver/test/tmp/bugfixes-test.out and /home/rmills/gnu/exiv2/buildserver/test/data/bugfixes-test.out differ
+1029d1028
+< Warning: Updating namespace URI for imageapp from orig/ to dest/
+1034c1033
+<     xmlns:imageapp="dest/"
+---
+>     xmlns:imageapp="orig/"
+1041a1041
+> Warning: Updating namespace URI for imageapp from dest/ to orig/
+1046c1046
+<     xmlns:imageapp="dest/"
+---
+>     xmlns:imageapp="orig/"
+++ exifdata-test.sh ++
+all testcases passed.
+++ exiv2-test.sh ++
+all testcases passed.
+++ imagetest.sh ++
+
+Erase all tests..................
+Copy all tests.........
+Copy iptc tests.........
+---------------------------------------------------------
+All test cases passed
+++ iotest.sh ++
+
+Io tests...
+---------------------------------------------------------
+All test cases passed
+++ iptctest.sh ++
+
+Read tests..................
+Remove tests..................
+Add/Mod tests..................
+Extended tests..................
+---------------------------------------------------------
+All test cases passed
+++ modify-test.sh ++
+all testcases passed.
+++ path-test.sh ++
+++ preview-test.sh ++
+.....................................
+All testcases passed.
+++ stringto-test.sh ++
+all testcases passed.
+++ tiff-test.sh ++
+all testcases passed.
+++ write-test.sh ++
+all testcases passed.
+++ write2-test.sh ++
+all testcases passed.
+++ xmpparser-test.sh ++
+all testcases passed.
+++ conversions.sh ++
+all testcases passed.
+exiv2 0.26 001a00 (64 bit build)
+Copyright (C) 2004-2017 Andreas Huggel.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA 02110-1301 USA
+exiv2=0.26.0
+platform=linux
+compiler=G++
+bits=64
+dll=1
+debug=0
+cplusplus=199711
+cplusplus11=0
+version=4.9.3
+date=May 17 2017
+time=02:18:16
+svn=4772
+ssh=0
+curl=0
+id=$Id: version.cpp 4764 2017-04-23 19:29:19Z robinwmills $
+executable=/home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exiv2
+library=/home/rmills/gnu/exiv2/buildserver/build/dist/linux/lib/libexiv2.so.26
+library=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
+library=/lib/x86_64-linux-gnu/libgcc_s.so.1
+library=/lib/x86_64-linux-gnu/libc.so.6
+library=/lib/x86_64-linux-gnu/libdl.so.2
+library=/usr/local/lib/libz.so.1
+library=/usr/local/lib/libexpat.so.1
+library=/lib/x86_64-linux-gnu/libm.so.6
+library=/lib/x86_64-linux-gnu/libpthread.so.0
+library=/lib64/ld-linux-x86-64.so.2
+have_regex=1
+have_strerror_r=1
+have_gmtime_r=1
+have_inttypes=0
+have_libintl=1
+have_lensdata=1
+have_iconv=1
+have_memory=1
+have_memset=1
+have_lstat=0
+have_stdbool=1
+have_stdint=1
+have_stdlib=1
+have_strlib=0
+have_strchr=1
+have_strerror=1
+have_strerror_r=1
+have_strings_h=0
+have_strtol=1
+have_mmap=1
+have_munmap=1
+have_sys_stat=1
+have_timegm=1
+have_unistd_h=0
+have_sys_mman=1
+have_libz=1
+have_xmptoolkit=1
+have_bool=0
+have_strings=1
+have_sys_types=1
+have_unistd=1
+have_unicode_path=1
+enable_video=1
+enable_webready=1
+config_path=/home/rmills/.exiv2
+uid=1000
+euid=1000
+gid=1000
+xmlns=DICOM:http://ns.adobe.com/DICOM/
+xmlns=GPano:http://ns.google.com/photos/1.0/panorama/
+xmlns=Iptc4xmpCore:http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/
+xmlns=Iptc4xmpExt:http://iptc.org/std/Iptc4xmpExt/2008-02-29/
+xmlns=MP:http://ns.microsoft.com/photo/1.2/
+xmlns=MPRI:http://ns.microsoft.com/photo/1.2/t/RegionInfo#
+xmlns=MPReg:http://ns.microsoft.com/photo/1.2/t/Region#
+xmlns=MicrosoftPhoto:http://ns.microsoft.com/photo/1.0/
+xmlns=acdsee:http://ns.acdsee.com/iptc/1.0/
+xmlns=album:http://ns.adobe.com/album/1.0/
+xmlns=asf:http://ns.adobe.com/asf/1.0/
+xmlns=audio:http://www.audio/
+xmlns=aux:http://ns.adobe.com/exif/1.0/aux/
+xmlns=bmsp:http://ns.adobe.com/StockPhoto/1.0/
+xmlns=creatorAtom:http://ns.adobe.com/creatorAtom/1.0/
+xmlns=crs:http://ns.adobe.com/camera-raw-settings/1.0/
+xmlns=crss:http://ns.adobe.com/camera-raw-saved-settings/1.0/
+xmlns=dc:http://purl.org/dc/elements/1.1/
+xmlns=dcterms:http://purl.org/dc/terms/
+xmlns=digiKam:http://www.digikam.org/ns/1.0/
+xmlns=dwc:http://rs.tdwg.org/dwc/index.htm
+xmlns=exif:http://ns.adobe.com/exif/1.0/
+xmlns=exifEX:http://cipa.jp/exif/1.0/
+xmlns=expressionmedia:http://ns.microsoft.com/expressionmedia/1.0/
+xmlns=iX:http://ns.adobe.com/iX/1.0/
+xmlns=jp2k:http://ns.adobe.com/jp2k/1.0/
+xmlns=jpeg:http://ns.adobe.com/jpeg/1.0/
+xmlns=kipi:http://www.digikam.org/ns/kipi/1.0/
+xmlns=lr:http://ns.adobe.com/lightroom/1.0/
+xmlns=mediapro:http://ns.iview-multimedia.com/mediapro/1.0/
+xmlns=mwg-kw:http://www.metadataworkinggroup.com/schemas/keywords/
+xmlns=mwg-rs:http://www.metadataworkinggroup.com/schemas/regions/
+xmlns=pdf:http://ns.adobe.com/pdf/1.3/
+xmlns=pdfaExtension:http://www.aiim.org/pdfa/ns/extension/
+xmlns=pdfaField:http://www.aiim.org/pdfa/ns/field#
+xmlns=pdfaProperty:http://www.aiim.org/pdfa/ns/property#
+xmlns=pdfaSchema:http://www.aiim.org/pdfa/ns/schema#
+xmlns=pdfaType:http://www.aiim.org/pdfa/ns/type#
+xmlns=pdfaid:http://www.aiim.org/pdfa/ns/id/
+xmlns=pdfx:http://ns.adobe.com/pdfx/1.3/
+xmlns=pdfxid:http://www.npes.org/pdfx/ns/id/
+xmlns=photoshop:http://ns.adobe.com/photoshop/1.0/
+xmlns=plus:http://ns.useplus.org/ldf/xmp/1.0/
+xmlns=png:http://ns.adobe.com/png/1.0/
+xmlns=rdf:http://www.w3.org/1999/02/22-rdf-syntax-ns#
+xmlns=stArea:http://ns.adobe.com/xmp/sType/Area#
+xmlns=stDim:http://ns.adobe.com/xap/1.0/sType/Dimensions#
+xmlns=stEvt:http://ns.adobe.com/xap/1.0/sType/ResourceEvent#
+xmlns=stFnt:http://ns.adobe.com/xap/1.0/sType/Font#
+xmlns=stJob:http://ns.adobe.com/xap/1.0/sType/Job#
+xmlns=stMfs:http://ns.adobe.com/xap/1.0/sType/ManifestItem#
+xmlns=stRef:http://ns.adobe.com/xap/1.0/sType/ResourceRef#
+xmlns=stVer:http://ns.adobe.com/xap/1.0/sType/Version#
+xmlns=tiff:http://ns.adobe.com/tiff/1.0/
+xmlns=video:http://www.video/
+xmlns=wav:http://ns.adobe.com/xmp/wav/1.0/
+xmlns=xml:http://www.w3.org/XML/1998/namespace
+xmlns=xmp:http://ns.adobe.com/xap/1.0/
+xmlns=xmpBJ:http://ns.adobe.com/xap/1.0/bj/
+xmlns=xmpDM:http://ns.adobe.com/xmp/1.0/DynamicMedia/
+xmlns=xmpG:http://ns.adobe.com/xap/1.0/g/
+xmlns=xmpGImg:http://ns.adobe.com/xap/1.0/g/img/
+xmlns=xmpMM:http://ns.adobe.com/xap/1.0/mm/
+xmlns=xmpNote:http://ns.adobe.com/xmp/note/
+xmlns=xmpRights:http://ns.adobe.com/xap/1.0/rights/
+xmlns=xmpT:http://ns.adobe.com/xap/1.0/t/
+xmlns=xmpTPg:http://ns.adobe.com/xap/1.0/t/pg/
+xmlns=xmpidq:http://ns.adobe.com/xmp/Identifier/qual/1.0/
+total 2028
+drwxrwxr-x 2 rmills rmills   4096 May 17 02:18 .
+drwxrwxr-x 6 rmills rmills   4096 May 17 02:18 ..
+-rwxr-xr-x 1 rmills rmills  44061 May 17 02:18 xmpparser-test
+-rwxr-xr-x 1 rmills rmills  62409 May 17 02:18 xmpsample
+-rwxr-xr-x 1 rmills rmills  55528 May 17 02:18 write2-test
+-rwxr-xr-x 1 rmills rmills  38933 May 17 02:18 xmpparse
+-rwxr-xr-x 1 rmills rmills  20950 May 17 02:18 werror-test
+-rwxr-xr-x 1 rmills rmills  46372 May 17 02:18 write-test
+-rwxr-xr-x 1 rmills rmills  15740 May 17 02:18 taglist
+-rwxr-xr-x 1 rmills rmills  51619 May 17 02:18 tiff-test
+-rwxr-xr-x 1 rmills rmills  28565 May 17 02:18 prevtest
+-rwxr-xr-x 1 rmills rmills  20952 May 17 02:18 stringto-test
+-rwxr-xr-x 1 rmills rmills  22278 May 17 02:18 mmap-test
+-rwxr-xr-x 1 rmills rmills  26947 May 17 02:18 path-test
+-rwxr-xr-x 1 rmills rmills  32333 May 17 02:18 largeiptc-test
+-rwxr-xr-x 1 rmills rmills  36924 May 17 02:18 metacopy
+-rwxr-xr-x 1 rmills rmills  37714 May 17 02:18 iptctest
+-rwxr-xr-x 1 rmills rmills  25588 May 17 02:18 key-test
+-rwxr-xr-x 1 rmills rmills  27144 May 17 02:18 iptceasy
+-rwxr-xr-x 1 rmills rmills  32659 May 17 02:18 iptcprint
+-rwxr-xr-x 1 rmills rmills  26028 May 17 02:18 ini-test
+-rwxr-xr-x 1 rmills rmills  32041 May 17 02:18 iotest
+-rwxr-xr-x 1 rmills rmills 182550 May 17 02:18 geotag
+-rwxr-xr-x 1 rmills rmills 355452 May 17 02:18 exiv2json
+-rwxr-xr-x 1 rmills rmills  21631 May 17 02:18 exifvalue
+-rwxr-xr-x 1 rmills rmills  66131 May 17 02:18 exifdata-test
+-rwxr-xr-x 1 rmills rmills  39721 May 17 02:18 exifprint
+-rwxr-xr-x 1 rmills rmills  20310 May 17 02:18 exifcomment
+-rwxr-xr-x 1 rmills rmills  61503 May 17 02:18 exifdata
+-rwxr-xr-x 1 rmills rmills  33981 May 17 02:18 convert-test
+-rwxr-xr-x 1 rmills rmills  27322 May 17 02:18 easyaccess-test
+-rwxr-xr-x 1 rmills rmills  85921 May 17 02:18 addmoddel
+-rwxr-xr-x 1 rmills rmills 428441 May 17 02:18 exiv2
+exiv2 0.26 001a00 (64 bit build)
+version=4.9.3
+date=May 17 2017
+time=02:18:16
+id=$Id: version.cpp 4764 2017-04-23 19:29:19Z robinwmills $
+have_gmtime_r=1
+have_timegm=1
+xmlns=mediapro:http://ns.iview-multimedia.com/mediapro/1.0/
+-rwxr-xr-x 1 rmills rmills 428441 May 17 02:18 /home/rmills/gnu/exiv2/buildserver/build/dist/linux/bin/exiv2
