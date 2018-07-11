@@ -1,0 +1,37 @@
+{
+    "server" : {
+        "host": "192.168.0.15"
+    },
+"locations" : {
+    "Chrome" : {
+        "location" : "Horsham_wptagent:Chrome",
+        "speed" : "",
+        "options" : ""
+        },
+    "Firefox" : {
+        "location" : "Horsham_wptagent:Firefox",
+        "speed" : "",
+        "options" : ""
+        },
+    "IE" : {
+        "location" : "Horsham_wptagent:IE",
+        "speed" : "",
+        "options" : ""
+        },
+    "Edge" : {
+        "location" : "Horsham_wptagent:IE",
+        "speed" : "",
+        "options" : ""
+        },
+    "Safari" : {
+        "location" : "Horsham_wptagent:Safari",
+        "speed" : "",
+        "options" : ""
+        },
+    "Opera" : {
+        "location" : "Horsham_wptagent:Opera",
+        "speed" : "",
+        "options" : ""
+        }
+    }
+}

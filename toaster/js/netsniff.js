@@ -113,23 +113,23 @@ if (system.args.length === 1) {
 	var viewportwidth = system.args[3];
 	var fname = system.args[4];
 	var uastring = system.args[5];
-    var brout = system.args[6];
+    var brout = system.args[6]; //$browserengineoutput path
     var outfile = '';
     var outfileCK = '';
     var outfilePD = '';
-    if(brout.substr(0,5) != '/usr/')
+    if(brout.substr(0,5) != '/usr/' && brout.substr(0,5) != '/var/') // usr on local, var on webpagetoaster.com
     {
 //console.log("Windows");
-        outfile = 'tmp/'+system.args[6]; // windows
-        outfileCK = 'tmp/CK'+system.args[6]; // windows
-        outfilePD = 'tmp/PD'+system.args[6]; // windows
+        outfile = 'tmp/'+system.args[6]; // windows page content - domafter
+        outfileCK = 'tmp/'+system.args[6]+"CK"; // windows cookies file
+        outfilePD = 'tmp/'+system.args[6]+"PD"; // windows postdata file
     }
     else
     {
 //console.log("Linux");
-        outfile = system.args[6]; // linux
-        outfileCK = system.args[6]+"CK"; // linux
-        outfilePD = system.args[6]+"PD"; // linux
+        outfile = system.args[6]; // linux page content - domafter
+        outfileCK = system.args[6]+"CK"; // linux cookies file
+        outfilePD = system.args[6]+"PD"; // linux postdata file
     }
 //console.log("PJS outfile: " + outfile);
 //console.log("PJS outfileck: " + outfileCK);
@@ -230,8 +230,8 @@ console.log(JSON.stringify(har, undefined, 4));
       var pathPD = outfilePD;
       //fs.remove(path);`
       var content = page.content;
-//console.log("writing content  " + content);
-//console.log("writing content to path " + outfile);
+// console.log("writing content  " + content);
+// console.log("writing content to path " + outfile);
       fs.write(path, content, 'a');
       fspd.write(pathPD, JSON.stringify(postData),'a');
       saveCookies(outfileCK);

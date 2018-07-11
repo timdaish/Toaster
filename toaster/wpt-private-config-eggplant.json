@@ -1,0 +1,47 @@
+{
+    "server" : {
+        "host": "10.90.67.11"
+    },
+"locations" : {
+    "Chrome" : {
+        "location" : "local_wptdriver:Chrome",
+        "speed" : "PA",
+        "options" : ""
+        },
+    "Firefox" : {
+        "location" : "local_wptdriver:Firefox",
+        "speed" : "PA",
+        "options" : ""
+        },
+    "IE" : {
+        "location" : "local_wptdriver:IE",
+        "speed" : "PA",
+        "options" : ""
+        },
+    "Edge" : {
+        "location" : "local_wptdriver:IE",
+        "speed" : "PA",
+        "options" : "ua"
+        },
+    "Android5.1N7" : {
+        "location" : "Local_Nexus7",
+        "speed" : "",
+        "options" : ""
+        },
+    "Android5.0M" : {
+        "location" : "Local_MotoG",
+        "speed" : "",
+        "options" : ""
+        },
+    "iPhone iOS11" : {
+        "location" : "BiPhone6",
+        "speed" : "",
+        "options" : ""
+        },
+    "iPad iOS11" : {
+        "location" : "BiPadAir",
+        "speed" : "",
+        "options" : ""
+        }
+    }
+}

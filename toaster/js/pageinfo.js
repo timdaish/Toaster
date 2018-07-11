@@ -1,4 +1,4 @@
-﻿// globals
+// globals
 var headerfields = '';
 var headeranalysis = '';
 var gzipanalysis = '';
@@ -400,10 +400,15 @@ function fnFormatDetails(oTable, nTr) {
         objLocFileCnv = objLocFileurl.replace(/[/\\*]/g, '\/');
         //console.log("WIN objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv);
     }
-    else {
-        objLocFileurl = objLocFile.substr(10); // strip the /usr/local from the front
+    else { // linux
+        if(objLocFile.indexOf("/usr/share") !== -1)
+        { // local
+        objLocFileurl = objLocFile.substr(10); // strip the /usr/share from the front
         objLocFileCnv = objLocFileurl.replace(/[/\\*]/g, '\/');
-        //console.log("LINUX objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv);
+        }
+        else // webpagetoaster.com
+            objLocFileCnv = objLocFile;
+//console.log("LINUX objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv);
     }
     objLocFileCnv.trim();
     //console.log("objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv);
@@ -854,10 +859,15 @@ function fnFormatOptImgDetails(oTable, nTr) {
         objLocFileCnv = objLocFileurl.replace(/[/\\*]/g, '\/');
         //console.log("WIN objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv);
     }
-    else {
-        objLocFileurl = objLocFile.substr(10); // strip the /usr/local from the front
+    else { // linux
+        if(objLocFile.indexOf("/usr/share") !== -1)
+        { // local
+        objLocFileurl = objLocFile.substr(10); // strip the /usr/share from the front
         objLocFileCnv = objLocFileurl.replace(/[/\\*]/g, '\/');
-        //console.log("LINUX objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv);
+        }
+        else // webpagetoaster.com
+            objLocFileCnv = objLocFile;
+//console.log("LINUX objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv);
     }
     objLocFileCnv.trim();
     //console.log("objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv)
@@ -1697,17 +1707,34 @@ function mainDisplay(browserenginever) {
                     local = local.substr(3); // strip the c:\ from the front
                     //console.log("WIN objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv);
                 }
-                else {
-                    local = local.substr(11); // strip the /usr/local from the front
-                    //console.log("LINUX objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv);
+                else { // linux
+                    if(local.indexOf("/usr/share") !== -1)
+                    { // local
+                    var objLocFileurl = local.substr(10); // strip the /usr/share from the front
+                    local = objLocFileurl.replace(/[/\\*]/g, '\/');
+                    }
+                    else // webpagetoaster.com
+                        local = local;
+            //console.log("LINUX objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv);
                 }
                 if (imgdim != '1 x 1 px' && imgdim != '2 x 2 px' && parseInt(NewObj[val]['Content length transmitted']) > 0) {
+                    if(local.substring(0,4) != "http")
+                        local = "/" + local;
+                    // adjust linux path
+                    if(local.indexOf("/usr/share") !== -1)
+                    { // local
+                        local = local.substr(11); // strip the /usr/share from the front
+                    }
+                    if(local.indexOf("//toast") !== -1)
+                    { // local
+                        local = local.substr(1); // strip the first / from the front
+                    }
                     local = local.replace(/[/\\*]/g, '\/');
-                    //console.log(local);
+                    console.log(local);
                     shortname = getShortName(remote);
                     caption = shortname + "<br/>" + csize;
                     imagestoshow.push(local);
-                    $("#theDiv").append('<figure><img id="theImg" src=\"/' + local + '" title="' + remote + '"><figcaption>' + caption + '</figcaption></figure>');
+                     $("#theDiv").append('<figure><img id="theImg" src=\"' + local + '" title="' + remote + '"><figcaption>' + caption + '</figcaption></figure>');
                 }
 
             } // end if value is not false
@@ -6658,7 +6685,7 @@ function plotChartPieDomains(data) {
                 data: data
             }],
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
         });
@@ -6698,7 +6725,7 @@ function plotChartPieDomains3P(data) {
                 data: data
             }],
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
         });
@@ -6737,7 +6764,7 @@ function plotChartPieDomains3P2(data) {
                 data: data
             }],
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
         });
@@ -6776,7 +6803,7 @@ function plotChartPieDomainTypes(data) {
                 data: data
             }],
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
         });
@@ -6816,7 +6843,7 @@ function plotChartPie3PDomains(data) {
                 data: data
             }],
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
         });
@@ -6856,7 +6883,7 @@ function plotChartPie3P2Domains(data) {
                 data: data
             }],
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
         });
@@ -6910,7 +6937,7 @@ function plotChartPie3P3Domains(data) {
                     }
             }],
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
         });
@@ -7017,7 +7044,7 @@ function createGroupCategoryPieChart(groupName)
                 data: data
             }],
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
         });
@@ -7147,7 +7174,7 @@ function plotChartPieOrderingHdrsb4(data) {
                 data: data
             }],
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
         });
@@ -7188,7 +7215,7 @@ function plotChartPieOrderingBodyb4(data) {
                 data: data
             }],
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
         });
@@ -7228,7 +7255,7 @@ function plotChartPieOrderingHdrs(data) {
                 data: data
             }],
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
         });
@@ -7269,7 +7296,7 @@ function plotChartPieOrderingBody(data) {
                 data: data
             }],
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
         });
@@ -7921,7 +7948,7 @@ function displayChartCacheAnalysis() {
                 }
             },
             credits: {
-                text: '© 2018 Eggplant',
+                text: '� 2018 Eggplant',
                 href: 'https://www.eggplant.io'
             },
             series: [{

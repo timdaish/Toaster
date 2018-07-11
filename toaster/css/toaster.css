@@ -214,20 +214,17 @@ padding: 10px;
 .busy * {
     cursor: wait !important;
 }
-#toastingnow{
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  max-width: 400px;
-  max-height: 800px;
-  overflow: hidden;
-}
+
 #theImg{
   margin-top: 32px;
   width: 100%;
 }
 .imgicon{
   border: none;
+}
+#floatcontainer
+{
+  display: block;
 }
 #boxlinks{
   position: absolute;
@@ -247,6 +244,14 @@ background-position:center;
   padding: 5px;
   margin: 5px;
   text-align: center;
+}
+#toastingnow{
+  float: left;
+  top: 10px;
+  right: 10px;
+  max-width: 400px;
+  max-height: 800px;
+  overflow: hidden;
 }
 a.tpdb{
     text-decoration: none; font: menu;

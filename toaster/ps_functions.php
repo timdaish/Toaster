@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $today = date("Ymd");
 //$cookie_jar tempnam('/tmp','cookie');
 if ($OS == "Windows")
@@ -10,8 +10,18 @@ if ($OS == "Windows")
 }
 else
 {
-    $cookie_jar = tempnam("/usr/share/toast/", "cky");
-    $drv = '/usr/share';
+    $hostname = gethostname();
+    //override for webpagetoaster server
+    if( strpos($hostname,"gridhost.co.uk") != false)
+    {
+        $cookie_jar = tempnam("/var/sites/w/webpagetoaster.com/subdomains/toast/", "cky");
+        $drv = '/var/sites/w/webpagetoaster.com/subdomains';
+    }
+        else
+    {
+        $cookie_jar = tempnam("/usr/share/toast/", "cky");
+        $drv = '/usr/share';
+    }
     $filepath_basesavedir = $drv . "/toast/";
 }
 define ( CURL_HTTP_VERSION_2TLS , 4);
@@ -20,6 +30,7 @@ $b3pdbPublic = true;
 $filepath_domainsavedir = '';
 $filepath_domainsaverootdir = '';
 $filepathname_rootobject_headersandbody = '';
+$runnotes = '';
 $toastedwebname = '';
 $localvpath = '';
 $result = '';
@@ -428,7 +439,7 @@ function getStyleIDandClasess($initurl)
         $str = str_replace("?&amp;", "?", $url, $count);
         if ($count > 0)
             error_log("replaced misconfigured query string parm ?& . " . $url);
-// htmlspecialchars_decode — Convert special HTML entities back to characters
+// htmlspecialchars_decode � Convert special HTML entities back to characters
         $url = htmlspecialchars_decode($url);
         $curlheader = array();
         $fp = fopen($sfn, "w");
@@ -896,7 +907,7 @@ function getStyleIDandClasess($initurl)
         $str = str_replace("?&amp;", "?", $url, $count);
         if ($count > 0)
             error_log("replaced misconfigured query string parm ?& . " . $url);
-// htmlspecialchars_decode — Convert special HTML entities back to characters
+// htmlspecialchars_decode � Convert special HTML entities back to characters
         $url = htmlspecialchars_decode($url);
         $curlheader = array();
         $fp = fopen($sfn, "w");
@@ -1936,7 +1947,7 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                 if (isset($update) and $update <> '')
                 {
                     $arrayPageObjects[$foundkey]["Object file"] = $inarr["Object file"];
-    //echo("updating local file to " . $update."<br/>");
+//echo("updating local file to " . $update."<br/>");
                 }
                 $update = @ $inarr["Object parent"];
                 if (isset($update) and $update <> '')
@@ -6900,7 +6911,7 @@ debug ("creating basefilepath ",$path);
 
     function sanitize_file_name($string, $force_lowercase = true, $anal = false)
     {
-        $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "=", "+", "[", "{", "]", "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;", "â€”", "â€“", ",", "<", ">", "?");
+        $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "=", "+", "[", "{", "]", "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;", "—", "–", ",", "<", ">", "?");
         $clean = trim(str_replace($strip, "", strip_tags($string)));
         $clean = preg_replace('/\s+/', " ", $clean);
         $clean = ($anal) ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean;
@@ -8178,5 +8189,4 @@ debug ("creating basefilepath ",$path);
 $kill = function($pid){ return stripos(php_uname('s'), 'win')>-1 
     ? exec("taskkill /F /PID $pid") : exec("kill -9 $pid");
 };
-
 ?>

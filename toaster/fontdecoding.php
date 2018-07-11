@@ -1,6 +1,6 @@
 <?php
 require_once 'base128.php'; 
-header('Content-type: text/html; charset=utf-8');
+//header('Content-type: text/html; charset=utf-8');
 // font decoding - WOFF WOFF2
 function getFontSignature($lf)
 {

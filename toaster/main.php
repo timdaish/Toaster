@@ -1,5 +1,7 @@
-﻿<?php
+<?php
+session_start();
 $serverName = 'http://'.$_SERVER['SERVER_NAME'];
+$hostname = gethostname();
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
   $windows = defined('PHP_WINDOWS_VERSION_MAJOR');
 //echo 'This is a server using Windows! '. $windows."<br/>";
@@ -9,13 +11,11 @@ else {
 //echo 'This is a server not using Windows!'."<br/>";
     $OS = PHP_OS;
 }
-session_start();
 $_SESSION['status'] = 'Putting the Page into the Toaster!';
 $_SESSION['object'] = '';
 $_SESSION['mimetype'] = '';
 $_SESSION['imagepath'] = '';
 $_SESSION['toastedfile']  = '';
-session_write_close();
 date_default_timezone_set('UTC');
 set_time_limit(0);
 ini_set("auto_detect_line_endings", true);
@@ -37,12 +37,22 @@ include 'class.GifDecoder.php';
 include 'ttfInfo.class.php';
 include 'wpt_functions.php';
 include '3ptags_nccgroup_db.php';
+$toasterid=generateRandomString();
 if($OS == "Windows")
 {
     $debuglog = "c:\\temp\\debug.txt";
 }
 else
-    $debuglog = "/usr/share/toast/debug.txt";
+{
+    //set path for webpagetoaster server and others
+	if( strpos($hostname,"gridhost.co.uk") != false)
+    {
+		$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/debug.txt";
+	}
+	else{
+		$debuglog = "/usr/share/toast/debug.txt";
+	}
+}
 file_put_contents($debuglog, "DEBUG LOG started" . PHP_EOL);
 ini_set("log_errors", 1);
 ini_set("error_log", $debuglog);
@@ -147,158 +157,23 @@ if (isset($_REQUEST["url"]))
 	  //echo "URL is valid";
 	  }
 	$i = $_REQUEST["ua"];
-    $wptbrowser = $i;
-	switch ($i) {
-    case "Chrome":
-        $ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
-		$res = "1920x1080";
-        $uastr ="Chrome_Desktop";
-        break;
-    case "Firefox":
-        $ua = "Mozilla/5.0 (Windows NT 8.1; Win64; rv:55.0) Gecko/20100101 Firefox/55.0";
-        $res = "1920x1080";
-        $uastr ="Firefox_Desktop";
-        break;
-    case "Edge":
-        $ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36 Edge/15.15063";
-        $res = "1920x1080";
-        $uastr ="Edge_Desktop";
-		break;
-    case "IE":
-        $ua = "Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko";
-        $res = "1920x1080";
-        $uastr ="IE_Desktop";
-		break;
-	case "iPhone iOS4":
-		$ua = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7";
-		$res = '640x960';
-        $uastr ="iPhone_Safari_iOS4";
-        break;
-	case "iPhone iOS5":
-		$ua = "Mozilla/5.0 (iphone; cpu iphone os 7_0_2 like mac os x) applewebkit/537.51.1 (khtml, like gecko) version/7.0 mobile/11a501 safari/9537.53";
-        $res = '640x960';
-        $uastr ="iPhone_Safari_iOS5";
-		break;
-	case "iPhone iOS6":
-		$ua = "Mozilla/5.0 (iPad; CPU OS 6_1_3 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10B329 Safari/8536.25";
-        $res = "640x1136";
-        $uastr ="iPhone_Safari_iOS6";
-		break;
-	case "iPhone iOS7":
-		$ua = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 7_0_4 like Mac OS X; en-US) AppleWebKit/534.35 (KHTML, like Gecko) Chrome/11.0.696.65 Safari/534.35 Puffin/3.11505IP Mobile";
-        $res = "750x1334";
-        $uastr ="iPhone_Safari_iOS7";
-		break;
-    case "iPhone iOS8":
-		$ua = "Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/538.34.9 (KHTML, like Gecko) Version/7.0 Mobile/12A4265u Safari/9537.53";
-        $res = "750x1334";
-        $uastr ="iPhone_Safari_iOS8";
-		break;
-    case "iPhone iOS9":
-		$ua = "Mozilla/5.0 (iPhone; CPU iPhone OS 9_2 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13C75 Safari/601.1";
-        $res = "750x1334";
-        $uastr ="iPhone_Safari_iOS9";
-		break;
-    case "iPhone iOS10":
-		$ua = "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.6 (KHTML, like Gecko) Version/10.0 Mobile/14G5057a Safari/602.1";
-        $res = "750x1334";
-        $uastr ="iPhone_Safari_iOS10";
-		break;
-    case "iPhone iOS11":
-		$ua = "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.21 (KHTML, like Gecko) Version/10.0 Mobile/15A5278f Safari/602.1";
-        $res = "750x1334";
-        $uastr ="iPhone_Safari_iOS11";
-		break;
-    case "iPad iOS3":
-		$ua = "Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.10";
-		$res = "1024x768";
-        $uastr ="iPad_Safari_iOS3";
-		break;
-	case "iPad iOS5":
-		$ua = "Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X; en-us) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B176 Safari/7534.48.3";
-		$res = "1024x768";
-        $uastr ="iPad_Safari_iOS5";
-		break;
-	case "iPad iOS6":
-		$ua = "Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25";
-		$res = "1024x768";
-        $uastr ="iPad_Safari_iOS6";
-		break;
-    case "iPad iOS7":
-		$ua = "Mozilla/5.0 (iPad; CPU OS 7_1_1 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) CriOS/35.0.1916.38 Mobile/11D201 Safari/9537.53 (000575)";
-		$res = "1024x768";
-        $uastr ="iPad_Safari_iOS7";
-		break;
-    case "iPad iOS8":
-		$ua = "Mozilla/5.0 (iPad; CPU OS 8_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) CriOS/30.0.1599.12 Mobile/11A465 Safari/8536.25 (3B92C18B-D9DE-4CB7-A02A-22FD2AF17C8F)";
-		$res = "1024x768";
-        $uastr ="iPad_Safari_iOS8";
-		break;
-    case "iPad iOS9":
-		$ua = "Mozilla/5.0 (iPad; CPU OS 9_0 like Mac OS X) AppleWebKit/601.1.17 (KHTML, like Gecko) Version/8.0 Mobile/13A175 Safari/600.1.4";
-		$res = "1024x768";
-        $uastr ="iPad_Safari_iOS9";
-		break;
-    case "iPad iOS10":
-		$ua = "Mozilla/5.0 (iPad; CPU OS 10_11 like Mac OS X) AppleWebKit/602.2.14 (KHTML, like Gecko) Version/10.0 Mobile/14B100 Safari/602.1";
-		$res = "1024x768";
-        $uastr ="iPad_Safari_iOS10";
-		break;
-    case "iPad iOS11":
-		$ua = "Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.21 (KHTML, like Gecko) Version/10.0 Mobile/15A5278f Safari/602.1";
-		$res = "1024x768";
-        $uastr ="iPad_Safari_iOS11";
-		break;
-	case "Android5.0M":
-		$ua = "Mozilla/5.0 (Linux; Android 5.0.2; XT1032 Build/LXB22.46-32) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.111 Mobile Safari/537.36";
-		$res = "720x1280";
-        $uastr ="Android_5.0_MotoG";
-		break;
-    case "Android5.0N5":
-		$ua = "Mozilla/5.0 (Linux; Android 5.0; Nexus 5 Build/LRX21O) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.3 Mobile Safari/537.36";
-		$res = "1920x1080";
-        $uastr ="Android_5.0_Nexus5";
-		break;
-    case "Android5.0N6":
-		$ua = "Mozilla/5.0 (Linux; Android 5.0; Nexus 6 Build/LRX21D) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/37.0.0.0 Mobile Safari/537.36";
-		$res = "2560x1440";
-        $uastr ="Android_5.0_Nexus6";
-		break;
-    case "Android5.1N7":
-		$ua = "Mozilla/5.0 (Linux; Android 5.0; Nexus 7 Build/KOT24) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.105 Safari/537.36";
-		$res = "1920x1200";
-        $uastr ="Android_5.1_Nexus7";
-		break;
-    case "Android5.0N9":
-		$ua = "Mozilla/5.0 (Linux; Android 5.0; Nexus 9 Build/LRX21F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.509 Safari/537.36";
-		$res = "2048 x 1536";
-        $uastr ="Android_5.0_Nexus9";
-		break;
-	case "Android6.0S6":
-		$ua = "Mozilla/5.0 (Linux; Android 6.0.1; SM-G920V Build/MMB29K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Mobile Safari/537.36";
-		$res = "2560 x 1440";
-        $uastr ="Android_6.0_Samsung GalaxyS6";
-		break;
-	case "Android7.0PC":
-		$ua = "Mozilla/5.0 (Linux; Android 7.0; Pixel C Build/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/59.0.3071.115 Safari/537.36";
-		$res = "2560 x 1800";
-        $uastr ="Android_7.0_PixelC";
-		break;
-	case "Googlebot":
-		$ua = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
-		$res = "1024x768";
-        $uastr ="Googlebot";
-		break;
-	case "Custom":
-		$ua = "Mozilla/5.0 (compatible; Googlebot/2.1; SiteConfidence; +https://www.nccgroup.com/en/our-services/website-performance/)";
-		$res = "1024x768";
-        $uastr ="Custom";
-		break;
-	default:
-        $ua = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36";
-		$res = "1680x1050";
-        $uastr ="ChromeDesktop";
-		break;
+	$wptbrowser = $i;
+	// read user agents from json config file
+	// read user agents from json config file
+	$jsonStr = file_get_contents("ua-config.json");
+	$config = json_decode($jsonStr,true); // if you put json_decode($jsonStr, true), it will convert the json string to associative array
+	//echo var_dump($config);
+
+//echo "processing each ua" . PHP_EOL;
+	foreach ($config as $key => $value) {
+//echo ($key . ": " .$value['ua'] . " " . $value["res"] . " " . $value["uastr"] . PHP_EOL);
+		if($key == $i)
+		{
+			$ua = $value['ua'];
+			$res = $value["res"];
+			$uastr = $value["uastr"];
+			break;
+		}
 	}
     if($i == "Googlebot" or $i == "Custom")
         echo "User agent: " . $ua."</br>";
@@ -407,6 +282,9 @@ if (isset($_REQUEST["url"]))
 	{
 		switch ($_REQUEST["wbengine"])
 		{
+			case 'none':
+				$browserengine = 0;
+				break;
 			case 'pjs1.9':
 				$browserengine = 1;
 				break;
@@ -416,7 +294,7 @@ if (isset($_REQUEST["url"]))
             case "pjs2.1":
 				$browserengine = 5;
 				break;
-            case "sjs0.9":
+			case "pjs2.5":
 				$browserengine = 3;
 				break;
             case "sjs0.10":
@@ -435,7 +313,7 @@ if (isset($_REQUEST["url"]))
             	$browserengine = 5;
 				break;
 		}
-//echo "Browser Engine selected: ".$browserengine . ": " . $_REQUEST["wbengine"] ."<br/>";
+echo "Browser Engine selected: ".$browserengine . ": " . $_REQUEST["wbengine"] ."<br/>";
 	}
 	if (isset($_REQUEST["username"]))
 		$username = $_REQUEST["username"];
@@ -454,7 +332,7 @@ if(isset($_REQUEST["comment"]))
         $runnotes = '';
 }
     // get current working dir
-echo "Request uri is: ".$_SERVER['REQUEST_URI']. "<br>";
+//echo "Request uri is: ".$_SERVER['REQUEST_URI']. "<br>";
   $curdir = dirname($_SERVER['REQUEST_URI'])."/";
   if(!isset($_SESSION['userIP']))
   {
@@ -464,7 +342,7 @@ echo "Request uri is: ".$_SERVER['REQUEST_URI']. "<br>";
 	//$externalIp = $m[1];
     $externalContent = file_get_contents('https://api.ipify.org');
 	$externalIp = $externalContent;
-echo ("ipify: my external ip: ".$externalIp."<br/>");
+//echo ("ipify: my external ip: ".$externalIp."<br/>");
     // check for office location by ip
     switch ($externalIp)
     {
@@ -499,7 +377,7 @@ echo ("ipify: my external ip: ".$externalIp."<br/>");
 			$geoMarkerLetter = "S";
 			$b3pdbPublic = true;
 
-echo ("toaster server location: ".$externalloc. '; lat='.$lat. '; long='.$long."<br/>");
+//echo ("toaster server location: ".$externalloc. '; lat='.$lat. '; long='.$long."<br/>");
     }
     $extlatlong = $lat.",".$long;
     $userlat = $lat;
@@ -710,7 +588,7 @@ error_log("Toasting " . $url .  PHP_EOL);
 	// define system filepaths, adding a trailing slash
 	$filepath_domainsavedir = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
 	$filepath_domainsavedirlnx1 = joinFilePaths($filepath_basesavedir,$uastr,DIRECTORY_SEPARATOR);
-	$filepath_domainsavedirlnx2 = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
+	$filepath_domainsavedirlnx2 = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
 	// create the save directory before it is needed by PhantomJS
 	debug ("main: creating basefilepath ",$filepath_domainsavedir);
 	createDomainSaveDir($filepath_domainsavedir);
@@ -720,7 +598,10 @@ error_log("Toasting " . $url .  PHP_EOL);
 		chmod($filepath_domainsavedirlnx1, 0777);
 		chmod($filepath_domainsavedirlnx2, 0777);
 		chmod($filepath_domainsavedir, 0777);
-		$filepath_domainsavedirLnx = "/usr/share/toast/". $uastr. "/".$host_domain;
+		if( strpos($hostname,"gridhost.co.uk") != false)
+			$filepath_domainsavedirLnx = "/var/sites/w/webpagetoaster.com/subdomains/toast/". $uastr. "/".$host_domain;
+		else
+			$filepath_domainsavedirLnx = "/usr/share/toast/". $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"];
 	}
 		$jsfilepath_domainsavedir = joinURLPaths('/toast',$uastr,$host_domain,$sourceurlparts["dirs"]);
 	$filepath_domainsaverootdir = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
@@ -763,15 +644,15 @@ error_log("Toasting " . $url .  PHP_EOL);
 	
     if($OS == 'Windows')
     {
-        $browserengineoutput = "out".generateRandomString().".txt";
+        $browserengineoutput = "out".generateRandomString();
         $wtmp = sys_get_temp_dir();
         //echo("windows tempdir = $wtmp<br/>");
     }
     else
     {
-        $browserengineoutput = $filepath_domainsavedirLnx."/out".generateRandomString().".txt";
+		$browserengineoutput = $filepath_domainsavedirLnx."/out".generateRandomString();
+//echo ("linux browserengineoutput = " . $browserengineoutput);
 	}
-
 	debug("browserengineoutput" , $browserengineoutput);
 
 	//echo("save path dir = $filepath_domainsavedir<br/>");
@@ -851,7 +732,14 @@ error_log("Toasting " . $url .  PHP_EOL);
     if($lastchar == "/")
         $toastedwebname = $jsfilepath_domainsavedir."toasted_".$thispagenameext;
     else
-        $toastedwebname = $jsfilepath_domainsavedir."/toasted_".$thispagenameext;
+		$toastedwebname = $jsfilepath_domainsavedir."/toasted_".$thispagenameext;
+	
+	$_SESSION['status'] = 'Processing hostname';
+	if( strpos($hostname,"gridhost.co.uk") != false)
+	{
+		$toastedwebname = 'http://toast.webpagetoaster.com/'. $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"] . "/toasted_".$thispagenameext;
+//echo ($toastedwebname);
+	}
 	$harfile = $jsfilepath_domainsavedir.$thispagenameext.".har";
 	//echo "saved as: ".$harfile."<br/>";
 	//echo "Analysing website at domain: ".$host_domain."<br/>";
@@ -1307,15 +1195,21 @@ debug('MAIN Running ', "'" . $browserengine . "'");
     $uar =  $ua; //str_replace(' ', '%20', $ua);
     switch ($browserengine)
     {
+		case 0:
+			$browserEngineVer = 'Toaster';
+			session_start();
+			$_SESSION['status'] = 'Running ' . $browserEngineVer;
+			session_write_close();
+			break;
         case 1:
             $browserEngineVer = 'Webkit (PhantomJS v1.9.8)';
             session_start();
             $_SESSION['status'] = 'Running ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
-                exec('win_tools\phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('win_tools\phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             else
-                exec('./lnx_tools/phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('./lnx_tools/phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             break;
         case 2:
             $browserEngineVer = 'Webkit (PhantomJS v2.0.0)';
@@ -1323,40 +1217,29 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             $_SESSION['status'] = 'Running ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
-                exec('win_tools\phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('win_tools\phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             else
-                exec('./lnx_tools/phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('./lnx_tools/phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             break;
         case 3:
-            $browserEngineVer = 'Gecko (SlimerJS v0.9.5)';
+            // $browserEngineVer = 'Gecko (SlimerJS v0.9.5)';
+            // session_start();
+            // $_SESSION['status'] = 'Running ' . $browserEngineVer;
+            // session_write_close();
+            // if($OS == "Windows")
+            //     exec('win_tools\slimerjs.bat js\netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+            // else
+            //     exec('./lnx_tools/slimerjs.bat js/netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+			// break;
+			$browserEngineVer = 'Webkit (PhantomJS v2.5)';
             session_start();
             $_SESSION['status'] = 'Running ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
-                exec('win_tools\slimerjs.bat js\netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
-            else
-                exec('./lnx_tools/slimerjs.bat js/netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
-            break;
-        case 4:
-            $browserEngineVer = 'Gecko (SlimerJS v0.10)';
-            session_start();
-            $_SESSION['status'] = 'Running ' . $browserEngineVer;
-            session_write_close();
-            if($OS == "Windows")
-                exec('win_tools\slimerjs-0.10.3\slimerjs.bat js\netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
-            else
-                exec('./lnx_tools/slimerjs.bat js/netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
-            break;
-        case 5:
-            $browserEngineVer = 'Webkit (PhantomJS v2.1.1)';
-            session_start();
-            $_SESSION['status'] = 'Running ' . $browserEngineVer;
-            session_write_close();
-            if($OS == "Windows")
-                exec('win_tools\phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+                exec('win_tools\phantomjs2.5 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
 			else
 			{
-				$cmd = './lnx_tools/phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ".  $browserengineoutput." ".$username. " ". $password . " 2>&1";
+				$cmd = './lnx_tools/phantomjs2.5 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password . " 2>&1";
 				error_log($cmd);
 				
 				exec('whoami',$who);
@@ -1364,10 +1247,37 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 				exec($cmd,$res); //responses & sniff
 				error_log(implode($res));
 			}
-	
-				break;
+			break;
+        case 4:
+            $browserEngineVer = 'Gecko (SlimerJS v0.10)';
+            session_start();
+            $_SESSION['status'] = 'Running ' . $browserEngineVer;
+            session_write_close();
+            if($OS == "Windows")
+                exec('win_tools\slimerjs-0.10.3\slimerjs.bat js\netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+            else
+                exec('./lnx_tools/slimerjs.bat js/netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+            break;
+        case 5:
+            $browserEngineVer = 'Webkit (PhantomJS v2.1.1)';
+            session_start();
+            $_SESSION['status'] = 'Running ' . $browserEngineVer;
+            session_write_close();
+            if($OS == "Windows")
+                exec('win_tools\phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
+			else
+			{
+				$cmd = './lnx_tools/phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js/netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password . " 2>&1";
+				error_log($cmd);
+				
+				exec('whoami',$who);
+				error_log("whoami: ".implode($who));
+				exec($cmd,$res); //responses & sniff
+//error_log(implode($res));
+			}
+			break;
 		case 6: // private instance WPT
-            $browserEngineVer = 'WebpageTest';
+            $browserEngineVer = 'WebpageTest Private Instance';
             session_start();
             $_SESSION['status'] = 'Running ' . $browserEngineVer;
             session_write_close();
@@ -1389,6 +1299,30 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             $harfile = "WebpageTest Test No. ". $testId;
             getWPTImagePath($testId,$imgname);
 			break;
+
+			case 8: // public WPT
+				$browserEngineVer = 'WebpageTest Public';
+				session_start();
+				$_SESSION['status'] = 'Running ' . $browserEngineVer;
+				session_write_close();
+				$urlenc = urlencode($urlforbrowserengine);
+				$testId = "";
+				list ($testId,$jsonResult,$summaryCSV,$detailCSV ) = submitWPTTest($wptbrowser,$urlenc,$uar,$width,$height,$username,$password);
+				$statusCode = 0;
+				$timoutcounter = 0;
+				while (intval($statusCode) != 200 and $timoutcounter < 600) {
+					$statusCode = checkWPTTestStatus($testId);
+					$timoutcounter++;
+					sleep(1);
+				}
+				// get testresults as HAR
+				$har = getWPTHAR($testId);
+	//echo $har;
+				$wptHAR = true;
+				$uploadedHAR = false;
+				$harfile = "WebpageTest Test No. ". $testId;
+				getWPTImagePath($testId,$imgname);
+				break;
 			
 		case 7:
 			$browserEngineVer = 'Chrome Headless';
@@ -1444,44 +1378,42 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 			}
 			else
 			{ // linux
-
+				
                 // set port
                 $port = "9221";
 				// launch headless chrome on a given port
 				$res = exec("google-chrome --remote-debugging-port=" . $port . " --headless > /dev/null 2>&1 & echo $!", $output);
                 // capture pid
 				$pid = (int)$output[0];
-				echo "Chrome process id = " . $pid . "<br/>";
-				print_r($output);
+//echo "Chrome process id = " . $pid . "<br/>";
+//print_r($output);
 
                 //get har
-                // $harname = '/usr/share/toast/test.har';
+                // $harname = '/var/sites/w/webpagetoaster.com/subdomains/toast/test.har';
                 // $height = 800;
                 // $width = 1200;
                 // $urlforbrowserengine = 'http://www.daish.net';
                 $uar = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
 
-				echo "generating HAR file to " . $harname . "<br/>";
+//echo "generating HAR file to " . $harname . "<br/>";
 				exec("node node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --port " . $port . " --output " . $harname . " 2>&1", $output2, $rv);
-				echo implode("\n", $output2);
-				echo "rv = " . $rv. "<br/>";
+				//echo implode("\n", $output2);
+//echo "rv = " . $rv. "<br/>";
 
                 sleep (1);
-				// get screenshot and dpm dump
-				echo "getting screenshot<br/>";
-				exec('node node_modules/cri-toaster.js --url ' . $urlforbrowserengine . " --fullPage true --width " . $width . " --height " . $height . " --imgpath " . $imgname . " --port " . $port . " 2>&1", $output, $rv);
-				echo implode("\n", $output);
-				echo $imgname.  " - rv = " . $rv . "<br/>";
+				// get screenshot and dom dump
+//				echo "getting dom, saving to " . $dumpname . "<br/>";
+//echo "saving screenshot to " . $imgname . "<br/>";
+				exec('node node_modules/cri-toaster.js --url ' . $urlforbrowserengine . " --fullPage true --width " . $width . " --height " . $height . " --imgpath " . $imgname . " --dompath " . $dumpname . " --port " . $port . " 2>&1", $output, $rv);
+//echo implode("\n", $output);
+//echo $imgname.  " - rv = " . $rv . "<br/>";
 
                 sleep (1);
 				// // kill chrome headless
 				$command = 'kill -9 ' . $pid ;
 				$res = exec($command . " 2>&1", $output);
-                print_r($output);
-                
-
-
-                echo PHP_EOL . " all done";
+//print_r($output);
+// echo PHP_EOL . " all done";
 			  
 				// get testresults as HAR
 				$uploadedHARFileName = $harname;
@@ -1502,18 +1434,18 @@ debug('MAIN Running ', "'" . $browserengine . "'");
     $eres = array();
 	exec($os_cmd,$eres);
     // get pjs and slimerjs cookies and postdata
-    if($browserengine < 6) // not WPT or Chrome Headless
+    if($browserengine < 6 and $browserengine != 0) // not WPT or Chrome Headless
     {
         //get phantom cookie file and add to cookie jar
         if($OS == "Windows" )
 		{
-            $pjsckfile = 'tmp/CK'.$browserengineoutput;
-			$pjspdfile = 'tmp/PD'.$browserengineoutput;
+            $pjsckfile = 'tmp/'.$browserengineoutput."CK";
+			$pjspdfile = 'tmp/'.$browserengineoutput."PD";
 		}
 		else
 		{
-            $pjsckfile = $browserengineoutput."txtCK";
-			$pjspdfile = $browserengineoutput."txtPD";
+            $pjsckfile = $browserengineoutput."CK";
+			$pjspdfile = $browserengineoutput."PD";
 		}
 // if(file_exists($pjsckfile) == true)
 //    echo("pjs cookie file: ".$pjsckfile." found<br/>");
@@ -1528,15 +1460,19 @@ debug('MAIN Running ', "'" . $browserengine . "'");
         transferPJScookies($pjscookiesJSON);
 
         $pjspostdataJSON = file_get_contents($pjspdfile);
-        transferPJSpostdata($pjspostdataJSON);
+        //transferPJSpostdata($pjspostdataJSON);
 
         //. ">".$localfilename.".har"
-    	//echo("sniff result<pre>");
-    	//print_r($res);
-    	//echo("</pre>");
-    	@unlink($localfilename.".har");
+// echo("sniff result<pre>");
+// print_r($res);
+// echo("</pre>");
+		$dumpname = $browserengineoutput;
+		// delete temp files returned from PhantomJS
+		@unlink($localfilename.".har");
+		@unlink($pjsckfile);
+		@unlink($pjspdfile);
     	$jsonstr = implode($res);
-    	//echo "Phantom JS; processing additional resources for $url<br/>";
+//echo "Phantom JS; processing additional resources for $url<br/>";
     	debug("<br/><?php echo $browserEngineVer;?>: processing additional resources for",$url);
        //echo("Phantom JS har file<pre>");
        //var_dump($res);
@@ -1546,7 +1482,8 @@ debug('MAIN Running ', "'" . $browserengine . "'");
         $har = implode($res);
 	}
 	else
-	$pjspostdataJSON = '';
+		$pjspostdataJSON = '';
+
     // add onContentLoad as PhantomJS fails to add it
     //$har = str_replace('"onLoad"','"onContentLoad": -1,    "onLoad"',$har);
 	// remove PhantomJS errors before "log":
@@ -1575,7 +1512,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 		$har = substr($har,0,$logendpos+1);
 	$harjson = json_decode($har,true);
 
-	//save HAR file from PhantomJS
+	//save HAR file from browser engine
     file_put_contents($localfilename.".har",$har,FILE_APPEND);
 //echo("reading har file<br/>");
     session_start();
@@ -2061,16 +1998,19 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 			$modrootfilecontent = file_get_contents(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput);
 		//echo "looking for dump in: " . realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput;
 		}
-			else
-			$modrootfilecontent = file_get_contents($browserengineoutput);
+		else
+		{
+//echo "looking for dump in: " .$dumpname;
+			$modrootfilecontent = file_get_contents($dumpname);
+		}
 		// echo "<pre><xmp>";
 		// echo "modified HTML:".$modrootfilecontent;
 		// echo "</xmp></pre>";
 		if(!empty($modrootfilecontent))
 		{
-			//echo "<xmp>";
-			//echo "modified HTML:".$modrootfilecontent;
-			//echo "</xmp>";
+			// echo "<xmp>";
+			// echo "modified HTML:".$modrootfilecontent;
+			// echo "</xmp>";
 		session_start();
 		$_SESSION['status'] = 'Parsing the updated DOM';
 		session_write_close();
@@ -2211,9 +2151,29 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             break;
 	}
 	// DEBUG INFO EXTRA - ALL OBJECT INFO - ANY non-printable chars here will prevent JS operation
-	//echo("array page objects converting to JS<pre>");
-	//print_r($arrayPageObjects);
-	//echo("</pre>");
+	// echo("array page objects before converting to JS<pre>");
+	// print_r($arrayPageObjects);
+	// echo("</pre>");
+	// convert www.webpagetoaster.com paths for viewing
+	foreach ($arrayPageObjects as $key => $valuearray)
+	{
+//var_dump($valuearray);
+		$value = $valuearray["Object source"];
+		$local = $valuearray["Object file"];
+//echo "checking " . $local . "<br/>";
+		if(strpos($local,"/var/sites/w/webpagetoaster.com/subdomains/toast") !== false )
+		{
+			$toastlocal = str_replace("/var/sites/w/webpagetoaster.com/subdomains/toast/","http://toast.webpagetoaster.com/",$local);
+			// echo ("updating " . $local . " to " . $toastlocal . "<br/>");
+			$arr = array("Object source" => $value, "Object file" => $toastlocal);
+             addUpdatePageObject($arr);
+		}
+
+	}
+	// echo("array page objects after converting to JS<pre>");
+	// print_r($arrayPageObjects);
+	// echo("</pre>");
+
     session_start();
     $_SESSION['status'] = 'Preparing Toasted Page';
     session_write_close();
@@ -2261,8 +2221,8 @@ debug('MAIN Running ', "'" . $browserengine . "'");
         <pre class="brush: html; stripBrs: true;"><?php $file = file_get_contents_utf8($localfilename);echo(htmlspecialchars($file));?>
 		</pre>
         <br>HTML page after DOM manipulation:
-        <pre class="brush: html; stripBrs: true;"><?php if($OS=='Windows'){$file = file_get_contents_utf8(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.htmlspecialchars($browserengineoutput));}else{$file = file_get_contents_utf8($browserengineoutput);}echo(htmlspecialchars($file));?></pre>
-		<h3 id="pjspage">Device view (default: "Above the Fold") using <?php echo $browserEngineVer;if($browserEngineVer =="WebpageTest") echo "WebpageTest id: ".$testId;?></h3>
+        <pre class="brush: html; stripBrs: true;"><?php if($OS=='Windows'){$file = file_get_contents_utf8(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.htmlspecialchars($browserengineoutput));}else{$file = file_get_contents_utf8($dumpname);}echo(htmlspecialchars($file));?></pre>
+		<h3 id="pjspage">Device view (default: "Above the Fold") using <?php echo $browserEngineVer;if(strpos($browserEngineVer,"WebpageTest") != false) echo " (id: ".$testId. ")";?></h3>
         <div style="height:<?php $adjheight = $height + 50; echo $adjheight;?>px; width:<?php $adjwidth = $width + 50;  echo $adjwidth;?>px;" id="pjspageimg"></div>
         <div style="clear: both;"></div>
         <!--<h2>Diagnostics</h2>
@@ -2656,7 +2616,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 </div> <!-- end wrap -->
 <script>
 <?php
-// tidy up
+// tidy up - remove temp. files
 //get file size of cookie file: delete if 0 size, or rename and move to toast folder if bigger
 $cookiedata = '';
 if(filesize($cookie_jar) == 0)
@@ -2669,7 +2629,7 @@ else
 if($OS == 'Windows')
 {
     if (file_exists(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput)) {
-        unlink(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput);
+		rename(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput,$filepath_domainsavedir."/domafter.htm");
         }
      if (file_exists(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR."CK".$browserengineoutput)) {
         unlink(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR."CK".$browserengineoutput);
@@ -2679,16 +2639,19 @@ if($OS == 'Windows')
 		}
 }
 else
-{
+{ // linux
     if (file_exists($browserengineoutput)) {
-        unlink($browserengineoutput);
+		rename($browserengineoutput,$filepath_domainsavedirLnx."/domafter.htm");
         }
-    if (file_exists("CK".$browserengineoutput)) {
-        unlink("CK".$browserengineoutput);
+    if (file_exists($browserengineoutput."CK")) {
+        unlink($browserengineoutput."CK");
 		}
-		if (file_exists("PD".$browserengineoutput)) {
-			unlink("PD".$browserengineoutput);
-			}
+	if (file_exists($browserengineoutput."PD")) {
+		unlink($browserengineoutput."PD");
+		}
+	if (file_exists($cookie_jar)) {
+		unlink($cookie_jar);
+		}		
 }
     session_start();
     $_SESSION['status'] = 'Formatting Page (JavaScript)';
@@ -2868,7 +2831,9 @@ $_SESSION['imagepath'] = '';
 $_SESSION['status']  = 'Ready to Toast';
 session_write_close();
 // Get the content that is in the buffer and put it in your file //
-file_put_contents($toastedfilepathname, ob_get_contents());
+//echo ("writing toast file to " . $toastedfilepathname);
+error_log (ob_get_contents());
+file_put_contents($toastedfilepathname, ob_get_contents(),LOCK_EX);
 // add generated file to lists of tests
 $dt = date("Y-m-d H:i:s");
 $line = $array = array($url,$toastedwebname,trim($dt),str_replace("_"," ",$uastr),htmlentities(trim($pagetitle)),trim($uploadedHARFileName),trim($jsimgname),$runnotes,);

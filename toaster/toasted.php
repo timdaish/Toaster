@@ -27,8 +27,19 @@ ini_set("auto_detect_line_endings", false);
 if($OS == "Windows")
 $fn = "/toast/toasted.csv";
 else
-    $fn = '/usr/share/toast/toasted.csv';
-$arrToasted = array ();
+{
+    $hostname = gethostname();
+    //set path for webpagetoaster server and others
+    if( strpos($hostname,"gridhost.co.uk") != false)
+    {
+        $fn = '/var/sites/w/webpagetoaster.com/subdomains/toast/toasted.csv';
+    }
+    else
+    {
+        $fn = '/usr/share/toast/toasted.csv';
+    }
+}
+    $arrToasted = array ();
 
 function array_sort($array, $on, $order=SORT_ASC)
 {
@@ -331,7 +342,7 @@ $.each( arrayURLS , function( key, value ) {
     {
         var pos = value.indexOf("\"");
         var svalue = value.substr(1,pos - 1);
-    console.log( "reloading " + ": " +  window.location.hostname + "/" + svalue );
+//console.log( "reloading " + ": " +  window.location.hostname + "/" + svalue );
 
         var win=window.open(  "/" + svalue, '_blank');
         win.focus();

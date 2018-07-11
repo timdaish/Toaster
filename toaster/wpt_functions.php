@@ -2,51 +2,59 @@
 // WPT FUNCTIONS
 function submitWPTTest($wptbrowser,$url,$ua,$vpw,$vph,$un,$pw)
 {
-    $browseroptions = "";
-    switch ($wptbrowser)
+    global $wptserver;
+    //read config file
+    $wptprivate = false;
+    $wptpublic = false;
+    global $browserengine;
+    if($browserengine == 6)
     {
-        case "Chrome":
-            $loc = "local_wptdriver:Chrome.PA";
-            break;
-        case "Firefox":
-            $loc = "local_wptdriver:Firefox.PA";
-            break;
-        case "IE":
-            $loc = "local_wptdriver:IE.PA";
-            break;
-        case "Edge":
-            $loc = "local_wptdriver:IE.PA";
-            $browseroptions = "&uastring=".$ua;
-            break;
-        case "Android5.1N7":
-            $loc = "Local_Nexus7";
-            break;
-        case "Android5.0M":
-            $loc = "Local_MotoG";
-            break;
-        case "iPhone iOS11":
-            $loc = "BiPhone6";
-            break;
-        case "iPad iOS11":
-            $loc = "BiPadAir";
-            break;
-        default:
-            $loc = "local_wptdriver:Chrome.PA";
-            $browseroptions = "&uastring=".$ua;
-            $vpoptions = "&width=".$width."&height=".$height;
-
+        $wptprivate = true;
+        $wptconfigfile = "wpt-private-config.json";
     }
+    else
+    {
+        $wptpublic = true;
+        $wptconfigfile = "wpt-public-config.json";
+    }
+    // read from config file
+	$jsonStr = file_get_contents($wptconfigfile);
+	$config = json_decode($jsonStr,true); // if you put json_decode($jsonStr, true), it will convert the json string to associative array
+	//echo var_dump($config);
+    $browseroptions = "";
+//echo "processing server and each wpt location" . PHP_EOL;
+    foreach ($config as $key => $value) {
+        if($key == "server")
+        {
+            echo ($key . ": " .$value['host'] );
+            $wptserver = $value['host'];
+        }
+        else
+            if($key == "locations")
+            {
 
-
-
-
+                foreach ($value as $lkey => $lvalue) {
+                    echo ($lkey . ": " .$lvalue['location'] . " " . $lvalue["speed"] . " " . $lvalue["options"] . PHP_EOL);
+                    if($wptbrowser == $lkey)
+                    {
+                        $loc = $lvalue['location'];
+                        if($speed != '')
+                            $loc = $loc . "." . $lvalue["speed"];
+                        if($lvalue["options"] == "ua")
+                            $browseroptions = "&uastring=".$ua;
+                        if($lvalue["options"] == "vp")
+                            $browseroptions = "&width=".$vpw."&height=".$vph;
+                        break;
+                    }
+                }
+            }
+    }
     $options = "&fvonly=1&video=1&noopt=1&priority=2&pngss=1&bodies=1&location=".$loc;
-
-    if($un !="" and pw != "")
+    if($un !="" and $pw != "")
     {
         $options = $options . "&login=".$un."&password=".$pw."&authtype=0";
     }
-    $result = file_get_contents('http://10.90.67.11/runtest.php?url='.$url."&f=json" . $options . $browseroptions);
+    $result = file_get_contents('http://'.$wptserver.'/runtest.php?url='.$url."&f=json" . $options . $browseroptions);
 
 //echo ("WPT Test Submission for '". $url . "'<br/>");
 //echo ($result);
@@ -71,7 +79,8 @@ function submitWPTTest($wptbrowser,$url,$ua,$vpw,$vph,$un,$pw)
 
 function checkWPTTestStatus($testId)
 {
-    $result = file_get_contents('http://10.90.67.11/testStatus.php?f=json&test=' . $testId);
+    global $wptserver;
+    $result = file_get_contents('http://'.$wptserver.'/testStatus.php?f=json&test=' . $testId);
     $jsonresponse = json_decode($result);
     $statusCode =  $jsonresponse->statusCode;
 //echo ("test running" . "<br/>");
@@ -89,13 +98,15 @@ function getWPTTestResults($resultURL)
 
 function getWPTHAR($testId)
 {
-    $result = file_get_contents('http://10.90.67.11/export.php?test=' . $testId);
+    global $wptserver;
+    $result = file_get_contents('http://'.$wptserver.'/export.php?test=' . $testId);
     return $result;
 }
 
 function getWPTImagePath($testId,$imgname)
 {
-    $ipath = 'http://10.90.67.11/results/'.date("y/m/d").'/'.substr($testId,7,2).'/'.substr($testId,10,2).'/1_screen.png';
+    global $wptserver;
+    $ipath = 'http://'.$wptserver.'/results/'.date("y/m/d").'/'.substr($testId,7,2).'/'.substr($testId,10,2).'/1_screen.png';
 //echo("webpagetest image name to get: ".$ipath ."<br/>");
 //echo("saving as: ".$imgname ."<br/>");
     file_put_contents($imgname, file_get_contents($ipath));

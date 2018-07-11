@@ -231,3 +231,4 @@ class A2_GIF_Decoder {
 	public function getTransparentG() { return $this->transparentG; }
 	public function getTransparentB() { return $this->transparentB; }
 }
+?>

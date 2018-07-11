@@ -261,3 +261,4 @@ class Minify_HTML {
         return ($this->_isXhtml && preg_match('/(?:[<&]|\\-\\-|\\]\\]>)/', $str));
     }
 }
+?>

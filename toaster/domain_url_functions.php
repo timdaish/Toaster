@@ -1941,9 +1941,9 @@ function lookupIATAAirportCode($code)
 //echo ("checking in airportscitiesstates.json" . PHP_EOL);
         // lookup locally
         if($OS == "Windows")
-            $str = file_get_contents("win_tools\airportscitiesstates.json");
+            $str = file_get_contents("toaster_tools\airportscitiesstates.json");
         else
-            $str = file_get_contents("lnx_tools/airportscitiesstates.json");
+            $str = file_get_contents("toaster_tools/airportscitiesstates.json");
 
 		$found = false;
 		$json = json_decode($str);
@@ -1970,9 +1970,9 @@ function lookupIATAAirportCode($code)
         {
 //echo ("checking in airports.dat" . PHP_EOL);
 			if($OS == "Windows")
-            	$str = file_get_contents("win_tools\airports.dat");
+            	$str = file_get_contents("toaster_tools\airports.dat");
         	else
-				$str = file_get_contents("lnx_tools/airports.dat");
+				$str = file_get_contents("toaster_tools/airports.dat");
 			
 			// Loop through our array, show HTML source as HTML source; and line numbers too.
 			foreach ($str as $line_num => $line) {
@@ -2686,9 +2686,9 @@ function lookupLocationforIP($inIP)
 //Latitude: 45.778801
 //Longitude: -119.528999
         if($OS == "Windows")
-            $names = json_decode(file_get_contents("win_tools/countrynames.json"), true);
+            $names = json_decode(file_get_contents("toaster_tools/countrynames.json"), true);
         else
-            $names = json_decode(file_get_contents("lnx_tools/countrynames.json"), true);
+            $names = json_decode(file_get_contents("toaster_tools/countrynames.json"), true);
         //echo "names ". $names;
         $lat = '';
         $long = '';
