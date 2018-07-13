@@ -10,7 +10,14 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 else {
     //echo 'This is a server not using Windows!'."<br/>";
     $OS = PHP_OS;
-    $debuglog = "/usr/local/optimg_debug.txt";
+    //set path for webpagetoaster server and others
+	if( strpos($hostname,"gridhost.co.uk") != false)
+    {
+		$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/debug.txt";
+	}
+	else{
+		$debuglog = "/usr/share/toast/debug.txt";
+	}
 }
 ini_set("log_errors", 1);
 ini_set("error_log", $debuglog);

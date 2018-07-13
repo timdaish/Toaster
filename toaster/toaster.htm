@@ -26,7 +26,7 @@
         <input type="radio" name="wbengine" class="wbpjs21" id="pjs2.1" value="pjs2.1" title="PhantomJS v2.1"><span class="wbpjs21">PhantomJS v2.1</span>
         <!--<input type="radio" class="wbsjs0.10" id="sjs0.10" name="wbengine" value="sjs0.10" title="SlimerJS v0.10"><span class="wbsjs0.10">Gecko v0.10</span>-->
         <input type="radio" name="wbengine" class="wbwpt_private" id="wpt_private" value="wpt_private" title="WPT Private Instance"><span class="wbwpt_private">WPT Private</span>
-        <input type="radio" name="wbengine" class="wbwpt_public" id="wpt_public" value="wpt_public" title="WPT Public"><span class="wbwpt_public">WPT Public</span>
+        <input type="radio" name="wbengine" class="wbwpt_public" id="wpt_public" value="wpt_public" title="WPT Public" disabled><span class="wbwpt_public">WPT Public</span>
       </span>
       </div>
       <div id="wbengineoptions"></div>
@@ -66,8 +66,8 @@
         <input id="links" type="checkbox" name="chklinks" value="links">
         <!--<label for="dbusage">Use 3rd Party DB</label>
 <input id="dbusage" type="checkbox" hidden checked name="dbusage" value="dbusage">-->
-        <label for="debug">Show Debug Msgs</label>
-        <input id="debug" type="checkbox" name="chkdebug" value="chkdebug">
+        <!--<label for="debug">Show Debug Msgs</label>
+        <input id="debug" type="checkbox" name="chkdebug" value="chkdebug">-->
         <label for="akdebug">Get Akamai Debug Hdrs</label>
         <input id="akdebug" type="checkbox" name="akdebug" value="akdebug">
         <!--<label for="3pchain">Get 3rd Party Call Chain</label>
@@ -134,7 +134,6 @@
   <script type="text/javascript">
     var toastedfilename = '';
     $(document).ready(function () {
-
       $storedurl = localStorage.getItem('urlfield');
 //console.log("storedurl",$storedurl);
       if($storedurl != '')
@@ -155,11 +154,12 @@
         case "www.webpagetoaster.com": // public web page toaster
           // only local
           optRemoteNodeChromeHeadless = true;
+          optWPTPublic = true;
           break;
         case "hpdev": // private web page toaster hosted on a local server
-          optLocalNodeChromeHeadless = true;
+          optLocalNodeChromeHeadless = false;
+          optRemoteNodeChromeHeadless = true;
           optWPTPrivateInstance = true;
-          //optRemoteNodeChromeHeadless = true;
           optPhantomJS25 = true;
           break;
         case "localhost": // private web page toaster hosted on the local machine
@@ -219,12 +219,13 @@
           // add remote port option
           if(optLocalNodeChromeHeadless == true)
           {
-            $("#wbengineoptions").append('<label for="chlocalurlandport">Local URL and Port</label><input id="chlocalurlandport" name="chlocalurlandport" placeholder="local"></input>');
+            $("#wbengineoptions").append('<label for="chlocalurlandport">Local URL and Port</label><input id="chlocalurlandport" name="chlocalurlandport" placeholder="local" hidden></input>');
           }
           else{
             $("#wbengineoptions").append('<label for="chremoteurlandport">Remote URL and Port</label><input id="chremoteurlandport" name="chremoteurlandport" placeholder="remote"></input>');
           }
-          
+          $storedchhserver = localStorage.getItem('chhserver');
+          $('#chremoteurlandport').text($storedchhserver);
         }
         if ($('#wpt_private').prop('checked')) {
 //console.log('wpt private is checked!');

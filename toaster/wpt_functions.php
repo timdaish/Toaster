@@ -26,7 +26,7 @@ function submitWPTTest($wptbrowser,$url,$ua,$vpw,$vph,$un,$pw)
     foreach ($config as $key => $value) {
         if($key == "server")
         {
-            echo ($key . ": " .$value['host'] );
+//echo ($key . ": " .$value['host'] );
             $wptserver = $value['host'];
         }
         else
@@ -34,10 +34,11 @@ function submitWPTTest($wptbrowser,$url,$ua,$vpw,$vph,$un,$pw)
             {
 
                 foreach ($value as $lkey => $lvalue) {
-                    echo ($lkey . ": " .$lvalue['location'] . " " . $lvalue["speed"] . " " . $lvalue["options"] . PHP_EOL);
+//echo ($lkey . ": " .$lvalue['location'] . " " . $lvalue["speed"] . " " . $lvalue["options"] . PHP_EOL);
                     if($wptbrowser == $lkey)
                     {
                         $loc = $lvalue['location'];
+                        $speed = $lvalue["speed"];
                         if($speed != '')
                             $loc = $loc . "." . $lvalue["speed"];
                         if($lvalue["options"] == "ua")

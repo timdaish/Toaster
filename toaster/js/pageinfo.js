@@ -1725,6 +1725,10 @@ function mainDisplay(browserenginever) {
                     { // local
                         local = local.substr(11); // strip the /usr/share from the front
                     }
+                    if(local.indexOf("/usr/share") !== -1)
+                    { // local
+                        local = local.substr(11); // strip the /usr/share from the front
+                    }
                     if(local.indexOf("//toast") !== -1)
                     { // local
                         local = local.substr(1); // strip the first / from the front
@@ -5338,6 +5342,8 @@ function displayTable3PContent()
     //var tob, tzb, tsb, tsp = 0;
     tbl_row = "<th>" + "Company Product" + "</th>" + "<th>" + "JavaScript" + "</th>" + "<th>" + "StyleSheet" + "</th>" + "<th>" + "HTML" + "</th>" + "<th>" + "Font" + "</th>" + "<th>" + "Image" + "</th>"+ "<th>" + "Data" + "</th>"+ "<th>" + "Other" + "</th>";
     $("#TPContent_table thead").html("<tr class=\"header\">" + tbl_row + "</tr>");
+    if(!DomainStats3PList)
+        return false;
     $.each(DomainStats3PList, function () {
         var tbl_row = "";
         var company = '';
@@ -8067,6 +8073,11 @@ function displayTableCssSelectors() {
     tblall_row = "<th>" + "Stylesheet" + "</th>" + "<th>" + "Selector Type" + "</th>" + "<th>" + "Selector Name" + "</th>" + "<th>" + "Used?" + "</th>";
     tblall_body += "<tr class=\"header\">" + tblall_row + "</tr>";
     tblall_row = '';
+//console.log(CSSselectors);
+    var count = Object.keys(CSSselectors).length
+//console.log("size", count);
+    if(count < 90)
+        return false;
     $.each(CSSselectors, function () {
         // for each selector
         $.each(this, function (k, v) {

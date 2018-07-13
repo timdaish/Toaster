@@ -8066,37 +8066,42 @@ debug ("creating basefilepath ",$path);
 
     function readcookiefile($infile)
     {
-// read the file
-        $lines = file($infile);
-// var to hold output
-        $trows = '<thead><tr><td>Domain</td><td>Flag</td><td>Path</td><td>Secure</td><td>Expiration</td><td>Name</td><td>Value</td></tr></thead>';
-// iterate over lines
-        foreach ($lines as $line)
+        // read the file if it exists
+        if(file_exists($infile))
         {
-// we only care for valid cookie def lines
-            if ($line[0] != '#' && $line[1] != 'H' && substr_count($line, "\t") == 6)
+            $lines = file($infile);
+    // var to hold output
+            $trows = '<thead><tr><td>Domain</td><td>Flag</td><td>Path</td><td>Secure</td><td>Expiration</td><td>Name</td><td>Value</td></tr></thead>';
+    // iterate over lines
+            foreach ($lines as $line)
             {
-// get tokens in an array
-                $tokens = explode("\t", $line);
-// trim the tokens
-                $tokens = array_map('trim', $tokens);
-// let's convert the expiration to something readable
-                $tokens[4] = date('Y-m-d h:i:s', $tokens[4]);
-// escape
-                $tokens[6] = htmlspecialchars(addslashes($tokens[6]));
-// we can do different things with the tokens, here we build a table row
-                $trows .= '<tr><td>' . implode('</td><td>', $tokens) . '</td></tr>';
-// another option, make arrays to do things with later,
-// we'd have to define the arrays beforehand to use this
-// $domains[] = $tokens[0];
-// flags[] = $tokens[1];
-// and so on, and so forth
+    // we only care for valid cookie def lines
+                if ($line[0] != '#' && $line[1] != 'H' && substr_count($line, "\t") == 6)
+                {
+    // get tokens in an array
+                    $tokens = explode("\t", $line);
+    // trim the tokens
+                    $tokens = array_map('trim', $tokens);
+    // let's convert the expiration to something readable
+                    $tokens[4] = date('Y-m-d h:i:s', $tokens[4]);
+    // escape
+                    $tokens[6] = htmlspecialchars(addslashes($tokens[6]));
+    // we can do different things with the tokens, here we build a table row
+                    $trows .= '<tr><td>' . implode('</td><td>', $tokens) . '</td></tr>';
+    // another option, make arrays to do things with later,
+    // we'd have to define the arrays beforehand to use this
+    // $domains[] = $tokens[0];
+    // flags[] = $tokens[1];
+    // and so on, and so forth
+                }
             }
+    // complete table and send output
+    // not very useful as it is almost like the original data, but then ...
+            return ('<table class=\"dataTable table-striped\" border=\"0\">' . '<tbody>' . $trows . '</tbody>' . '</table>');
         }
-// complete table and send output
-// not very useful as it is almost like the original data, but then ...
-        return ('<table class=\"dataTable table-striped\" border=\"0\">' . '<tbody>' . $trows . '</tbody>' . '</table>');
-    }
+        else
+            return ('<table></table>');
+}
 
 
 

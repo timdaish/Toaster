@@ -13,13 +13,8 @@
         "speed" : "",
         "options" : ""
         },
-    "IE" : {
-        "location" : "Horsham_wptagent:IE",
-        "speed" : "",
-        "options" : ""
-        },
     "Edge" : {
-        "location" : "Horsham_wptagent:IE",
+        "location" : "Horsham_wptagent:Edge",
         "speed" : "",
         "options" : ""
         },

@@ -96,6 +96,7 @@ ob_start();
 addInitialRules();
 //echo 'This web server runs on '. $OS .'<br/>';
 $wptHAR = false;
+$chhHAR = false;
 $loadContentFromHAR = false;
 if(!empty($_FILES))
 {
@@ -313,7 +314,7 @@ if (isset($_REQUEST["url"]))
             	$browserengine = 5;
 				break;
 		}
-echo "Browser Engine selected: ".$browserengine . ": " . $_REQUEST["wbengine"] ."<br/>";
+//echo "Browser Engine selected: ".$browserengine . ": " . $_REQUEST["wbengine"] ."<br/>";
 	}
 	if (isset($_REQUEST["username"]))
 		$username = $_REQUEST["username"];
@@ -331,7 +332,15 @@ if(isset($_REQUEST["comment"]))
     if( $runnotes == 'Enter text here...')
         $runnotes = '';
 }
-    // get current working dir
+
+//print_r($_REQUEST);
+$chheadlessserver = '';
+if(isset($_REQUEST["chremoteurlandport"]))
+{
+	$chheadlessserver = $_REQUEST["chremoteurlandport"];
+//echo ("chrome headless remote server = " . $chheadlessserver. PHP_EOL);
+}
+// get current working dir
 //echo "Request uri is: ".$_SERVER['REQUEST_URI']. "<br>";
   $curdir = dirname($_SERVER['REQUEST_URI'])."/";
   if(!isset($_SESSION['userIP']))
@@ -416,7 +425,7 @@ if(isset($_REQUEST["comment"]))
 //echo "getting user lon: ".$_SESSION['userlong']."<br/>";
   }
 //echo ("my location: ".$externalloc. ' lat='.$userlat. '; long='.$userlong."<br/>");
- // echo "Current dir is: ".$curdir."<br/>";
+ //echo "Current dir is: ".$curdir."<br/>";
   //echo realpath($curdir.'\getstatus.php')."<br/>";
   //echo realpath( '.' );
 	//step 1
@@ -433,8 +442,8 @@ if(isset($_REQUEST["comment"]))
 		//$fullpagepath .= $sourceurlparts["querystring"];
 	list($host_domain,$host_domain_path) = getDomainHostFromURL($url,false,"main geo");
 	$roothost = $host_domain;
-// echo ('roothost '.$roothost.'<br/>');
-// echo("host domain: ".$host_domain."<br/>");
+//echo ('roothost '.$roothost.'<br/>');
+//echo("host domain: ".$host_domain."<br/>");
 //echo("host domain path: ".$host_domain_path."<br/>");
     debug ('roothost ',$roothost);
 	$arrayroothost = array($host_domain);
@@ -532,7 +541,7 @@ error_log("Toasting " . $url .  PHP_EOL);
 		{
 			$rootloc = lookupLocationForLatLong($lat,$lon);
 			$rootloc = $edgeloc;
-//echo ('main named rootloc '.$rootloc.' was latlong, reset to edgeloc<br/>');
+echo ('main named rootloc '.$rootloc.' was latlong, reset to edgeloc<br/>');
 		}
 		// override rootloc for testing
 		//$rootloc = "Oslo,Oslo,NO";
@@ -578,9 +587,9 @@ error_log("Toasting " . $url .  PHP_EOL);
     "Product"=> "",
 	);
 	$arrayDomains[] = $arr;
-	// echo("init <pre>");
+	//echo("init <pre>");
 	// print_r($arrayDomains);
-	// echo("</pre>");
+	//echo("</pre>");
 	// define initial filenames
 	$thispagename = pathinfo($url,PATHINFO_BASENAME);
 	$thispageext = pathinfo($url,PATHINFO_EXTENSION);
@@ -589,7 +598,7 @@ error_log("Toasting " . $url .  PHP_EOL);
 	$filepath_domainsavedir = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
 	$filepath_domainsavedirlnx1 = joinFilePaths($filepath_basesavedir,$uastr,DIRECTORY_SEPARATOR);
 	$filepath_domainsavedirlnx2 = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
-	// create the save directory before it is needed by PhantomJS
+	// create the save directory before it is needed by a browser engine
 	debug ("main: creating basefilepath ",$filepath_domainsavedir);
 	createDomainSaveDir($filepath_domainsavedir);
 	// set up the linux path to the save dir.
@@ -601,9 +610,12 @@ error_log("Toasting " . $url .  PHP_EOL);
 		if( strpos($hostname,"gridhost.co.uk") != false)
 			$filepath_domainsavedirLnx = "/var/sites/w/webpagetoaster.com/subdomains/toast/". $uastr. "/".$host_domain;
 		else
+		{
 			$filepath_domainsavedirLnx = "/usr/share/toast/". $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"];
+			$filepath_domainsavedir = $filepath_domainsavedirLnx;
+		}
 	}
-		$jsfilepath_domainsavedir = joinURLPaths('/toast',$uastr,$host_domain,$sourceurlparts["dirs"]);
+	$jsfilepath_domainsavedir = joinURLPaths('/toast',$uastr,$host_domain,$sourceurlparts["dirs"]);
 	$filepath_domainsaverootdir = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
 	$localvpath = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
 	$lc = substr($jsfilepath_domainsavedir,-1);
@@ -652,6 +664,10 @@ error_log("Toasting " . $url .  PHP_EOL);
     {
 		$browserengineoutput = $filepath_domainsavedirLnx."/out".generateRandomString();
 //echo ("linux browserengineoutput = " . $browserengineoutput);
+		if(strpos($hostname,"gridhost.co.uk") != false)
+		{
+				$jsimgname = substr($jsimgname,6);
+		}
 	}
 	debug("browserengineoutput" , $browserengineoutput);
 
@@ -729,16 +745,25 @@ error_log("Toasting " . $url .  PHP_EOL);
 //echo("root lfn " . $localfilename."<br/>");
 	$toastedfilepathname = $filepath_domainsavedir."toasted_".$thispagenameext;
     $lastchar = substr($jsfilepath_domainsavedir, -1);
-    if($lastchar == "/")
-        $toastedwebname = $jsfilepath_domainsavedir."toasted_".$thispagenameext;
-    else
+	if($lastchar == "/")
+	{
+		$toastedwebname = $jsfilepath_domainsavedir."toasted_".$thispagenameext;
+		$toastedfilepathname = $filepath_domainsavedir."toasted_".$thispagenameext;
+	}
+	else
+		{
 		$toastedwebname = $jsfilepath_domainsavedir."/toasted_".$thispagenameext;
-	
+		$toastedfilepathname = $filepath_domainsavedir."/toasted_".$thispagenameext;
+		}
+debug ("toast filepathname: " .$toastedfilepathname,1);
+// echo ("toast filepathname: " .$toastedfilepathname."<br/>");
+// echo ("toast webname: " .$toastedwebname."<br/>");
 	$_SESSION['status'] = 'Processing hostname';
 	if( strpos($hostname,"gridhost.co.uk") != false)
 	{
 		$toastedwebname = 'http://toast.webpagetoaster.com/'. $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"] . "/toasted_".$thispagenameext;
 //echo ($toastedwebname);
+debug ("toasted webname: " .$toastedwebname ,1);
 	}
 	$harfile = $jsfilepath_domainsavedir.$thispagenameext.".har";
 	//echo "saved as: ".$harfile."<br/>";
@@ -1155,7 +1180,7 @@ $retbodylen = strlen($body);
 	$ListOfLinks = getArrayOfLinks();
 	$ListOfObjects = getArrayOfObjects();
 	$ListOfErrors = getArrayOfErrors();
- debug ("MAIN: start PhantomJS / SlimerJS","");
+ debug ("MAIN: starting browser engine","");
  
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1191,20 +1216,20 @@ $retbodylen = strlen($body);
     {
         $urlforbrowserengine = $originalurl;
     }
-debug('MAIN Running ', "'" . $browserengine . "'");
+debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
     $uar =  $ua; //str_replace(' ', '%20', $ua);
     switch ($browserengine)
     {
 		case 0:
 			$browserEngineVer = 'Toaster';
 			session_start();
-			$_SESSION['status'] = 'Running ' . $browserEngineVer;
+			$_SESSION['status'] = 'Running basic test only';
 			session_write_close();
 			break;
         case 1:
             $browserEngineVer = 'Webkit (PhantomJS v1.9.8)';
             session_start();
-            $_SESSION['status'] = 'Running ' . $browserEngineVer;
+            $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
                 exec('win_tools\phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
@@ -1214,7 +1239,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
         case 2:
             $browserEngineVer = 'Webkit (PhantomJS v2.0.0)';
             session_start();
-            $_SESSION['status'] = 'Running ' . $browserEngineVer;
+            $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
                 exec('win_tools\phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
@@ -1233,7 +1258,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 			// break;
 			$browserEngineVer = 'Webkit (PhantomJS v2.5)';
             session_start();
-            $_SESSION['status'] = 'Running ' . $browserEngineVer;
+            $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
                 exec('win_tools\phantomjs2.5 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
@@ -1251,7 +1276,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
         case 4:
             $browserEngineVer = 'Gecko (SlimerJS v0.10)';
             session_start();
-            $_SESSION['status'] = 'Running ' . $browserEngineVer;
+            $_SESSION['status'] = 'Running test on  ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
                 exec('win_tools\slimerjs-0.10.3\slimerjs.bat js\netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
@@ -1261,7 +1286,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
         case 5:
             $browserEngineVer = 'Webkit (PhantomJS v2.1.1)';
             session_start();
-            $_SESSION['status'] = 'Running ' . $browserEngineVer;
+            $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
             session_write_close();
             if($OS == "Windows")
                 exec('win_tools\phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
@@ -1279,7 +1304,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 		case 6: // private instance WPT
             $browserEngineVer = 'WebpageTest Private Instance';
             session_start();
-            $_SESSION['status'] = 'Running ' . $browserEngineVer;
+            $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
             session_write_close();
             $urlenc = urlencode($urlforbrowserengine);
             $testId = "";
@@ -1300,137 +1325,181 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             getWPTImagePath($testId,$imgname);
 			break;
 
-			case 8: // public WPT
-				$browserEngineVer = 'WebpageTest Public';
-				session_start();
-				$_SESSION['status'] = 'Running ' . $browserEngineVer;
-				session_write_close();
-				$urlenc = urlencode($urlforbrowserengine);
-				$testId = "";
-				list ($testId,$jsonResult,$summaryCSV,$detailCSV ) = submitWPTTest($wptbrowser,$urlenc,$uar,$width,$height,$username,$password);
-				$statusCode = 0;
-				$timoutcounter = 0;
-				while (intval($statusCode) != 200 and $timoutcounter < 600) {
-					$statusCode = checkWPTTestStatus($testId);
-					$timoutcounter++;
-					sleep(1);
-				}
-				// get testresults as HAR
-				$har = getWPTHAR($testId);
-	//echo $har;
-				$wptHAR = true;
-				$uploadedHAR = false;
-				$harfile = "WebpageTest Test No. ". $testId;
-				getWPTImagePath($testId,$imgname);
-				break;
+		case 8: // public WPT
+			$browserEngineVer = 'WebpageTest Public';
+			session_start();
+			$_SESSION['status'] = 'Running test on ' . $browserEngineVer;
+			session_write_close();
+			$urlenc = urlencode($urlforbrowserengine);
+			$testId = "";
+			list ($testId,$jsonResult,$summaryCSV,$detailCSV ) = submitWPTTest($wptbrowser,$urlenc,$uar,$width,$height,$username,$password);
+			$statusCode = 0;
+			$timoutcounter = 0;
+			while (intval($statusCode) != 200 and $timoutcounter < 600) {
+				$statusCode = checkWPTTestStatus($testId);
+				$timoutcounter++;
+				sleep(1);
+			}
+			// get testresults as HAR
+			$har = getWPTHAR($testId);
+//echo $har;
+			$wptHAR = true;
+			$uploadedHAR = false;
+			$harfile = "WebpageTest Test No. ". $testId;
+			getWPTImagePath($testId,$imgname);
+			break;
 			
 		case 7:
-			$browserEngineVer = 'Chrome Headless';
+			$browserEngineVer = 'Headless Chrome';
 			session_start();
-			$_SESSION['status'] = 'Running ' . $browserEngineVer;
+			$_SESSION['status'] = 'Running test on ' . $browserEngineVer;
 			session_write_close();	
             $urlenc = urlencode($urlforbrowserengine);
 			$testId = "";
 			
-			if($OS == "Windows")
-			{	
-				// use psexec to start in background, pipe stderr to stdout to capture pid
-				$command = '"c:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --enable-logging --remote-debugging-port=9222';
-				$res = exec("win_tools\pstools\PsExec64 -s -d -accepteula $command 2>&1", $output);
-				//echo $res . "<br/>";
-				// capture pid on the 6th line
-				preg_match('/ID (\d+)/', $output[6], $matches);
-				$pid = $matches[1];
-				//echo "Chrome process id = " . $pid . "<br/>";
-				//print_r($output);
-				// launch chrome headless
-//				exec('start chrome --headless --disable-gpu --enable-logging --remote-debugging-port=9222',$output,$rv);
+			if($chheadlessserver == '')
+			{
+				if($OS == "Windows")
+				{	
+					// use psexec to start in background, pipe stderr to stdout to capture pid
+					$command = '"c:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --enable-logging --remote-debugging-port=9222';
+					$res = exec("win_tools\pstools\PsExec64 -s -d -accepteula $command 2>&1", $output);
+					//echo $res . "<br/>";
+					// capture pid on the 6th line
+					preg_match('/ID (\d+)/', $output[6], $matches);
+					$pid = $matches[1];
+					//echo "Chrome process id = " . $pid . "<br/>";
+					//print_r($output);
+					// launch chrome headless
+	//				exec('start chrome --headless --disable-gpu --enable-logging --remote-debugging-port=9222',$output,$rv);
 
-//echo "Google Chrome launched with PID "  . $pid . "<br/>";
-				// get screenshot
-				//echo "getting screenshot<br/>";
-				exec("node win_tools/chromeremote/take_screenshot.js --url " . $urlforbrowserengine . " --pathname " . $imgname . " --viewportHeight " . $height . " --viewportWidth " . $width. " 2>&1", $output, $rv);
-				//echo implode("\n", $output);
-				//echo $imgname.  " - rv = " . $rv . "<br/>";
-
-
-				// get har
-				//echo "generating HAR file to " . $harname . "<br/>";
-				exec("node win_tools/chromeremote/node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --output " . $harname . " --height " . $height . " --width " . $width . " --agent \"" . $uar . "\" 2>&1", $output2, $rv);
-				//echo implode("\n", $output2);
-				//echo "rv = " . $rv. "<br/>";
+	//echo "Google Chrome launched with PID "  . $pid . "<br/>";
+					// get screenshot
+					//echo "getting screenshot<br/>";
+					exec("node win_tools/chromeremote/take_screenshot.js --url " . $urlforbrowserengine . " --pathname " . $imgname . " --viewportHeight " . $height . " --viewportWidth " . $width. " 2>&1", $output, $rv);
+					//echo implode("\n", $output);
+					//echo $imgname.  " - rv = " . $rv . "<br/>";
 
 
-				// get HTML DOM, after age end with injections
-				$outpath = realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput;
-				//echo "dumping HTML after page load to " . $outpath . "<br/>";
-				exec("node win_tools/chromeremote/dump.js --url " . $urlforbrowserengine. " --pathname " . $outpath . " 2>&1", $output2, $rv);
-				//echo implode("\n", $output2);
-				//echo "rv = " . $rv. "<br/>";
+					// get har
+					//echo "generating HAR file to " . $harname . "<br/>";
+					exec("node win_tools/chromeremote/node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --output " . $harname . " --height " . $height . " --width " . $width . " --agent \"" . $uar . "\" 2>&1", $output2, $rv);
+					//echo implode("\n", $output2);
+					//echo "rv = " . $rv. "<br/>";
 
-				// get testresults as HAR
-				$uploadedHARFileName = $harname;
-				$wptHAR = false;
-				$uploadedHAR = true;
 
-				// kill remote chrome headless instance
-				exec("win_tools\pstools\PsKill -t $pid", $output);
+					// get HTML DOM, after age end with injections
+					$outpath = realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput;
+					//echo "dumping HTML after page load to " . $outpath . "<br/>";
+					exec("node win_tools/chromeremote/dump.js --url " . $urlforbrowserengine. " --pathname " . $outpath . " 2>&1", $output2, $rv);
+					//echo implode("\n", $output2);
+					//echo "rv = " . $rv. "<br/>";
+
+					// get testresults as HAR
+					$uploadedHARFileName = $harname;
+					$wptHAR = false;
+					$uploadedHAR = true;
+
+					// kill remote chrome headless instance
+					exec("win_tools\pstools\PsKill -t $pid", $output);
+				}
+				else
+				{ // linux
+					
+					// set port
+					$port = "9221";
+					// launch headless chrome on a given port
+					$res = exec("google-chrome --remote-debugging-port=" . $port . " --headless > /dev/null 2>&1 & echo $!", $output);
+					// capture pid
+					$pid = (int)$output[0];
+	//echo "Chrome process id = " . $pid . "<br/>";
+	//print_r($output);
+
+					//get har
+					// $harname = '/var/sites/w/webpagetoaster.com/subdomains/toast/test.har';
+					// $height = 800;
+					// $width = 1200;
+					// $urlforbrowserengine = 'http://www.daish.net';
+					$uar = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
+
+	//echo "generating HAR file to " . $harname . "<br/>";
+					exec("node node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --port " . $port . " --output " . $harname . " 2>&1", $output2, $rv);
+					//echo implode("\n", $output2);
+	//echo "rv = " . $rv. "<br/>";
+
+					sleep (1);
+					// get screenshot and dom dump
+	//				echo "getting dom, saving to " . $dumpname . "<br/>";
+	//echo "saving screenshot to " . $imgname . "<br/>";
+					exec('node node_modules/cri-toaster.js --url ' . $urlforbrowserengine . " --fullPage true --width " . $width . " --height " . $height . " --imgpath " . $imgname . " --dompath " . $dumpname . " --port " . $port . " 2>&1", $output, $rv);
+	//echo implode("\n", $output);
+	//echo $imgname.  " - rv = " . $rv . "<br/>";
+
+					sleep (1);
+					// // kill chrome headless
+					$command = 'kill -9 ' . $pid ;
+					$res = exec($command . " 2>&1", $output);
+	//print_r($output);
+	//echo PHP_EOL . " all done";
+				
+					// get testresults as HAR
+					$uploadedHARFileName = $harname;
+					$wptHAR = true;
+					$uploadedHAR = true;
+
+				}
 			}
 			else
-			{ // linux
-				
-                // set port
-                $port = "9221";
-				// launch headless chrome on a given port
-				$res = exec("google-chrome --remote-debugging-port=" . $port . " --headless > /dev/null 2>&1 & echo $!", $output);
-                // capture pid
-				$pid = (int)$output[0];
-//echo "Chrome process id = " . $pid . "<br/>";
-//print_r($output);
+			{
+				// remote chrome headless
+//echo ("running chrome headless on remote server " . $chheadlessserver. PHP_EOL);
 
-                //get har
-                // $harname = '/var/sites/w/webpagetoaster.com/subdomains/toast/test.har';
-                // $height = 800;
-                // $width = 1200;
-                // $urlforbrowserengine = 'http://www.daish.net';
-                $uar = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
+				// jSON URL which should be requested
+				// $json_url = 'http://' . $chheadlessserver . "tid=143&content=0&url=http://www.daish.net/tpd&action=test";
+				if(strpos($chheadlessserver,"http") === false)
+					$chheadlessserver = 'http://' .$chheadlessserver;
+//echo("Chrome headless command path: " . $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test<br/>");
+				$page = file_get_contents( $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test");
 
-//echo "generating HAR file to " . $harname . "<br/>";
-				exec("node node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --port " . $port . " --output " . $harname . " 2>&1", $output2, $rv);
-				//echo implode("\n", $output2);
-//echo "rv = " . $rv. "<br/>";
+				//$page = '"{\"id\":144,\"har\":\"\\Users\\Tim\\toasterchh\\144.har\",\"dom\":\"\\Users\\Tim\\toasterchh\\144_domafter.txt\",\"imgb64\":\"\\Users\\Tim\\toasterchh\\144_screenshot.png\"}"';
+				// $ap = json_decode(json_encode($page, JSON_UNESCAPED_SLASHES)); // decode the json record
+				// print_r($ap);
 
-                sleep (1);
-				// get screenshot and dom dump
-//				echo "getting dom, saving to " . $dumpname . "<br/>";
-//echo "saving screenshot to " . $imgname . "<br/>";
-				exec('node node_modules/cri-toaster.js --url ' . $urlforbrowserengine . " --fullPage true --width " . $width . " --height " . $height . " --imgpath " . $imgname . " --dompath " . $dumpname . " --port " . $port . " 2>&1", $output, $rv);
-//echo implode("\n", $output);
-//echo $imgname.  " - rv = " . $rv . "<br/>";
+				// get the prepared files and save them
+	// echo "saving returned chrome headless files to:<br/>";
+	// echo "saving returned harfile: " . $harname. "<br/>";
+	// echo "saving returned domdump: " . $dumpname. "<br/>";
+	// echo "saving returned screenshot: " . $imgname. "<br/>";
+				$har = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=gethar");
+				file_put_contents($harname,$har);
+				$pagedom = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getdom");
+				file_put_contents($dumpname,$pagedom);
+				$pagescreenshot = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getimg");
+				file_put_contents($imgname,$pagescreenshot);
 
-                sleep (1);
-				// // kill chrome headless
-				$command = 'kill -9 ' . $pid ;
-				$res = exec($command . " 2>&1", $output);
-//print_r($output);
-// echo PHP_EOL . " all done";
-			  
-				// get testresults as HAR
 				$uploadedHARFileName = $harname;
 				$wptHAR = false;
+				$chhHAR = true;
 				$uploadedHAR = true;
-
 			}
 				break;
 			case 8: // public wpt - to do - get har file
 
-    } // end switch
+	} // end switch
+//echo("continuing after browser engine<br/>");
     // save thumnbnail of $imgname
-    $fileimage = str_replace("\\\\", "\\",$imgname);
+	$fileimage = str_replace("\\\\", "\\",$imgname);
+	echo "saving thumbnail from " . $fileimage . " to " . $filepath_domainsavedirLnx . "<br/>";
     if($OS == 'Windows')
         $os_cmd = 'c:\ImageMagick\mogrify -format gif -path ' . $filepath_domainsavedir . ' -thumbnail 100x100 ' . escapeshellarg($fileimage);
-    else
-        $os_cmd = 'mogrify -format gif -path ' . $filepath_domainsavedir . ' -thumbnail 100x100 ' . escapeshellarg($fileimage);
+	else
+	{
+		if(strpos($hostname,"gridhost.co.uk") != false)
+			$os_cmd = 'mogrify -format gif -path ' . $filepath_domainsavedirLnx . ' -thumbnail 100x100 ' . escapeshellarg($fileimage);
+		else
+			$os_cmd = 'mogrify -format gif -path ' . $filepath_domainsavedir . ' -thumbnail 100x100 ' . escapeshellarg($fileimage);
+	}
+	echo ($os_cmd."</br>");
     $eres = array();
 	exec($os_cmd,$eres);
     // get pjs and slimerjs cookies and postdata
@@ -1484,9 +1553,11 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 	else
 		$pjspostdataJSON = '';
 
+//echo ($browserEngineVer . ": processing additional resources for url: " . $url . "<br.>");
+
     // add onContentLoad as PhantomJS fails to add it
     //$har = str_replace('"onLoad"','"onContentLoad": -1,    "onLoad"',$har);
-	// remove PhantomJS errors before "log":
+	// remove ant HAR formatting errors before "log":
 	$logpos = strpos($har,'{');
 	//echo ("logpos = " . $logpos. "<br/>");
 	if ($logpos >1)
@@ -1513,20 +1584,20 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 	$harjson = json_decode($har,true);
 
 	//save HAR file from browser engine
-    file_put_contents($localfilename.".har",$har,FILE_APPEND);
-//echo("reading har file<br/>");
+	file_put_contents($localfilename.".har",$har,FILE_APPEND);
+	$harfilelength = strlen($har);
+//echo("reading har file of length . " . $harfilelength . "<br/>");
     session_start();
     $_SESSION['status'] = 'Reading HAR file';
     session_write_close();
-    // override the HAR file if not for WPT
-    if($uploadedHAR == True and $wptHAR == false)
+    // override the HAR file if not for WPT or Chrome Headless
+    if($uploadedHAR == True and $wptHAR == false and $chhHAR == false)
     {
         $har = file_get_contents($uploadedHARFileName);
 //echo($uploadedHARFileName . ' - overriding HAR file from engine<br/>');
         $harjson = json_decode($har,true);
         $harfile =$uploadedHARFileName;
 	}
-
 //echo("processing har file<br/>");
 //debug HAR JSON string
 // echo("har<code><pre>");
@@ -1542,31 +1613,36 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 	$domLoadEnd = 0;
     foreach ($harjson['log'] as $logtype => $logval)
     {
-   //   echo("har<code> ".$logtype . " ". $logval->text."<br/>");
+//echo("har<code> ".$logtype . " ". $logval->text."</code> <br/>");
         switch ($logtype)
             {
                 case 'pages':
-                foreach ($logval as $key => $value) {
-                    //echo("PAGES log level 1: ".$key . " ". $value);
+                	foreach ($logval as $key => $value) {
+//echo("HAR PAGES log level 1: ".$key . " ". $value);
                     $evalue =json_encode($value);
-                    //echo "startedDateTime: ".$value['startedDateTime']."<br/>";
-					//echo "render: ".$value['_render']."<br/>";
+//echo "startedDateTime: ".$value['startedDateTime']."<br/>";
+//echo "render: ".$value['_render']."<br/>";
 					// add render time to array
-					if($browserengine == 6 or $browserengine == 8) // WPT only
+					switch($browserengine)
 					{
-						$rst = $value['_render'];
-						$onLoad = $value['_docTime'];
-						$domLoadStart = $value['_domContentLoadedEventStart'];
-						$domLoadEnd = $value['_domContentLoadedEventEnd'];
-						$doct = $value['_fullyLoaded'];
-						
-					}
-					else
-					{
-						$rst = 0;
-						$doct = 0;
-						$onLoad = 0;
-					}
+						case 6: // WPT private
+						case 8: // WPT public
+							$rst = $value['_render'];
+							$onLoad = $value['_docTime'];
+							$domLoadStart = $value['_domContentLoadedEventStart'];
+							$domLoadEnd = $value['_domContentLoadedEventEnd'];
+							$doct = $value['_fullyLoaded'];
+							break;
+						case 7: //chrome headless
+							$rst = 0;
+							$domLoadStart = $value['onContentLoad'];
+							$onLoad = $value['OnLoad'];
+							break;
+						default:
+							$rst = 0;
+							$doct = 0;
+							$onLoad = 0;
+					} // end switch $browserengine
 					$arr = array("renderms"=> $rst);
 					$rstime_ms = $rst;
 					$domCompletetime_ms = $domLoadEnd;
@@ -1575,8 +1651,8 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 					$docTime_ms = $doct;
 					$scoreArray[] = $arr;
 					addStatToFileListAnalysis(number_format($rstime_sec,3), "Seconds", "Render Start Time", "info");
-				}
-                    break;
+					break;
+				} // end for each page
               case 'entries':
             	$pjsObjCnt = 0;
             	$pjsObjCntExisting = 0;
@@ -1585,7 +1661,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             	$starturl = '';
             	$endurl = '';
                 foreach ($logval as $key => $value) {
-                    //echo("log level 1: ".$key . " ". $value."<br/>");
+//echo("log level 1: ".$key . " ". $value."<br/>");
                     $evalue =json_encode($value);
                     //echo "<br/>entry $key<br/>";
                     //echo "startedDateTime: ".$value['startedDateTime']."<br/>";
@@ -1600,28 +1676,39 @@ debug('MAIN Running ', "'" . $browserengine . "'");
                     $httpstatus = $response['status'];
                     $pageref = $value['pageref'];
 					$requestheaders = $request['headers'];
+					$timings = $value['timings'];
 					// get WPT values for timings
-					if($browserengine == 6 or $browserengine == 8)
+					switch($browserengine)
 					{
-						$requestStartMS = $value['_ttfb_start'];
-						$ttfbMS = $value['_ttfb_ms'];
-						$contentDownloadMS = $value['_download_ms'];
-						$allMS = $value['_all_ms'];
-						$allStartMS = $value['_all_start'];
-						$allEndMS = $value['_all_end'];
-						$cacheTime = $value['_cache_time'];
+						case 6: // WPT private
+						case 8: // WPT public
+							$requestStartMS = $value['_ttfb_start'];
+							$ttfbMS = $value['_ttfb_ms'];
+							$contentDownloadMS = $value['_download_ms'];
+							$allMS = $value['_all_ms'];
+							$allStartMS = $value['_all_start'];
+							$allEndMS = $value['_all_end'];
+							$cacheTime = $value['_cache_time'];
+							break;
+						case 7: // Chrome Headless
+							$requestStartMS = 0;
+							$ttfbMS = 0;
+							$contentDownloadMS = 0;
+							$allMS = 0;
+							$allStartMS = 0;
+							$allEndMS = 0;
+							$cacheTime = 0;
+							break;
 //echo ($ObjURL . "; allms =  " . $allMS . ";<br/>");
-					}
-					else
-					{
-					$requestStartMS = 0;
-					$ttfbMS = 0;
-					$contentDownloadMS = 0;
-					$allMS = 0;
-					$allStartMS = 0;
-					$allEndMS = 0;
-					$cacheTime = 0;
-					}
+						default:
+							$requestStartMS = 0;
+							$ttfbMS = 0;
+							$contentDownloadMS = 0;
+							$allMS = 0;
+							$allStartMS = 0;
+							$allEndMS = 0;
+							$cacheTime = 0;
+					} // end switch $browserengine
                     foreach ($requestheaders as $reqhdrkey => $reqhdrvalue) {
                         //echo ("req hdr key ". $reqhdrkey. " ".$reqhdrvalue."<br/>");
                         if($reqhdrvalue['name'] == 'Referer')
@@ -1739,7 +1826,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             			}
 					$pjsObjCnt += 1;
 					// HAR add object
-            		//echo("Checking HARfile object against root: $ObjURL --- $url<br/>");
+//echo("Checking HARfile object against root: $ObjURL --- $url<br/>");
             		if($ObjURL != $url."/" )
             		//if($ObjURL != $url and $ObjURL != $url."/" )
             		{
@@ -1747,37 +1834,47 @@ debug('MAIN Running ', "'" . $browserengine . "'");
             			//echo("HARfile object lookup: $ObjURL; ".$id."; localfilename: ".$lfn. "<br/>");
             			if (!is_numeric($id))
             			{
-            				//echo ("HARfile new object: ".$ObjURL.": " . $ObjMimeType  ."<br/>");
+//echo ("HARfile new object: ".$ObjURL.": " . $ObjMimeType  ."<br/>");
             				$pjsObjCntNew += 1;
-            				list($hd, $hp) = getDomainHostFromURL($ObjURL,false,"main pjs");
+            				list($hd, $hp) = getDomainHostFromURL($ObjURL,false,"main processing objects from" . $browserengine);
             			}
             			else
             			{
-            				//echo ("HARfile existing object ($id): ".$ObjURL.": " . $ObjMimeType  ."<br/>");
+//echo ("HARfile existing object ($id): ".$ObjURL.": " . $ObjMimeType  ."<br/>");
             				$pjsObjCntExisting += 1;
 							// UPDATE HARFile stats
-							// update existing  object timing
-							if($browserengine == 6 or $browserengine == 8)
+							// update existing object timing
+							switch ($browserengine)
 							{
-							$requestStartMS = $value['_ttfb_start'];
-							$ttfbMS = $value['_ttfb_ms'];
-							$contentDownloadMS = $value['_download_ms'];
-							$allMS = $value['_all_ms'];
-							$allStartMS = $value['_all_start'];
-							$allEndMS = $value['_all_end'];
-							$cacheTime = $value['_cache_time'];
+								case 6: // wpt private
+								case 8: // wpt public
+									$requestStartMS = $value['_ttfb_start'];
+									$ttfbMS = $value['_ttfb_ms'];
+									$contentDownloadMS = $value['_download_ms'];
+									$allMS = $value['_all_ms'];
+									$allStartMS = $value['_all_start'];
+									$allEndMS = $value['_all_end'];
+									$cacheTime = $value['_cache_time'];
+									break;
 //echo ("update " . $ObjURL . "; allms =  " . $allMS . ";<br/>");
-							}
-							else
-							{
-							$requestStartMS = 0;
-							$ttfbMS = 0;
-							$contentDownloadMS = 0;
-							$allMS = 0;
-							$allStartMS = 0;
-							$allEndMS = 0;
-							$cacheTime = 0;
-							}
+								case 7: // chrome headless
+									$requestStartMS = $value['blocked'];
+									$ttfbMS = $value['wait'];
+									$contentDownloadMS = $value['receive'];
+									$allMS = 0;
+									$allStartMS = 0;
+									$allEndMS = 0;
+									$cacheTime = 0;
+									break;
+								default:
+									$requestStartMS = 0;
+									$ttfbMS = 0;
+									$contentDownloadMS = 0;
+									$allMS = 0;
+									$allStartMS = 0;
+									$allEndMS = 0;
+									$cacheTime = 0;
+							} // end switch $browserengine
 							$arr = array(
             				"Object source" => $ObjURL,
 							"offsetDuration" => $requestStartMS,
@@ -1974,9 +2071,9 @@ debug('MAIN Running ', "'" . $browserengine . "'");
     } // end for har log reading
     //var_dump($harjson);
   // end reading of urls from har from PhantomJS/SlimerJS/WPT
-//	echo ("HARfile object: total: ".$pjsObjCnt."<br/>");
-//	echo ("HARfile object: new: ".$pjsObjCntNew."<br/>");
-//	echo ("HARfile object: existing: ".$pjsObjCntExisting."<br/>");
+	// echo ("HARfile object: total: ".$pjsObjCnt."<br/>");
+	// echo ("HARfile object: new: ".$pjsObjCntNew."<br/>");
+	// echo ("HARfile object: existing: ".$pjsObjCntExisting."<br/>");
 
 
 
@@ -1989,7 +2086,7 @@ debug('MAIN Running ', "'" . $browserengine . "'");
 //echo (__FUNCTION__.' '. __LINE__." Main: 1st parseRootBodytoDOM being called to check html content: "."html is not empty");
     getCSSJSOrdering('source');
     // extra processing of HTML document for modified DOM - use output from PhantomJS or SlimerJS
-//error_log("browser engine ver = " . $browserEngineVer);
+//echo("domdump processing from browser engine ver = " . $browserEngineVer."</br>");
 	if($browserengine != 6 and $browserengine != 8) // don't run for WPT
 	{
 		//$modrootfilepath = "output.txt";
@@ -2626,6 +2723,7 @@ else
     rename($cookie_jar,  $localfilename."_cookies.txt");
     $cookiedata = readcookiefile($localfilename."_cookies.txt");
 }
+//echo "removing temp files<br/>";
 if($OS == 'Windows')
 {
     if (file_exists(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput)) {
@@ -2744,7 +2842,8 @@ var cookietext = '<?php echo utf8_converter($cookiedata); ?>';
     var HostedThirdPartyFiles = <?php echo json_encode(utf8_converter($arrayHost3PFiles));?>;
     var ThirdPartyChain = <?php echo json_encode(utf8_converter($arrayThirdPartyChain));?>;
 	// analysis of root header
-	var rootheaderanalysis = analyseHeader(0,headerStr,mimetype,true);
+	var rootheaderanalysis = '';
+	rootheaderanalysis = analyseHeader(0,headerStr,mimetype,true);
 	var reverseipresults = <?php echo json_encode($reverseIPResults); ?>;
 	var rootlatlong = "<?php echo $rootlatlong; ?>";
     var extloc = "<?php echo $geoExtLoc; ?>";
@@ -2831,9 +2930,10 @@ $_SESSION['imagepath'] = '';
 $_SESSION['status']  = 'Ready to Toast';
 session_write_close();
 // Get the content that is in the buffer and put it in your file //
-//echo ("writing toast file to " . $toastedfilepathname);
-error_log (ob_get_contents());
-file_put_contents($toastedfilepathname, ob_get_contents(),LOCK_EX);
+//echo ("writing toast file to " . $toastedfilepathname."<br/>");
+//error_log (ob_get_contents());
+$toastfileresult = file_put_contents($toastedfilepathname, ob_get_contents(),LOCK_EX);
+//echo ("toast file put result " . $toastfileresult."<br/>");
 // add generated file to lists of tests
 $dt = date("Y-m-d H:i:s");
 $line = $array = array($url,$toastedwebname,trim($dt),str_replace("_"," ",$uastr),htmlentities(trim($pagetitle)),trim($uploadedHARFileName),trim($jsimgname),$runnotes,);

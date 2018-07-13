@@ -136,9 +136,28 @@ while (($line = fgetcsv($f)) !== false) {
                         if($OS == 'Windows')
                             $os_cmd = 'c:\ImageMagick\mogrify -format gif -path ' . dirname($thumbnail) . ' -thumbnail 100x100 ' . escapeshellarg($file);
                         else
-                            $os_cmd = 'mogrify -format gif -path ' . dirname($thumbnail) . ' -thumbnail 100x100 ' . escapeshellarg($file);
-                        $res = array();
-                    	exec($os_cmd,$res);
+                        {
+                            if(strpos($hostname,"gridhost.co.uk") == false)
+                            {
+                                $os_cmd = 'mogrify -format gif -path ' . dirname($thumbnail) . ' -thumbnail 100x100 ' . escapeshellarg($file);
+                                $res = array();
+                                exec($os_cmd,$res);
+                            }
+                            else
+                            { // www.webpagetoaster.com
+                                // convert and mogrify give errors on www.webpagetoaster.com, so use php instead
+                                //$os_cmd = 'mogrify -format gif -path ' . dirname($thumbnail) . ' -thumbnail 100x100 ' . escapeshellarg($file);
+                                $tn = "/var/sites/w/webpagetoaster.com/subdomains" . $thumbnail ;
+                                $infilename = "http://toast.webpagetoaster.com" .substr($file,6);
+                                //echo ("converting image from " . $infilename .  " to thumbnail:" .$tn . "<br/>");
+                                $inim = @imagecreatefrompng($infilename);
+                                $im = @imagescale($inim,100,100,IMG_NEAREST_NEIGHBOUR);
+                                $imgif = @imagegif($im,$tn);
+                                
+
+                            }
+                        }
+                        
                     }
 					break;
                 case 7:
@@ -234,6 +253,11 @@ for($i=$c-1; $i>=0; $i--)
 
 		$l = str_replace('\\','/',$link);
 
+        if(strpos($hostname,"gridhost.co.uk") != false)
+		{
+            $ss = "http://toast.webpagetoaster.com/" . substr($ss,6);
+        }
+        
 		//echo("Link:".$l."<br/>");
 		//echo("page:".$page."<br/>");
 		echo ("<tr><td><a class=\"history\" href=\"". ''. "\" target=\"_blank\"><img src=\"".$ss."\" height=100 width=100 class=\"thumbnail\" \"></img></a></td>");
