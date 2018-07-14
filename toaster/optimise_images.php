@@ -1,6 +1,7 @@
 <?php
-date_default_timezone_set('UTC');
 session_start();
+date_default_timezone_set('UTC');
+$hostname = gethostname();
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
   $windows = defined('PHP_WINDOWS_VERSION_MAJOR');
     //echo 'This is a server using Windows! '. $windows."<br/>";
@@ -10,18 +11,18 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 else {
     //echo 'This is a server not using Windows!'."<br/>";
     $OS = PHP_OS;
-    //set path for webpagetoaster server and others
+        //set path for webpagetoaster server and others
 	if( strpos($hostname,"gridhost.co.uk") != false)
     {
-		$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/debug.txt";
+		$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/debug_optimg.txt";
 	}
 	else{
-		$debuglog = "/usr/share/toast/debug.txt";
+		$debuglog = "/usr/share/toast/debug_optimg.txt";
 	}
 }
 ini_set("log_errors", 1);
 ini_set("error_log", $debuglog);
-file_put_contents($debuglog, "DEBUG LOG started" . PHP_EOL);
+file_put_contents($debuglog, "IMAGE OPTIMISATION DEBUG LOG started" . PHP_EOL);
 
 $data = file_get_contents('php://input');
 $d = urldecode($data);
@@ -38,6 +39,21 @@ foreach ($djson as $value) {
   $mt =  $value->mimetype;
   $url = $value->url;
   $file = str_replace("\\\\", "\\",$value->localfile);
+  echo ("optmising image: " . $file.PHP_EOL);
+  // update localfilepath for linux
+    if( $OS != "Windows")
+    {
+                //set path for webpagetoaster server and others
+	if( strpos($hostname,"gridhost.co.uk") != false)
+    {
+		$file = str_replace ("http://toast.webpagetoaster.com", "/var/sites/w/webpagetoaster.com/subdomains/toast",$file);
+	}
+	else{
+        $file = str_replace ("http://toast.webpagetoaster.com", "/usr/share/toast",$file);
+	    }
+    }
+
+
   $savepath = $value->savepath;
   $animflag = $value->animflag;
   //$tinyjpgkey = $value->tinyjpgapikey;
@@ -45,10 +61,20 @@ foreach ($djson as $value) {
 
   $path_parts = pathinfo($file);
   $filename = $path_parts['filename'];
+  echo ("saving optmised image to the path: " . $savepath .PHP_EOL);
   if($OS == 'Windows')
     $savepath = str_replace("/","\\",$savepath);
+  else
+    // if( strpos($hostname,"gridhost.co.uk") != false)
+    // {
+	// 	$savepath= "/var/sites/w/webpagetoaster.com/subdomains/toast/";
+	// }
+	// else{
+	// 	$savepath = "/usr/share/toast/";
+	// }
 
- //error_log("opt image save path: ".$savepath);
+
+ error_log("opt image save path: ".$savepath);
   switch($mt)
   {
     case "image/png":
@@ -108,8 +134,6 @@ function optimisePNG($savepath, $lfn)
   global $OS;
     $path_parts = pathinfo($lfn);
     $filename = $path_parts['filename'];
-    if($OS == 'Windows')
-        $savepath = str_replace("/","\\",$savepath);
 
     $folder = '_Optimised_Images';
     $baseImgfolder =  $savepath.$folder;
@@ -120,8 +144,8 @@ function optimisePNG($savepath, $lfn)
     $PNGImgfolder = $baseImgfolder.$folder;
     if (!file_exists($PNGImgfolder))
         mkdir($PNGImgfolder, 0777, true);
-    //echo "optimising JPG: ".$lfn."</br>";
-    //echo "optimising JPG savepath: ".$JPGImgfolder."</br>";
+    //echo "optimising PNG: ".$lfn."</br>";
+    echo ("optimising PNGs to savepath folder: ".$PNGImgfolder."</br>");
 
     // init array to return
     $pngdata = array();
@@ -135,12 +159,13 @@ function optimisePNG($savepath, $lfn)
     $PNGImgfile = $SaveImgfolder . $filename . '.png';
     $ImgWithoutMetadata = $PNGImgfile;
 
-    //echo "optimising JPG as: ".$JPGImgfile."</br>";
+    echo "optimising PNG as: ".$PNGImgfile."</br>";
     if($OS == 'Windows')
         $os_cmd = 'win_tools\exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
     else
-        $os_cmd = 'exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
-    //echo 'cmd = '.$os_cmd;
+    
+        $os_cmd = './lnx_tools/ExifTool/exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
+    echo 'cmd = '.$os_cmd;
     //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
@@ -180,7 +205,7 @@ function optimisePNG($savepath, $lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\pngquant ' .escapeshellarg($PNGImgfileUnoptimised) .' -o '.escapeshellarg($PNGImgfile);
     else
-        $os_cmd = 'pngquant ' .escapeshellarg($PNGImgfileUnoptimised) .' -o '.escapeshellarg($PNGImgfile);
+        $os_cmd = '.\lnx_tools\pngquant ' .escapeshellarg($PNGImgfileUnoptimised) .' -o '.escapeshellarg($PNGImgfile);
     //echo 'cmd = '.$os_cmd;
         $res = array();
 	exec($os_cmd,$res);
@@ -445,7 +470,7 @@ function optimiseJPG($savepath,$lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\exiftool -all= -o '.escapeshellarg($JPGImgfile). ' ' . escapeshellarg($lfn);
     else
-        $os_cmd = 'exiftool -all= -o '.escapeshellarg($JPGImgfile). ' ' . escapeshellarg($lfn);
+        $os_cmd = './lnx_tools/ExifTool/exiftool -all= -o '.escapeshellarg($JPGImgfile). ' ' . escapeshellarg($lfn);
     error_log('cmd = '.$os_cmd);
     //exiftool - remove metadata
     $res = array();
@@ -893,7 +918,7 @@ function optimiseGIF($savepath, $lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
     else
-        $os_cmd = 'exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
+        $os_cmd = './lnx_tools/ExifTool/exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
     //echo 'cmd = '.$os_cmd;
     //exiftool - remove metadata
     $res = array();
@@ -1078,7 +1103,7 @@ function optimiseGIFAnimation($savepath, $lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
     else
-        $os_cmd = 'exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
+        $os_cmd = './lnx_tools/ExifTool/exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
     //echo 'cmd = '.$os_cmd;
     //exiftool - remove metadata
     $res = array();

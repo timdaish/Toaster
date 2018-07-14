@@ -81,7 +81,7 @@ $f = fopen($fn, "r");
 if($f == false)
    die("can't open file");
 $runnotes = '';
-
+//var_dump($_SERVER);
 while (($line = fgetcsv($f)) !== false) {
                 //echo implode($line)."<br/>";
                 $ua = '';
@@ -144,17 +144,30 @@ while (($line = fgetcsv($f)) !== false) {
                                 exec($os_cmd,$res);
                             }
                             else
-                            { // www.webpagetoaster.com
+                            { 
+                                if($SERVER["HTTP_HOST"] == "www.webpagetoaster.com")
+                                {
+                                // www.webpagetoaster.com
                                 // convert and mogrify give errors on www.webpagetoaster.com, so use php instead
                                 //$os_cmd = 'mogrify -format gif -path ' . dirname($thumbnail) . ' -thumbnail 100x100 ' . escapeshellarg($file);
                                 $tn = "/var/sites/w/webpagetoaster.com/subdomains" . $thumbnail ;
-                                $infilename = "http://toast.webpagetoaster.com" .substr($file,6);
-                                //echo ("converting image from " . $infilename .  " to thumbnail:" .$tn . "<br/>");
+                                $infilename = "http://toast.webpagetoaster.com" .$file;
+//echo ("converting image from " . $infilename .  " to thumbnail:" .$tn . "<br/>");
                                 $inim = @imagecreatefrompng($infilename);
                                 $im = @imagescale($inim,100,100,IMG_NEAREST_NEIGHBOUR);
                                 $imgif = @imagegif($im,$tn);
-                                
-
+                                }
+                                else
+                                {
+                                    // toast.webpagetoaster.com
+                                    $tn = "/var/sites/w/webpagetoaster.com/subdomains" . $thumbnail ;
+                                    $tn = str_replace("http://toast.webpagetoaster.com","/toast",$tn);
+                                    $infilename = $file;
+//echo ("converting image from " . $infilename .  " to thumbnail:" .$tn . "<br/>");
+                                    $inim = @imagecreatefrompng($infilename);
+                                    $im = @imagescale($inim,100,100,IMG_NEAREST_NEIGHBOUR);
+                                    $imgif = @imagegif($im,$tn);
+                                    }
                             }
                         }
                         
@@ -255,7 +268,13 @@ for($i=$c-1; $i>=0; $i--)
 
         if(strpos($hostname,"gridhost.co.uk") != false)
 		{
-            $ss = "http://toast.webpagetoaster.com/" . substr($ss,6);
+//echo("linux screenshot path: " . $ss ."<br/>" );
+            if(substr($ss,0,6) == "/toast")
+                $ss = substr($ss,6);
+            if($SERVER["HTTP_HOST"] == "toast.webpagetoaster.com")
+                $ss = "http://toast.webpagetoaster.com" . $ss;
+            else
+                $ss = "http://toast.webpagetoaster.com" . $ss;
         }
         
 		//echo("Link:".$l."<br/>");

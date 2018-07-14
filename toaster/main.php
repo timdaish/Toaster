@@ -667,6 +667,8 @@ echo ('main named rootloc '.$rootloc.' was latlong, reset to edgeloc<br/>');
 		if(strpos($hostname,"gridhost.co.uk") != false)
 		{
 				$jsimgname = substr($jsimgname,6);
+				$jsimgname = "http://toast.webpagetoaster.com".$jsimgname;
+//echo "jsimagename: " . $jsimgname  . "<br/>";
 		}
 	}
 	debug("browserengineoutput" , $browserengineoutput);
@@ -1489,7 +1491,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 //echo("continuing after browser engine<br/>");
     // save thumnbnail of $imgname
 	$fileimage = str_replace("\\\\", "\\",$imgname);
-	echo "saving thumbnail from " . $fileimage . " to " . $filepath_domainsavedirLnx . "<br/>";
+//echo "saving thumbnail from " . $fileimage . " to " . $filepath_domainsavedirLnx . "<br/>";
     if($OS == 'Windows')
         $os_cmd = 'c:\ImageMagick\mogrify -format gif -path ' . $filepath_domainsavedir . ' -thumbnail 100x100 ' . escapeshellarg($fileimage);
 	else
@@ -1499,7 +1501,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 		else
 			$os_cmd = 'mogrify -format gif -path ' . $filepath_domainsavedir . ' -thumbnail 100x100 ' . escapeshellarg($fileimage);
 	}
-	echo ($os_cmd."</br>");
+//echo ($os_cmd."</br>");
     $eres = array();
 	exec($os_cmd,$eres);
     // get pjs and slimerjs cookies and postdata
