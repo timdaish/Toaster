@@ -279,7 +279,7 @@ for($i=$c-1; $i>=0; $i--)
         
 		//echo("Link:".$l."<br/>");
 		//echo("page:".$page."<br/>");
-		echo ("<tr><td><a class=\"history\" href=\"". ''. "\" target=\"_blank\"><img src=\"".$ss."\" height=100 width=100 class=\"thumbnail\" \"></img></a></td>");
+		echo ("<tr><td><a class=\"history\" href=\"". ''. "\" target=\"_blank\">link</a></td>"); //<img src=\"".$ss."\" height=100 width=100 class=\"thumbnail\" \"></img>
         echo "<td><a class=\"history\" href=\"". $l. "\" target=\"_blank\">" . $page . "</a></td>";
         echo "<td>". $pagetitle. "</td>";
         echo "<td>". $harfile. "</td>";
@@ -357,7 +357,7 @@ echo "</tbody></table>";
            var hrefloc = aData[7];
            //console.log("img src = " +imgsrc);
 
-            $('td:eq(0)', nRow).html( '<a class="history" href="' + hrefloc + '" target="_blank"><img src="' + imgsrc + '" height=100 width=100 class="thumbnail"></img></a>' );
+            $('td:eq(0)', nRow).html( '<a class="history" href="' + hrefloc + '" target="_blank">link</a>' ); //<img src="' + imgsrc + '" height=100 width=100 class="thumbnail"></img>
         },
         "aaSorting": [[5, 'desc']], // sorts by a column and direction as set by the table type
          "columnDefs": [

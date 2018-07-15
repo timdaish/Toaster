@@ -21,7 +21,7 @@
         <span class="multipleradio">
         <!--<input type="radio" name="wbengine" value="pjs2.0" title="PhantomJS v2">Webkit v2.0&nbsp;-->
         <input type="radio" name="wbengine" class="wbNone" id="none" value="none" checked title="none"><span class="wbNone">None</span>
-        <input type="radio" name="wbengine" class="wbChromeheadless" id="chromeheadless" value="ch_headless" title="Chrome Headless"><span class="wbChromeheadless">Chrome Headless</span>
+        <input type="radio" name="wbengine" class="wbChromeheadless" id="chromeheadless" value="ch_headless" title="Headless Chrome"><span class="wbChromeheadless">Headless Chrome</span>
         <input type="radio" name="wbengine" class="wbpjs25" id="pjs2.5" value="pjs2.5" title="PhantomJS v2.5"><span class="wbpjs25">PhantomJS v2.5</span>
         <input type="radio" name="wbengine" class="wbpjs21" id="pjs2.1" value="pjs2.1" title="PhantomJS v2.1"><span class="wbpjs21">PhantomJS v2.1</span>
         <!--<input type="radio" class="wbsjs0.10" id="sjs0.10" name="wbengine" value="sjs0.10" title="SlimerJS v0.10"><span class="wbsjs0.10">Gecko v0.10</span>-->
@@ -35,27 +35,6 @@
       <input type="text" name="url" id="urlfield" size="70" maxlength="10000" value="" class="long" required autofocus>
       <label>Real(*WPT)/Emulated Device</label>
       <select id="ualist" name="ua" required>
-        <!-- <option value="Chrome">Chrome Desktop*</option>
-        <option value="Firefox">Firefox Desktop*</option>
-        <option value="Edge">Edge Desktop</option>
-        <option value="IE">IE11 Desktop*</option>
-        <option value="iPhone iOS9">iPhone Safari iOS9</option>
-        <option value="iPhone iOS10">iPhone Safari iOS10</option>
-        <option value="iPhone iOS11">iPhone Safari iOS11*</option>
-        <option value="iPhone iOS11">iPhone Safari iOS12</option>
-        <option value="iPad iOS9">iPad Safari iOS9</option>
-        <option value="iPad iOS10">iPad Safari iOS10</option>
-        <option value="iPad iOS11">iPad Safari iOS11*</option>
-        <option value="iPad iOS11">iPad Safari iOS12</option>
-        <option value="Android5.0M">Android 5.0 MotoG Phone*</option>
-        <option value="Android5.1N7">Android 5.0 Nexus7 Tablet*</option>
-        <option value="Android5.0N5">Android 5.0 Nexus5 Tablet</option>
-        <option value="Android5.0N6">Android 5.0 Nexus6 Phone</option>
-        <option value="Android5.0N9">Android 5.0 Nexus9 Tablet</option>
-        <option value="Android6.0S6">Android 6.0 Samsung Galaxy S6 Phone</option>
-        <option value="Android7.0PC">Android 7.0 Google Pixel C Tablet</option>
-        <option value="Googlebot">Googlebot</option>
-        <option value="Custom">Googlebot Custom</option> -->
       </select>
       <div class="checkbox">
         <label for="cssimgs">Get All Available Objects</label>
@@ -138,7 +117,6 @@
 //console.log("storedurl",$storedurl);
       if($storedurl != '')
         $("#urlfield").val($storedurl);
-
       // determine server name
       var svrname = location.hostname;
 //console.log("hostname",svrname);
@@ -225,7 +203,7 @@
             $("#wbengineoptions").append('<label for="chremoteurlandport">Remote URL and Port</label><input id="chremoteurlandport" name="chremoteurlandport" placeholder="remote"></input>');
           }
           $storedchhserver = localStorage.getItem('chhserver');
-          $('#chremoteurlandport').text($storedchhserver);
+          $('#chremoteurlandport').val($storedchhserver);
         }
         if ($('#wpt_private').prop('checked')) {
 //console.log('wpt private is checked!');
@@ -541,6 +519,9 @@
           // get full list of urls from input field
           listofurls = $('#urlfield').val();
           localStorage.setItem('urlfield', listofurls);
+          var rchhsvr = $('#chremoteurlandport').val();
+          if(rchhsvr != '')
+            localStorage.setItem('chhserver', rchhsvr);
           //console.log(listofurls);
 
           if ($('#comment').val() != '')

@@ -4,6 +4,7 @@ require_once 'base128.php';
 // font decoding - WOFF WOFF2
 function getFontSignature($lf)
 {
+    return false;
 //echo "reading signature of WOFF/WOFF2 file - " . $lf . "<br/>";
 	$truefonttype = '';
 	debug("checking true font type",$lf);
@@ -187,7 +188,8 @@ function readWoff2FontData($lf,$startOfCompressedFontData,$TotalCompressedSize)
     global $byteArray;
 
 //echo "uncompressing WOFF2 Font Data, from byte " . $startOfCompressedFontData . " for " . $TotalCompressedSize . " bytes<br/>";
-
+    return;
+    
     fgetBytesFromFile($lf,$startOfCompressedFontData,$TotalCompressedSize);
     $compressedBin = hex2bin(implode("", $byteArray)); // conveet to binary
     //echo "noof bytes compressd = " . sizeof($byteArray) ."<br/>";

@@ -4397,7 +4397,7 @@ function initImageOptimisation(container) {
 
         var d = JSON.stringify(TableData);
         console.log(d);
-        console.log(location.protocol + '//' + location.host);
+        //console.log(location.protocol + '//' + location.host);
         $opturl = "/toaster/optimise_images.php";
         // if(location.host == "toast.webpagetoaster.com");
         //     $opturl = "https://www.webpagetoaster.com/toaster/optimise_images.php"

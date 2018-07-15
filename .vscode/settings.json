@@ -1,0 +1,5 @@
+{
+    "php.validate.enable": true,
+    "php.validate.executablePath": "E:/xampp/php/php.exe",
+    "php.validate.run": true
+}

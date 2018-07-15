@@ -338,7 +338,7 @@ $chheadlessserver = '';
 if(isset($_REQUEST["chremoteurlandport"]))
 {
 	$chheadlessserver = $_REQUEST["chremoteurlandport"];
-//echo ("chrome headless remote server = " . $chheadlessserver. PHP_EOL);
+//echo ("headless chrome remote server = " . $chheadlessserver. PHP_EOL);
 }
 // get current working dir
 //echo "Request uri is: ".$_SERVER['REQUEST_URI']. "<br>";
@@ -1056,14 +1056,19 @@ $retbodylen = strlen($body);
     session_start();
     $_SESSION['status'] = 'Parsing the DOM';
     session_write_close();
-$retbodylen = strlen($body);
-            //error_log("5 returned body lengh = ". $retbodylen);
+	$retbodylen = strlen($body);
+// echo("main, source DOM - returned body length = ". $retbodylen."<br>");
+// echo $body; 
 	// parse root object into DOM
 	$returned = parseRootBodytoDOM($body, 'main, source DOM');
-    if(!empty($returned))
+	if(!empty($returned))
+	{
         $html = $returned;
-	$pagetitle = getTitleOfPage();
-	//echo $pagetitle."<br/>";
+		$pagetitle = getTitleOfPage();
+	}
+	else
+		$pagetitle = '';
+//echo $pagetitle."<br/>";
 	$redir_metadata = false;
 	$redir_javascript = false;
 	// check for meta data refresh in the HTML, and parse the DOM again if the refresh meta tag exists
@@ -1081,12 +1086,19 @@ $retbodylen = strlen($body);
 		// redo the DOM
 		// parse root object into DOM
 		$returned = parseRootBodytoDOM($body,'main, redir_metadata');
-        if(!empty($returned))
-            $html = $returned;
-        else
-            $html = '';
-		$pagetitle = getTitleOfPage();
-		//echo $pagetitle."<br/>";
+//echo ( "returned body of html '" . "'");
+		if($returned != '')
+		{
+			$html = $returned;
+			$pagetitle = getTitleOfPage();
+//echo ($pagetitle."<br/>");
+		}
+		else
+			{
+			$html = '';
+			$pagetitle = '';
+//echo ("empty html - no page title");
+			}
 		$boolRootRedirect = true;
 		$redir_type  = "Meta";
 		addTestResult("11.1","11","Root object redirects","Fail");
@@ -1372,7 +1384,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 					$pid = $matches[1];
 					//echo "Chrome process id = " . $pid . "<br/>";
 					//print_r($output);
-					// launch chrome headless
+					// launch headless chrome
 	//				exec('start chrome --headless --disable-gpu --enable-logging --remote-debugging-port=9222',$output,$rv);
 
 	//echo "Google Chrome launched with PID "  . $pid . "<br/>";
@@ -1402,7 +1414,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 					$wptHAR = false;
 					$uploadedHAR = true;
 
-					// kill remote chrome headless instance
+					// kill remote headless chrome instance
 					exec("win_tools\pstools\PsKill -t $pid", $output);
 				}
 				else
@@ -1438,7 +1450,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 	//echo $imgname.  " - rv = " . $rv . "<br/>";
 
 					sleep (1);
-					// // kill chrome headless
+					// // kill headless chrome
 					$command = 'kill -9 ' . $pid ;
 					$res = exec($command . " 2>&1", $output);
 	//print_r($output);
@@ -1453,14 +1465,14 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 			}
 			else
 			{
-				// remote chrome headless
-//echo ("running chrome headless on remote server " . $chheadlessserver. PHP_EOL);
+				// remote headless chrome
+//echo ("running headless chrome on remote server " . $chheadlessserver. PHP_EOL);
 
 				// jSON URL which should be requested
 				// $json_url = 'http://' . $chheadlessserver . "tid=143&content=0&url=http://www.daish.net/tpd&action=test";
 				if(strpos($chheadlessserver,"http") === false)
 					$chheadlessserver = 'http://' .$chheadlessserver;
-//echo("Chrome headless command path: " . $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test<br/>");
+//echo("headless chrome command path: " . $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test<br/>");
 				$page = file_get_contents( $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test");
 
 				//$page = '"{\"id\":144,\"har\":\"\\Users\\Tim\\toasterchh\\144.har\",\"dom\":\"\\Users\\Tim\\toasterchh\\144_domafter.txt\",\"imgb64\":\"\\Users\\Tim\\toasterchh\\144_screenshot.png\"}"';
@@ -1468,7 +1480,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 				// print_r($ap);
 
 				// get the prepared files and save them
-	// echo "saving returned chrome headless files to:<br/>";
+	// echo "saving returned headless chrome files to:<br/>";
 	// echo "saving returned harfile: " . $harname. "<br/>";
 	// echo "saving returned domdump: " . $dumpname. "<br/>";
 	// echo "saving returned screenshot: " . $imgname. "<br/>";
@@ -1505,7 +1517,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
     $eres = array();
 	exec($os_cmd,$eres);
     // get pjs and slimerjs cookies and postdata
-    if($browserengine < 6 and $browserengine != 0) // not WPT or Chrome Headless
+    if($browserengine < 6 and $browserengine != 0) // not WPT or headless chrome
     {
         //get phantom cookie file and add to cookie jar
         if($OS == "Windows" )
@@ -1592,7 +1604,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
     session_start();
     $_SESSION['status'] = 'Reading HAR file';
     session_write_close();
-    // override the HAR file if not for WPT or Chrome Headless
+    // override the HAR file if not for WPT or headless chrome
     if($uploadedHAR == True and $wptHAR == false and $chhHAR == false)
     {
         $har = file_get_contents($uploadedHARFileName);
@@ -1635,7 +1647,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 							$domLoadEnd = $value['_domContentLoadedEventEnd'];
 							$doct = $value['_fullyLoaded'];
 							break;
-						case 7: //chrome headless
+						case 7: //headless chrome
 							$rst = 0;
 							$domLoadStart = $value['onContentLoad'];
 							$onLoad = $value['OnLoad'];
@@ -1692,7 +1704,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 							$allEndMS = $value['_all_end'];
 							$cacheTime = $value['_cache_time'];
 							break;
-						case 7: // Chrome Headless
+						case 7: // headless chrome
 							$requestStartMS = 0;
 							$ttfbMS = 0;
 							$contentDownloadMS = 0;
@@ -1859,7 +1871,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 									$cacheTime = $value['_cache_time'];
 									break;
 //echo ("update " . $ObjURL . "; allms =  " . $allMS . ";<br/>");
-								case 7: // chrome headless
+								case 7: // headless chrome
 									$requestStartMS = $value['blocked'];
 									$ttfbMS = $value['wait'];
 									$contentDownloadMS = $value['receive'];

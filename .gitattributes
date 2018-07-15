@@ -1,1 +1,5 @@
 toaster/toaster_tools/* linguist-vendored
+*.eot binary
+*.ttf binary
+*.woff binary
+*.woff2 binary

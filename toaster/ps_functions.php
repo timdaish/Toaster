@@ -2674,7 +2674,7 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
 //echo ("missing html from parseRootBodytoDOM - ". $source);
             debug("Func: parseRootBodytoDOM: empty html:  " . $source);
             error_log("Func: parseRootBodytoDOM: empty html:  " . $source);
-            $html = '';
+            $html = '<i></i>';
 //die;
 //debug("Func: parseRootBodytoDOM: DOM body"."<xml>".$instring."</xml>");
         }
@@ -2682,6 +2682,7 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
             debug("Func: parseRootBodytoDOM: checking html content: " . "html present");
 //debug("Func: parseRootBodytoDOM: DOM",$html->saveHTML());
 // DOM is returned as an object
+//echo("returning parsed html<br/>");
         return $html; // non-global
     }
 
@@ -2770,8 +2771,11 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
         $generatorfound = false;
         debug("<br/>PROCESSING META TAGS", "");
 //echo("<br/>PROCESSING META TAGS<br/>");
+// var_dump($html);
         $refresh = '';
         $cms = '';
+        if(!$html)
+            return false;
         foreach ($html->find('meta') as $element)
         {
             foreach ($element->attr as $key => $value)
@@ -2833,9 +2837,9 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
             if ($refreshFound == true)
                 break;
         } // end for each meta
-//echo("Meta refresh<pre>");
-//print_r($refresh);
-//echo("</pre>");
+// echo("Meta refresh<pre>");
+// print_r($refresh);
+// echo("</pre>");
         return $refreshFound;
     }
 
