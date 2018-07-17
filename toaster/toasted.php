@@ -145,29 +145,29 @@ while (($line = fgetcsv($f)) !== false) {
                             }
                             else
                             { 
-                                if($SERVER["HTTP_HOST"] == "www.webpagetoaster.com")
-                                {
-                                // www.webpagetoaster.com
-                                // convert and mogrify give errors on www.webpagetoaster.com, so use php instead
-                                //$os_cmd = 'mogrify -format gif -path ' . dirname($thumbnail) . ' -thumbnail 100x100 ' . escapeshellarg($file);
-                                $tn = "/var/sites/w/webpagetoaster.com/subdomains" . $thumbnail ;
-                                $infilename = "http://toast.webpagetoaster.com" .$file;
-//echo ("converting image from " . $infilename .  " to thumbnail:" .$tn . "<br/>");
-                                $inim = @imagecreatefrompng($infilename);
-                                $im = @imagescale($inim,100,100,IMG_NEAREST_NEIGHBOUR);
-                                $imgif = @imagegif($im,$tn);
-                                }
-                                else
-                                {
-                                    // toast.webpagetoaster.com
-                                    $tn = "/var/sites/w/webpagetoaster.com/subdomains" . $thumbnail ;
-                                    $tn = str_replace("http://toast.webpagetoaster.com","/toast",$tn);
-                                    $infilename = $file;
-//echo ("converting image from " . $infilename .  " to thumbnail:" .$tn . "<br/>");
-                                    $inim = @imagecreatefrompng($infilename);
-                                    $im = @imagescale($inim,100,100,IMG_NEAREST_NEIGHBOUR);
-                                    $imgif = @imagegif($im,$tn);
-                                    }
+//                                 if($SERVER["HTTP_HOST"] == "www.webpagetoaster.com")
+//                                 {
+//                                 // www.webpagetoaster.com
+//                                 // convert and mogrify give errors on www.webpagetoaster.com, so use php instead
+//                                 //$os_cmd = 'mogrify -format gif -path ' . dirname($thumbnail) . ' -thumbnail 100x100 ' . escapeshellarg($file);
+//                                 $tn = "/var/sites/w/webpagetoaster.com/subdomains" . $thumbnail ;
+//                                 $infilename = "http://toast.webpagetoaster.com" .$file;
+// //echo ("converting image from " . $infilename .  " to thumbnail:" .$tn . "<br/>");
+//                                 $inim = @imagecreatefrompng($infilename);
+//                                 $im = @imagescale($inim,100,100,IMG_NEAREST_NEIGHBOUR);
+//                                 $imgif = @imagegif($im,$tn);
+//                                 }
+//                                 else
+//                                 {
+//                                     // toast.webpagetoaster.com
+//                                     $tn = "/var/sites/w/webpagetoaster.com/subdomains" . $thumbnail ;
+//                                     $tn = str_replace("http://toast.webpagetoaster.com","/toast",$tn);
+//                                     $infilename = $file;
+// //echo ("converting image from " . $infilename .  " to thumbnail:" .$tn . "<br/>");
+//                                     $inim = @imagecreatefrompng($infilename);
+//                                     $im = @imagescale($inim,100,100,IMG_NEAREST_NEIGHBOUR);
+//                                     $imgif = @imagegif($im,$tn);
+//                                     }
                             }
                         }
                         

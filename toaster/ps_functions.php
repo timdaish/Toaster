@@ -2415,11 +2415,9 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                                     }
                                     else
                                     {
-// add brotli linux deocder
+                                        // brotli linux decoder
                                         $fni = '/tmp/bri';
                                         $fno = '/tmp/bro';
-                                        //$tempi = tempnam("c:\\temp\\", "bri");
-                                        //$tempo = tempnam("c:\\temp\\", "bro");
                                         file_put_contents($fni, $body);
                                         exec('./lnx_tools/brotli -d '  . " -o " . escapeshellarg($fno) ." " . $fni, $res);
                                         $body = file_get_contents($fno);
