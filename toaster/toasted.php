@@ -25,7 +25,7 @@ else {
 }
 ini_set("auto_detect_line_endings", false);
 if($OS == "Windows")
-$fn = "/toast/toasted.csv";
+    $fn = "/toast/toasted.csv";
 else
 {
     $hostname = gethostname();
@@ -236,9 +236,9 @@ fclose($f);
 $arrToastedByDate = array ();
 
 $arrToastedByDate = array_sort($arrToasted, 'date', SORT_ASC); // Sort by newest first
-//echo("<pre>");
-//print_r($arrToasted); // Sort by newest first
-//echo("</pre>");
+// echo("<pre>");
+// print_r($arrToasted); // Sort by newest first
+// echo("</pre>");
 
 // renumber the keys
 $arrToastedByDate = array_values($arrToastedByDate);

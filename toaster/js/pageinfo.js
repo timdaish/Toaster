@@ -483,7 +483,10 @@ function fnFormatDetails(oTable, nTr) {
                 break;
         }
         sOut += 'Comments Only<br/><pre><code class="sunburst filecode" id="filec' + objID + '">Please wait... loading comments</code></pre>';
-        sOut += 'Beautified, Full File<br/><pre><code class="sunburst filecode" id="file' + objID + '">Please wait... loading and unminifying the full file</code></pre>';
+        if(location.host == "toast.webpagetoaster.com")
+            sOut += 'Full File<br/><pre><code class="sunburst filecode" id="file' + objID + '">Please wait... loading the full file</code></pre>';
+        else
+            sOut += 'Beautified, Full File<br/><pre><code class="sunburst filecode" id="file' + objID + '">Please wait... loading and beautifing the full file</code></pre>';
         $.post(
             "/toaster/getafilebeautify.php",
             { name: objLocFileCnv, type: objType },

@@ -19,14 +19,27 @@ if( $_REQUEST["name"] )
    {
       case "JavaScript":
        if($OS == "Windows")
+       {
             exec('win_tools\jsbeautify ' . $url ,$res);
-       $data = implode(PHP_EOL,$res);
+            $data = implode(PHP_EOL,$res);
+       }
+        else
+        {
+//echo $url;
+            $data = file_get_contents("$url");
+        }
+       
        break;
 
       case "StyleSheet":
        if($OS == "Windows")
+       {
             exec('win_tools\cssbeautify ' . $url ,$res);
-       $data = implode(PHP_EOL,$res);
+            $data = implode(PHP_EOL,$res);
+       }
+        else
+            $data = file_get_contents($url);
+       
        break;
 
        default:
