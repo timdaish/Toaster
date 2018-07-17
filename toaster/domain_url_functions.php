@@ -2121,7 +2121,7 @@ function lookup3PDescriptionDirect($domain)
 //echo ("overriding domain " . $domain . " with Adobe Analytics<br/>");
 	}
 
-echo ("looking up 3p domain " . $domainnoqs  . "; domtype: " . $domtype . "; host= " . $host_domain .  "<br/>");
+//echo ("looking up 3p domain " . $domainnoqs  . "; domtype: " . $domtype . "; host= " . $host_domain .  "<br/>");
     // make a curl request to the API directly
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
