@@ -302,7 +302,7 @@ function getDomainHostFromURL($url,$boolAddDomain,$debuginfo)
 	{
 		$h = $parse['host'];
 		if($boolAddDomain == true)
-			AddDomainToArray($h,$roothost);
+			AddDomainToArray($url,$roothost);
 	}
 	$p = '';
 	if(isset($parse['path']))
@@ -650,7 +650,7 @@ function AddDomainToArray($url,$roothost)
 	if($url == '')
 		return;
 	list($hostdomain, $p) = getDomainHostFromURL($url,false,"AddDomainToArray");
-	//echo("domain checking: ".$url."<br/>");
+//echo("domain checking: ".$url."<br/>");
 	//echo("retrieved host domain: ".$hostdomain."<br/>");
 	//echo("retrieved host domain path: ".$p."<br/>");
 	$ln = strlen($hostdomain);
@@ -718,11 +718,17 @@ function AddDomainToArray($url,$roothost)
         $product = '';
 		if($domref == '3P' or $domref =="CDN" or $domref =="Shard" or $domref == "redirection")
 		{
-//echo 'New 3P Domain identified, attempting to look up domain meta description: '.$hostdomain.'<br/>';
+//echo 'New 3P Domain identified, attempting to look up domain meta description: '.$url.'<br/>';
 			if($hostdomain != '')
 			{
-				list($sitedesc,$domprovider,$category,$product,$group) = get3PDescription($hostdomain);
+				list($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime) = get3PDescription($url);
 //echo ($domref.' domain checked, provider: '.$domprovider.'<br/>');
+			// update domref to shard if an entry was found for the domain with party == 1	
+				if($party == '1')
+				{
+					$domref = "Shard";
+//echo ($hostdomain . ' domain upgraded to shard, provider: '.$domprovider.'<br/>');
+				}
 			}
 		}
 		// geo location
@@ -2033,12 +2039,12 @@ function get3PDescription($indomain)
 
 //echo('start func get3PDescription<br/>'.'arg indomain: '.$indomain.'<br/>');
 	// try subdomain first
-	list($sitedesc,$domprovider,$category,$product,$group) = lookup3PDescriptionDirect($indomain);
+	list($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime) = lookup3PDescriptionDirect($indomain);
 	if ($domprovider == '')
 	{
 		//if subdomain not defined, try the actual domain
 		$newdomain = get3PDomain($indomain);
-		list($sitedesc,$domprovider,$category,$product,$group) = lookup3PDescriptionDirect($newdomain);
+		list($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime) = lookup3PDescriptionDirect($newdomain);
 		//echo('domain return value: '.$sitedesc.'<br/>');
 	}
 	else
@@ -2048,7 +2054,7 @@ function get3PDescription($indomain)
 	//echo('return value: '.$sitedesc.'<br/>');
 	//echo('end func get3PDescription<br/>');
 	$sitedesc = preg_replace( '/[^[:print:]]/', '',$sitedesc);
-	return array($sitedesc,$domprovider,$category,$product,$group);
+	return array($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime);
 }
 function read3PDescriptionsFromFile()
 {
@@ -2115,13 +2121,13 @@ function lookup3PDescriptionDirect($domain)
 //echo ("overriding domain " . $domain . " with Adobe Analytics<br/>");
 	}
 
-//echo ("looking up 3p domain " . $domainnoqs  . "; domtype: " . $domtype . "; host= " . $host_domain .  "<br/>");
+echo ("looking up 3p domain " . $domainnoqs  . "; domtype: " . $domtype . "; host= " . $host_domain .  "<br/>");
     // make a curl request to the API directly
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	if($b3pdbPublic)
-		curl_setopt($ch, CURLOPT_URL, 'https://www.webpagetoaster.com/lookup3pdb.php?host=//'.$domainnoqs.'/'); // public 3pdb
+		curl_setopt($ch, CURLOPT_URL, 'https://www.webpagetoaster.com/lookup3pdb.php?host=//'.$domainnoqs . "/&domain="  . $host_domain); // public 3pdb
 	else
 		curl_setopt($ch, CURLOPT_URL, 'https://tagdb.nccgroup-webperf.com/2/find?host='.$domainnoqs); // private database - internal NCC Group/Eggplant use only
 	
@@ -2156,12 +2162,15 @@ function lookup3PDescriptionDirect($domain)
             $objgroup = $objcat->group;
             @$domainproduct  = html_entity_decode($objproduct->name);
     		$domaingroup = html_entity_decode($objgroup->name);
-       		$domaincat = html_entity_decode($objcat->name);
+			$domaincat = html_entity_decode($objcat->name);
+			@$party = $objjson->party;
+			@$author = $objjson->author;
+			@$datetime = $objjson->datetime;
     //        @$domaingroup  = html_entity_decode($arr[5]);
     //        $domainRegex = html_entity_decode($arr[6]);
 //echo $domainprovider . "; cat: " . $domaincat . "; product: " . $domainproduct . "; group: ". $domaingroup . "; desc: " . $domaindesc . "<br/>";
     }
-    return array($domaindesc,$domainprovider,$domaincat,$domainproduct,$domaingroup);
+    return array($domaindesc,$domainprovider,$domaincat,$domainproduct,$domaingroup,$party,$author,$datetime);
 }
 function lookup3PDescription($domain)
 {
@@ -2872,28 +2881,40 @@ function getDomainMarkers($domtype)
 };
 function lookupReverseIP($inDomain)
 {
-	global $reverseIPResults;
+	global $reverseIPResults,$debug;
 	$parameters = '?url='.$inDomain. "&output=json";
 	//echo("calling reverse lookup api with parms: ".$parameters."<br/>");
 	$response = '';
 	$response = file_get_contents('http://reverseip.logontube.com/'.$parameters);
 	$reverseIPResults = json_decode($response);
-	//echo("ReverseIP response:<pre>");
-	//print_r($reverseIPResults);
-	//echo("</pre>");
-	//echo ("response<br/>");
+	if($debug == true)
+	{
+	echo("ReverseIP response:<pre>");
+	print_r($reverseIPResults);
+	echo("</pre>");
+	echo ("response<br/>");
+	}
 	return true;
 }
 function NSlookup($DomainOrIP)
 {
-	exec('nslookup -timeout=20 '.$DomainOrIP,$res);
-	//echo "NS Lookup for ".$DomainOrIP."<br/>";
-	//echo "<pre>";
-	//print_r($res);
-	//echo("</pre>");
+	global $debug;
+	$strNslookup  = 'nslookup -timeout=20 '.$DomainOrIP . "<br/>";
+	exec($strNslookup,$res);
+	if($debug == true)
+	{
+		echo "NS Lookup for ".$DomainOrIP."<br/>";
+		echo "cmd = " . $strNslookup . "<br/>";
+		echo "<pre>";
+		print_r($res);
+		echo("</pre>");
+	}
 	$edgename = '';
 	$edgeaddress = '';
-	$boolFound = false;
+
+	// use nslookup results if present
+	if($res)
+	{
 	// extract address from results
 	foreach($res as $k => $v)
 	{	
@@ -2922,8 +2943,20 @@ function NSlookup($DomainOrIP)
 			}
 		}
 	}
-	//echo ("edge name = '".$edgename."'<br/>");
-	//echo ("edge address = '".$edgeaddress."'<br/>");
+}
+else
+{
+	$edgeaddress  = gethostbyname($DomainOrIP);
+//echo $edgeaddress ;
+
+	$edgename = gethostbyaddr($hostip );
+// echo $edgename;
+}
+	if($debug == true)
+	{
+		echo ("edge name = '".$edgename."'<br/>");
+		echo ("edge address = '".$edgeaddress."'<br/>");
+	}
 	return array($edgename,$edgeaddress);
 }
 function distance($lat1, $lon1, $lat2, $lon2, $unit) {
