@@ -2885,11 +2885,12 @@ var cookietext = '<?php echo utf8_converter($cookiedata); ?>';
 <!-- Latest compiled and minified JavaScript -->
 <script>
 	var browserEngineVer = <?php echo "'".$browserEngineVer."'";?>;
+	loadConfigFile();
 	mainDisplay(browserEngineVer);
 </script>
 <script type="text/javascript" src="/toaster/js/jquery.tools.min.js"></script>
 <script type="text/javascript" src="/toaster/js/jquery-ui.js"></script>
-<script type="text/javascript" src="/toaster/js/ncc_har.js"></script>
+<script type="text/javascript" src="/toaster/js/har.js"></script>
 <script type="text/javascript" src="/toaster/js/vis.js"></script>	
 <script type="text/javascript" src="/toaster/js/jquery.collapsible.js"></script>
 <script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>

@@ -1,10 +1,12 @@
 /**
- * NCC Web Performance HAR Viewer
+ * Toaster Web Performance HAR Viewer
  * Requires: jQuery 1.8+, jQueryUI, Highcharts 3+
  * 
- * Version 2.2
- *  with third party colouring
- * based upon code developed by Gareth Hughes http://github.com/brassic-lint/ncc-harviewer
+ * Version 3
+ *  2.2: with third party colouring 
+ *  2.3 tag waterfall chart added
+ *  3.0 file renamed from ncc_har.js to har.js to reflect unbundling from company code
+ *  * based upon code developed by Gareth Hughes http://github.com/brassic-lint/ncc-harviewer
  * 
  */
 var HARpages = '';
@@ -97,7 +99,7 @@ function renderHAR(harfile){
 		if ("_startRender" in pagesdata.pageTimings){
 			pages.RenderStartTime = SanitiseTimings(pagesdata.pageTimings._startRender);
 		}
-		if ("_renderStart" in pagesdata.pageTimings && pagesdata.id == "page_0"){
+		if ("_renderStart" in pagesdata.pageTimings && pagesdata.id){
 			pages.RenderStartTime = SanitiseTimings(pagesdata.pageTimings._renderStart);
 		}
 
@@ -108,10 +110,12 @@ function renderHAR(harfile){
 		if ("_domContentLoadedEventStart" in pagesdata){
 			pages.DomContentStartTime = SanitiseTimings(pagesdata._domContentLoadedEventStart);
 		}
-		if ("onContentLoad" in pagesdata && pagesdata.id == "page_0"){
+		if ("onContentLoad" in pagesdata && pagesdata.id){
 			pages.onContentLoad = SanitiseTimings(pagesdata.onContentLoad);
 		}
-
+		if ("onContentLoad" in pagesdata.pageTimings){
+			pages.onContentLoad = SanitiseTimings(pagesdata.pageTimings.onContentLoad);
+		}
 
 
 
@@ -365,8 +369,8 @@ var group = '';
 				'position':{
 					'x':-15
 					},
-                'text': '(c) 2018 Eggplant',
-                'href': 'https://www.eggplant.io',
+					text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+					href: analysisURL
 				},
 			'plotOptions':{
 				'series':{
@@ -571,13 +575,13 @@ function display3PTagWaterfall(tagwfmode){
 	var dataImage = [];
 	var dataData = [];
 	var dataMTOther = [];
-
+	var maxtiming = 0;
 
 
 	$.each(HARpages.pages, function(i,val) {
 		
-//console.log("page...");
-//console.log(val);
+console.log("page...");
+console.log(val);
 
 		if(val.id == "page_0" || val.id == "page_1_0" || val.id == "page_1_0_1") // former HTTPWatch iPhone / latter WPT
 		{
@@ -586,10 +590,17 @@ function display3PTagWaterfall(tagwfmode){
 			fullyloadedtime = val.FullyLoadedTime;
 			onloadtime = val.onLoadTime;
 		}
-
+		else
+		{
+			renderstarttime = "undefined";
+			domloadtime = val.onContentLoad;
+			onloadtime = val.onLoadTime;
+			fullyloadedtime = "undefined";
+		}
 
 		x++;
 		y=0;
+
 		$.each(val.objects, function(j,objects) {
 			y++;
 //  console.log("object...");
@@ -702,7 +713,8 @@ function display3PTagWaterfall(tagwfmode){
 						else
 						//	if(parseFloat(objects.OffsetTime)< parseFloat(fullyloadedtime))
 								dataNavTiming4.push(node);
-
+					if(objects.OffsetTime  > maxtiming)
+						maxtiming = objects.OffsetTime;
 					// mode 3 - mime types
 					// remove chartset ref
 					var mt = '';
@@ -960,15 +972,19 @@ console.log("plotting data for mode " + tagwfmode.toString());
 
 console.log("render start time: " + renderstarttime);
 // blitz all nav timings if render not present
-if(typeof renderstarttime === "undefined" )
-{
-	renderstarttime = "undefined";
-	domloadtime = "undefined";
-	onloadtime = "undefined";
-	fullyloadedtime = "undefined"
-}
-//console.log(dataSeries);
-
+// if(typeof renderstarttime === "undefined" )
+// {
+// 	renderstarttime = "undefined";
+// 	domloadtime = "undefined";
+// 	onloadtime = "undefined";
+// 	fullyloadedtime = "undefined"
+// }
+//console.log("timing dataseries",dataSeries);
+if(fullyloadedtime === "undefined")
+	var xaxismaxvalue = Math.max(onloadtime, maxtiming ) + 1;
+else
+var xaxismaxvalue = Math.max(onloadtime, fullyloadedtime, maxtiming ) + 1;
+//console.log("max x value", onloadtime,fullyloadedtime, maxtiming);
     $(function () {
         $('#container_3Ptagwaterfall').highcharts({
 
@@ -995,7 +1011,8 @@ if(typeof renderstarttime === "undefined" )
             //gridLineWidth: 1,
             title: {
                 text: 'Page Load Duration (seconds)'
-            },
+			},
+			max: xaxismaxvalue,
             labels: {
                 format: '{value} s'
 			},
@@ -1092,8 +1109,8 @@ if(typeof renderstarttime === "undefined" )
             }
         },
 		credits: {
-			text: '© 2018 Eggplant',
-			href: 'https://www.eggplant.io'
+			text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+			href: analysisURL
 		},
 		series: dataSeries,
 		exporting: {

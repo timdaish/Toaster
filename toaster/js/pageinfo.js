@@ -1,3 +1,10 @@
+/**
+ * Toaster Web Performance Page Processing
+ * Requires: jQuery 3+, Highcharts 3+, Google Charts
+ * 
+ * Version 5
+ * 
+ */
 // globals
 var headerfields = '';
 var headeranalysis = '';
@@ -42,10 +49,19 @@ var tphdata = '';
 var tphoptions = '';
 var mode = "D"; // "D" = domain ; "CP" = Company Product
 var gchart;
+var analysisOwner = '';
+var analysisURL = '';
+var analysisDisplayDate = new Date();
+var analysisYear = analysisDisplayDate.getFullYear();
+function loadConfigFile(configFile) {
+    $.getJSON('../../config.json', function(data) {
+//console.log("owner",data.owner);
+        analysisOwner = data.owner;
+    });
+  }
 function displayPageStatus(status) {
     document.getElementById("activitystatus").innerHTML = status;
 }
-
 function displayPageInfo() {
     document.getElementById("site").innerHTML = unescape(SiteTitle);
     document.getElementById("pagetitle").innerHTML = unescape(unescape(decodeEntities(PageTitle)));
@@ -6697,8 +6713,8 @@ function plotChartPieDomains(data) {
                 data: data
             }],
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
         });
     });
@@ -6737,8 +6753,8 @@ function plotChartPieDomains3P(data) {
                 data: data
             }],
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
         });
     });
@@ -6776,8 +6792,8 @@ function plotChartPieDomains3P2(data) {
                 data: data
             }],
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
         });
     });
@@ -6815,8 +6831,8 @@ function plotChartPieDomainTypes(data) {
                 data: data
             }],
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
         });
     });
@@ -6855,8 +6871,8 @@ function plotChartPie3PDomains(data) {
                 data: data
             }],
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
         });
     });
@@ -6895,8 +6911,8 @@ function plotChartPie3P2Domains(data) {
                 data: data
             }],
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
         });
     });
@@ -6949,8 +6965,8 @@ function plotChartPie3P3Domains(data) {
                     }
             }],
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
         });
     });
@@ -7056,8 +7072,8 @@ function createGroupCategoryPieChart(groupName)
                 data: data
             }],
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
         });
     });;
@@ -7186,8 +7202,8 @@ function plotChartPieOrderingHdrsb4(data) {
                 data: data
             }],
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
         });
     });
@@ -7227,8 +7243,8 @@ function plotChartPieOrderingBodyb4(data) {
                 data: data
             }],
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
         });
     });
@@ -7267,8 +7283,8 @@ function plotChartPieOrderingHdrs(data) {
                 data: data
             }],
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
         });
     });
@@ -7308,8 +7324,8 @@ function plotChartPieOrderingBody(data) {
                 data: data
             }],
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
         });
     });
@@ -7960,8 +7976,8 @@ function displayChartCacheAnalysis() {
                 }
             },
             credits: {
-                text: '� 2018 Eggplant',
-                href: 'https://www.eggplant.io'
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                href: analysisURL
             },
             series: [{
                 name: 'Modified days before',
