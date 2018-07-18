@@ -274,15 +274,25 @@ for($i=$c-1; $i>=0; $i--)
             if($SERVER["HTTP_HOST"] == "toast.webpagetoaster.com")
                 $ss = "http://toast.webpagetoaster.com" . $ss;
             else
-                $ss = "http://toast.webpagetoaster.com" . $ss;
+                $ss = "http://toast.webpagetoaster.com" . $ss;   
+
+            // harfile
+            $harfile= str_replace("/var/sites/w/webpagetoaster.com/subdomains/toast","",$harfile);
+            if($SERVER["HTTP_HOST"] == "toast.webpagetoaster.com")
+                $harfile = "http://toast.webpagetoaster.com" . $harfile;
+            else
+                $harfile = "http://toast.webpagetoaster.com" . $harfile;   
+
         }
-        
+        else
+            $harfile= str_replace("/usr/share","",$harfile);
+
 		//echo("Link:".$l."<br/>");
 		//echo("page:".$page."<br/>");
 		echo ("<tr><td><a class=\"history\" href=\"". ''. "\" target=\"_blank\">link</a></td>"); //<img src=\"".$ss."\" height=100 width=100 class=\"thumbnail\" \"></img>
         echo "<td><a class=\"history\" href=\"". $l. "\" target=\"_blank\">" . $page . "</a></td>";
         echo "<td>". $pagetitle. "</td>";
-        echo "<td>". $harfile. "</td>";
+        echo '<td><a href="'. $harfile . '" download="test.har">Download HAR</a></td>';
 
 
         $deviceUA = '';
