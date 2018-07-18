@@ -291,77 +291,82 @@
         }
       }
 
-      var refreshStatus = setInterval(function () {
-
-        $.ajax(
-          {
-
-            type: "GET",
-            url: "getstatus.php",
-            //data: '',
-            dataType: 'json',
-            success: function (obj) {
-              //$('#status').html(msg);
-
-              //console.log(JSON.stringify(obj));
-
-              if (obj.status == 'Ready to Toast') {
-                $('#submit').removeAttr('disabled');
-                $('#submit').removeClass("grey");
-                $('#statusdetail').html("&nbsp;");
-                $('#toasturl').html("&nbsp;");
-                $('#fileupload').html("");
-                $('div#toastingnow > img').remove();
-                var imgpath;
-              }
-              else {
-                $('#status').text(decodeURI(obj.status));
-                if (obj.status.substr(0, 11) == "Downloading" || obj.status.substr(0, 9) == "Analysing" || obj.status.substr(0, 11) == "Identifying" || obj.status.substr(0, 6) == "iframe") {
-                  var statusToDisplay = decodeURI(obj.object);
-                  if (statusToDisplay.length > 50) {
-                    statusToDisplay = statusToDisplay.substr(1, 25) + ".." + statusToDisplay.slice(-25);
-                  }
-                  else
-
-                    $('#statusdetail').html(statusToDisplay);
-                  //if (obj.mimetype == '')
-                  //  obj.mimetype = 'application_x_mswinurl';
-                  //var loc = 'images/mimetypes128x128/' + obj.mimetype + '.png';
-                  //console.log("src " + obj.object + "; mt = " + obj.mimetype);
-
-                  //$('#fileupdate img').attr("src",loc);
-                }
-                else {
-                  $('#statusdetail').html("&nbsp;");
-                  //$('#fileupdate img').attr("src",'');
-                }
-
-                if (obj.imagepath != '') {
-                  imgpath = obj.imagepath;
-                  var src = $('#theImg').attr('src');
-                  if (src != imgpath) {
-                    //console.log("image = " + obj.imagepath);
-                    $('div#toastingnow > img').remove();
-                    $('#toastingnow').prepend('<img id="theImg" src="' + imgpath + '" />');
-                  }
-                }
-
-                if (obj.toastedfile != '') {
-                  toastedfilename = obj.toastedfile;
-                  //console.log('status toastedfilename: ' + toastedfilename);
-                }
-              }
-
-            } // end success
-
-          }
-        ); // Ajax Call
-
-      }, 300
-      );
-
     }
     );
+
+function startRefresh()
+{
+  var refreshStatus = setInterval(function () {
+
+  $.ajax(
+    {
+
+      type: "GET",
+      url: "getstatus.php",
+      //data: '',
+      dataType: 'json',
+      success: function (obj) {
+        //$('#status').html(msg);
+
+        //console.log(JSON.stringify(obj));
+
+        if (obj.status == 'Ready to Toast') {
+          $('#submit').removeAttr('disabled');
+          $('#submit').removeClass("grey");
+          $('#statusdetail').html("&nbsp;");
+          $('#toasturl').html("&nbsp;");
+          $('#fileupload').html("");
+          $('div#toastingnow > img').remove();
+//console.log("stopping refresh status timer");
+          clearInterval(refreshStatus);
+          var imgpath;
+        }
+        else {
+          $('#status').text(decodeURI(obj.status));
+          if (obj.status.substr(0, 11) == "Downloading" || obj.status.substr(0, 9) == "Analysing" || obj.status.substr(0, 11) == "Identifying" || obj.status.substr(0, 6) == "iframe") {
+            var statusToDisplay = decodeURI(obj.object);
+            if (statusToDisplay.length > 50) {
+              statusToDisplay = statusToDisplay.substr(1, 25) + ".." + statusToDisplay.slice(-25);
+            }
+            else
+
+              $('#statusdetail').html(statusToDisplay);
+            //if (obj.mimetype == '')
+            //  obj.mimetype = 'application_x_mswinurl';
+            //var loc = 'images/mimetypes128x128/' + obj.mimetype + '.png';
+            //console.log("src " + obj.object + "; mt = " + obj.mimetype);
+
+            //$('#fileupdate img').attr("src",loc);
+          }
+          else {
+            $('#statusdetail').html("&nbsp;");
+            //$('#fileupdate img').attr("src",'');
+          }
+
+          if (obj.imagepath != '') {
+            imgpath = obj.imagepath;
+            var src = $('#theImg').attr('src');
+            if (src != imgpath) {
+              //console.log("image = " + obj.imagepath);
+              $('div#toastingnow > img').remove();
+              $('#toastingnow').prepend('<img id="theImg" src="' + imgpath + '" />');
+            }
+          }
+
+          if (obj.toastedfile != '') {
+            toastedfilename = obj.toastedfile;
+            //console.log('status toastedfilename: ' + toastedfilename);
+          }
+        }
+
+      } // end success
+
+    }
+  ); // Ajax Call
+
+  }, 300
+  );
+}
 
     (function ($) {
 
@@ -384,6 +389,8 @@
             url: 'main.php',
             beforeSend: function () {
               $('body').addClass('busy');
+              startRefresh(); // startRefresh timer
+//console.log("starting refresh status timer");
             },
             dataType: 'text',
             type: 'post',

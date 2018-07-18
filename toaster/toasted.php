@@ -282,7 +282,6 @@ for($i=$c-1; $i>=0; $i--)
                 $harfile = "http://toast.webpagetoaster.com" . $harfile;
             else
                 $harfile = "http://toast.webpagetoaster.com" . $harfile;   
-
         }
         else
             $harfile= str_replace("/usr/share","",$harfile);
