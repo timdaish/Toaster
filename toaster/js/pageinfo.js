@@ -50,6 +50,7 @@ var tphoptions = '';
 var mode = "D"; // "D" = domain ; "CP" = Company Product
 var gchart;
 var analysisOwner = '';
+var analysisSite = '';
 var analysisURL = '';
 var analysisDisplayDate = new Date();
 var analysisYear = analysisDisplayDate.getFullYear();
@@ -57,6 +58,8 @@ function loadConfigFile(configFile) {
     $.getJSON('../../config.json', function(data) {
 //console.log("owner",data.owner);
         analysisOwner = data.owner;
+        analysisSite = data.site;
+        analysisURL = data.url;
     });
   }
 function displayPageStatus(status) {
@@ -6713,7 +6716,7 @@ function plotChartPieDomains(data) {
                 data: data
             }],
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
         });
@@ -6753,7 +6756,7 @@ function plotChartPieDomains3P(data) {
                 data: data
             }],
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
         });
@@ -6792,7 +6795,7 @@ function plotChartPieDomains3P2(data) {
                 data: data
             }],
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
         });
@@ -6831,7 +6834,7 @@ function plotChartPieDomainTypes(data) {
                 data: data
             }],
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
         });
@@ -6871,7 +6874,7 @@ function plotChartPie3PDomains(data) {
                 data: data
             }],
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
         });
@@ -6911,7 +6914,7 @@ function plotChartPie3P2Domains(data) {
                 data: data
             }],
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
         });
@@ -6965,7 +6968,7 @@ function plotChartPie3P3Domains(data) {
                     }
             }],
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
         });
@@ -7072,7 +7075,7 @@ function createGroupCategoryPieChart(groupName)
                 data: data
             }],
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
         });
@@ -7202,7 +7205,7 @@ function plotChartPieOrderingHdrsb4(data) {
                 data: data
             }],
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
         });
@@ -7243,7 +7246,7 @@ function plotChartPieOrderingBodyb4(data) {
                 data: data
             }],
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
         });
@@ -7283,7 +7286,7 @@ function plotChartPieOrderingHdrs(data) {
                 data: data
             }],
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
         });
@@ -7324,7 +7327,7 @@ function plotChartPieOrderingBody(data) {
                 data: data
             }],
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
         });
@@ -7976,7 +7979,7 @@ function displayChartCacheAnalysis() {
                 }
             },
             credits: {
-                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+                text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
                 href: analysisURL
             },
             series: [{

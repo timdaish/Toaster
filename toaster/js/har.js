@@ -369,7 +369,7 @@ var group = '';
 				'position':{
 					'x':-15
 					},
-					text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+					text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
 					href: analysisURL
 				},
 			'plotOptions':{
@@ -1109,7 +1109,7 @@ var xaxismaxvalue = Math.max(onloadtime, fullyloadedtime, maxtiming ) + 1;
             }
         },
 		credits: {
-			text: '\u00A9' + " " + analysisYear + " "+ analysisOwner,
+			text: '\u00A9' + " " + analysisYear + " "+ analysisOwner + " " + analysisSite,
 			href: analysisURL
 		},
 		series: dataSeries,
