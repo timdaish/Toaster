@@ -151,9 +151,10 @@ function debug($info1, $info2 = '')
     if (is_array($info2))
         $info2 = implode($info2);
     $info2 = (string) $info2; // force a string
+$debug == true;
     if ($debug == true)
         echo date("H:i:s") . " " . $info1 . ": " . $info2 . "<br/>";
-//    error_log($info1 . ": " . $info2);
+    error_log($info1 . ": " . $info2);
 //file_put_contents($filepath_domainsavedir."\\debug.htm", $info1.": ".$info2."<br/>", FILE_APPEND);
 }
 

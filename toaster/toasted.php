@@ -23,12 +23,12 @@ else {
 //echo 'This is a server not using Windows!'."<br/>";
     $OS = PHP_OS;
 }
+$hostname = gethostname();
 ini_set("auto_detect_line_endings", false);
 if($OS == "Windows")
     $fn = "/toast/toasted.csv";
 else
 {
-    $hostname = gethostname();
     //set path for webpagetoaster server and others
     if( strpos($hostname,"gridhost.co.uk") != false)
     {

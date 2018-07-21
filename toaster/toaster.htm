@@ -60,8 +60,8 @@
         <br>
         <label for="ipapi">Geo IP API Provider</label>
         <input type="radio" name="ipapi" value="dbip" title="Best option - Cities - limit of 2,000 requests per day">db-IP&nbsp;
-        <input type="radio" name="ipapi" value="freegeoip" title="2nd option - Countries - limit of 10,000 requests per hour" checked>Freegeoip
-        <input type="radio" name="ipapi" value="hackertarget" title="3rd option - good for US and Australian locations">HackerTarget
+        <!--<input type="radio" name="ipapi" value="freegeoip" title="2nd option - Countries - limit of 10,000 requests per hour" checked>Freegeoip-->
+        <input type="radio" name="ipapi" value="hackertarget" title="3rd option - good for US and Australian locations" checked>HackerTarget
       </div>
       <label>Auth Username</label>
       <input type="text" name="username" size="60" width="60" value="">
@@ -142,7 +142,7 @@
           break;
         case "localhost": // private web page toaster hosted on the local machine
           optPhantomJS25 = true;
-          optLocalNodeChromeHeadless = true;
+          optLocalNodeChromeHeadless = false;
           optRemoteNodeChromeHeadless = true;
           optWPTPrivateInstance = true;
           optWPTPublic = true;
@@ -447,6 +447,10 @@ function startRefresh()
               //alert("Error: Either PHP code has an error or URL is invalid!");
               //console.log(textStatus);
               //console.log(jqXhr.responseText);
+              if(!jqXhr)
+              {
+                console.log("Toasting error: " + jqXhr.responseText);
+              }
               var x = jqXhr.responseText;
               var aError = x.split(',');
               console.log("Toasting error: returned data = " + aError);

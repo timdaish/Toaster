@@ -13,8 +13,8 @@ form {
 background: -webkit-gradient(linear, bottom, left 175px, from(#CCCCCC), to(#EEEEEE));
 position:relative;
 top: 10px;
-width:800px;
-height:530px;
+width:840px;
+height:440px;
 font-family: Tahoma, Geneva, sans-serif;
 font-size: 14px;
 line-height: 30px;
@@ -204,7 +204,7 @@ height: 200px;
 #tools A:hover {text-decoration: underline; color: yellow;}
 .statusupdates{
 left: 50px;
-width: 800px;
+width: 840px;
 margin-top: 5px;
 font-size: 200%;
 background-color: #1C2033;
@@ -229,7 +229,7 @@ padding: 10px;
 #boxlinks{
   position: absolute;
   top: 40px;
-  left: 850px;
+  left: 870px;
   background-color: #333;
 -webkit-border-radius: 10px;
 -moz-border-radius: 10px;

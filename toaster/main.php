@@ -213,6 +213,7 @@ if (isset($_REQUEST["url"]))
     //     readShardsFromFile();
 	// 	//echo "dbusage status false<br/>";
 	// }
+	
 	if (isset($_REQUEST["chkdebug"]) and $_REQUEST["chkdebug"] == true)
 	{
 		$debug = true;
@@ -385,6 +386,7 @@ if(isset($_REQUEST["chremoteurlandport"]))
 			$externalloc = "Slough, Berkshire, England";
 			$geoMarkerLetter = "S";
 			$b3pdbPublic = true;
+			$geoExtLocStaticMarker = "&markers=color:red%7Clabel:U%7CUser".$city.",".$stateprov.",".$country;
 
 //echo ("toaster server location: ".$externalloc. '; lat='.$lat. '; long='.$long."<br/>");
     }
@@ -1016,8 +1018,8 @@ $retbodylen = strlen($body);
 		{
 			$edgeloc = $edgelochdr;
 		}
-		//echo ('main header rootloc '.$rootloc.'<br/>');
-		//echo ('main header edgeloc '.$edgeloc.'<br/>');
+		// echo ('main header rootloc '.$rootloc.'<br/>');
+		// echo ('main header edgeloc '.$edgeloc.'<br/>');
 		//	echo("Main: ROOT loc updated: ".$edgeloc."<br/>");
 		// final checks for updating rootloc based on edgeloc after cdn header lookup
 		list($ll,$lat,$lon) = isthisAddressLatLong($rootloc);
@@ -1036,7 +1038,7 @@ $retbodylen = strlen($body);
 			$url = $newurlpath;
 			$fullurlpath = $newurlpath;
 			$arrayroothost = array($roothost);
-			//echo("Main: ROOT URL path REDIRECTED: ".$fullurlpath."<br/><br/>");
+//echo("Main: ROOT URL path REDIRECTED: ".$fullurlpath."<br/><br/>");
 			debug("Main Root Redir: Initial URL path",$fullurlpath);
 //echo("Main Root Redir: Initial URL path: " . $fullurlpath);
 		// detect if new url is secure of not and reset basescheme
@@ -1230,7 +1232,7 @@ $retbodylen = strlen($body);
     {
         $urlforbrowserengine = $originalurl;
     }
-debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
+debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
     $uar =  $ua; //str_replace(' ', '%20', $ua);
     switch ($browserengine)
     {
@@ -1370,55 +1372,58 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 			session_write_close();	
             $urlenc = urlencode($urlforbrowserengine);
 			$testId = "";
-			
+//echo ('Running test on ' . $browserEngineVer . " against remote server" . $chheadlessserver."<br/>");
 			if($chheadlessserver == '')
 			{
+				// local server
 				if($OS == "Windows")
 				{	
-					// use psexec to start in background, pipe stderr to stdout to capture pid
-					$command = '"c:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --enable-logging --remote-debugging-port=9222';
-					$res = exec("win_tools\pstools\PsExec64 -s -d -accepteula $command 2>&1", $output);
-					//echo $res . "<br/>";
-					// capture pid on the 6th line
-					preg_match('/ID (\d+)/', $output[6], $matches);
-					$pid = $matches[1];
-					//echo "Chrome process id = " . $pid . "<br/>";
-					//print_r($output);
-					// launch headless chrome
-	//				exec('start chrome --headless --disable-gpu --enable-logging --remote-debugging-port=9222',$output,$rv);
 
-	//echo "Google Chrome launched with PID "  . $pid . "<br/>";
-					// get screenshot
-					//echo "getting screenshot<br/>";
-					exec("node win_tools/chromeremote/take_screenshot.js --url " . $urlforbrowserengine . " --pathname " . $imgname . " --viewportHeight " . $height . " --viewportWidth " . $width. " 2>&1", $output, $rv);
-					//echo implode("\n", $output);
-					//echo $imgname.  " - rv = " . $rv . "<br/>";
+						// local chrome headless
+					
+						// use psexec to start in background, pipe stderr to stdout to capture pid
+						$command = '"c:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --enable-logging --remote-debugging-port=9222';
+						$res = exec("win_tools\pstools\PsExec64 -s -d -accepteula $command 2>&1", $output);
+						//echo $res . "<br/>";
+						// capture pid on the 6th line
+						preg_match('/ID (\d+)/', $output[6], $matches);
+						$pid = $matches[1];
+						//echo "Chrome process id = " . $pid . "<br/>";
+						//print_r($output);
+						// launch headless chrome
+		//				exec('start chrome --headless --disable-gpu --enable-logging --remote-debugging-port=9222',$output,$rv);
 
+		//echo "Google Chrome launched with PID "  . $pid . "<br/>";
+						// get screenshot
+						//echo "getting screenshot<br/>";
+						exec("node win_tools/chromeremote/take_screenshot.js --url " . $urlforbrowserengine . " --pathname " . $imgname . " --viewportHeight " . $height . " --viewportWidth " . $width. " 2>&1", $output, $rv);
+						//echo implode("\n", $output);
+						//echo $imgname.  " - rv = " . $rv . "<br/>";
 
-					// get har
-					//echo "generating HAR file to " . $harname . "<br/>";
-					exec("node win_tools/chromeremote/node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --output " . $harname . " --height " . $height . " --width " . $width . " --agent \"" . $uar . "\" 2>&1", $output2, $rv);
-					//echo implode("\n", $output2);
-					//echo "rv = " . $rv. "<br/>";
+						// get har
+						//echo "generating HAR file to " . $harname . "<br/>";
+						exec("node win_tools/chromeremote/node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --output " . $harname . " --height " . $height . " --width " . $width . " --agent \"" . $uar . "\" 2>&1", $output2, $rv);
+						//echo implode("\n", $output2);
+						//echo "rv = " . $rv. "<br/>";
 
+						// get HTML DOM, after age end with injections
+						$outpath = realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput;
+						//echo "dumping HTML after page load to " . $outpath . "<br/>";
+						exec("node win_tools/chromeremote/dump.js --url " . $urlforbrowserengine. " --pathname " . $outpath . " 2>&1", $output2, $rv);
+						//echo implode("\n", $output2);
+						//echo "rv = " . $rv. "<br/>";
 
-					// get HTML DOM, after age end with injections
-					$outpath = realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput;
-					//echo "dumping HTML after page load to " . $outpath . "<br/>";
-					exec("node win_tools/chromeremote/dump.js --url " . $urlforbrowserengine. " --pathname " . $outpath . " 2>&1", $output2, $rv);
-					//echo implode("\n", $output2);
-					//echo "rv = " . $rv. "<br/>";
+						// get testresults as HAR
+						$uploadedHARFileName = $harname;
+						$wptHAR = false;
+						$uploadedHAR = true;
 
-					// get testresults as HAR
-					$uploadedHARFileName = $harname;
-					$wptHAR = false;
-					$uploadedHAR = true;
-
-					// kill remote headless chrome instance
-					exec("win_tools\pstools\PsKill -t $pid", $output);
-				}
+						// kill remote headless chrome instance
+						exec("win_tools\pstools\PsKill -t $pid", $output);
+					
+				} // end if windows local
 				else
-				{ // linux
+				{ // linux local
 					
 					// set port
 					$port = "9221";
@@ -1464,42 +1469,60 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 				}
 			}
 			else
-			{
-				// remote headless chrome
-//echo ("running headless chrome on remote server " . $chheadlessserver. PHP_EOL);
-
-				// jSON URL which should be requested
-				// $json_url = 'http://' . $chheadlessserver . "tid=143&content=0&url=http://www.daish.net/tpd&action=test";
+			{ // chrome remote
 				if(strpos($chheadlessserver,"http") === false)
 					$chheadlessserver = 'http://' .$chheadlessserver;
-//echo("headless chrome command path: " . $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test<br/>");
-				$page = file_get_contents( $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test");
 
-				//$page = '"{\"id\":144,\"har\":\"\\Users\\Tim\\toasterchh\\144.har\",\"dom\":\"\\Users\\Tim\\toasterchh\\144_domafter.txt\",\"imgb64\":\"\\Users\\Tim\\toasterchh\\144_screenshot.png\"}"';
-				// $ap = json_decode(json_encode($page, JSON_UNESCAPED_SLASHES)); // decode the json record
-				// print_r($ap);
+				// remote headless chrome
+				if($OS == "Windows")
+				{
+//echo ("Windows running headless chrome on remote server " . $chheadlessserver. PHP_EOL);
+					//echo("headless chrome command path: " . $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test<br/>");
+					$page = file_get_contents( $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".urlencode($urlforbrowserengine)."&action=test");
+
+//echo($chheadlessserver . "?tid=". $toasterid . "&action=gethar". "<br/>");
+					$har = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=gethar");
+//echo "saving har file to " . $harname. "<br/>";
+					$res = file_put_contents($harname,$har);
+//echo "file save result: " . $res. "<br/>";
+					$pagedom = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getdom");
+					file_put_contents($dumpname,$pagedom);
+					$pagescreenshot = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getimg");
+					file_put_contents($imgname,$pagescreenshot);
+				}
+				else
+				{
+//echo ("Windows running headless chrome on remote server " . $chheadlessserver. PHP_EOL);
+					//echo("headless chrome command path: " . $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test<br/>");
+					$page = file_get_contents( $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test");
+		
+					$har = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=gethar");
+					file_put_contents($harname,$har);
+					$pagedom = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getdom");
+					file_put_contents($dumpname,$pagedom);
+					$pagescreenshot = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getimg");
+					file_put_contents($imgname,$pagescreenshot);
+				}
 
 				// get the prepared files and save them
 	// echo "saving returned headless chrome files to:<br/>";
 	// echo "saving returned harfile: " . $harname. "<br/>";
 	// echo "saving returned domdump: " . $dumpname. "<br/>";
 	// echo "saving returned screenshot: " . $imgname. "<br/>";
-				$har = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=gethar");
-				file_put_contents($harname,$har);
-				$pagedom = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getdom");
-				file_put_contents($dumpname,$pagedom);
-				$pagescreenshot = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getimg");
-				file_put_contents($imgname,$pagescreenshot);
+
 
 				$uploadedHARFileName = $harname;
 				$wptHAR = false;
 				$chhHAR = true;
 				$uploadedHAR = true;
-			}
+			} // end if chrome remote
 				break;
 			case 8: // public wpt - to do - get har file
 
 	} // end switch
+
+
+
 //echo("continuing after browser engine<br/>");
     // save thumnbnail of $imgname
 	$fileimage = str_replace("\\\\", "\\",$imgname);
@@ -1555,7 +1578,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 		@unlink($pjsckfile);
 		@unlink($pjspdfile);
     	$jsonstr = implode($res);
-//echo "Phantom JS; processing additional resources for $url<br/>";
+echo "browser engine: processing additional resources for $url<br/>";
     	debug("<br/><?php echo $browserEngineVer;?>: processing additional resources for",$url);
        //echo("Phantom JS har file<pre>");
        //var_dump($res);
@@ -1567,7 +1590,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 	else
 		$pjspostdataJSON = '';
 
-//echo ($browserEngineVer . ": processing additional resources for url: " . $url . "<br.>");
+echo ($browserEngineVer . ": processing additional resources for url: " . $url . "<br.>");
 
     // add onContentLoad as PhantomJS fails to add it
     //$har = str_replace('"onLoad"','"onContentLoad": -1,    "onLoad"',$har);
@@ -1612,12 +1635,16 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
         $harjson = json_decode($har,true);
         $harfile =$uploadedHARFileName;
 	}
-//echo("processing har file<br/>");
+//echo("main processing har file<br/>");
 //debug HAR JSON string
 // echo("har<code><pre>");
 // print_r($har);
 // echo("</pre></code><br/>");
-
+	$rstime_ms = 0;
+	$domCompletetime_ms = 0;
+	$rstime_sec = 0;
+	$onload_ms = 0;
+	$docTime_ms = 0;
     // escape the HAR json for onward processing by the waterfall chart
 	// process the HAR
 	// 1) identify objects and add to the list of page objects if unknown
@@ -1646,11 +1673,14 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 							$domLoadStart = $value['_domContentLoadedEventStart'];
 							$domLoadEnd = $value['_domContentLoadedEventEnd'];
 							$doct = $value['_fullyLoaded'];
+							$statname = "Render Start Time";
 							break;
 						case 7: //headless chrome
-							$rst = 0;
+							$rst = $value['FirstMeaningfulPaint'];
 							$domLoadStart = $value['onContentLoad'];
 							$onLoad = $value['OnLoad'];
+							$doct = $value['TotalTime'];
+							$statname = "First Meaningful Paint";
 							break;
 						default:
 							$rst = 0;
@@ -1664,7 +1694,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 					$onload_ms = $onLoad;
 					$docTime_ms = $doct;
 					$scoreArray[] = $arr;
-					addStatToFileListAnalysis(number_format($rstime_sec,3), "Seconds", "Render Start Time", "info");
+					addStatToFileListAnalysis(number_format($rstime_sec,3), "Seconds", $statname, "info");
 					break;
 				} // end for each page
               case 'entries':
@@ -2104,16 +2134,20 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
 	if($browserengine != 6 and $browserengine != 8) // don't run for WPT
 	{
 		//$modrootfilepath = "output.txt";
-		if($OS == 'Windows')
+		if($browserengine != 7)
 		{
+//echo "looking for dump in: " . realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput;
 			$modrootfilecontent = file_get_contents(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput);
-		//echo "looking for dump in: " . realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput;
+			$dumpname = realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput;
 		}
 		else
 		{
-//echo "looking for dump in: " .$dumpname;
 			$modrootfilecontent = file_get_contents($dumpname);
+			$browserengineoutput = $dumpname;
+//echo "looking for chrome remote dump in: " .$dumpname;
 		}
+
+
 		// echo "<pre><xmp>";
 		// echo "modified HTML:".$modrootfilecontent;
 		// echo "</xmp></pre>";
@@ -2332,7 +2366,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'");
         <pre class="brush: html; stripBrs: true;"><?php $file = file_get_contents_utf8($localfilename);echo(htmlspecialchars($file));?>
 		</pre>
         <br>HTML page after DOM manipulation:
-        <pre class="brush: html; stripBrs: true;"><?php if($OS=='Windows'){$file = file_get_contents_utf8(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.htmlspecialchars($browserengineoutput));}else{$file = file_get_contents_utf8($dumpname);}echo(htmlspecialchars($file));?></pre>
+        <pre class="brush: html; stripBrs: true;"><?php $file = file_get_contents_utf8($dumpname);echo(htmlspecialchars($file));?></pre>
 		<h3 id="pjspage">Device view (default: "Above the Fold") using <?php echo $browserEngineVer;if(strpos($browserEngineVer,"WebpageTest") != false) echo " (id: ".$testId. ")";?></h3>
         <div style="height:<?php $adjheight = $height + 50; echo $adjheight;?>px; width:<?php $adjwidth = $width + 50;  echo $adjwidth;?>px;" id="pjspageimg"></div>
         <div style="clear: both;"></div>
@@ -2940,6 +2974,7 @@ var cookietext = '<?php echo utf8_converter($cookiedata); ?>';
 </body>
 </html>
 <?php
+@unlink($cookie_jar);
 session_start();
 $_SESSION['imagepath'] = '';
 $_SESSION['status']  = 'Ready to Toast';

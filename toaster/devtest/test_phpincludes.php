@@ -1,7 +1,5 @@
 <?php
 header("Content-type:text/plain");
-include 'main.php';
-echo "ok - main.php".PHP_EOL;
 include 'ps_functions.php';
 echo "ok - ps_functions.php".PHP_EOL;
 include 'downloadObject.php';
