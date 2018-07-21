@@ -1372,152 +1372,53 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
 			session_write_close();	
             $urlenc = urlencode($urlforbrowserengine);
 			$testId = "";
-//echo ('Running test on ' . $browserEngineVer . " against remote server" . $chheadlessserver."<br/>");
-			if($chheadlessserver == '')
+//echo ('Running test on ' . $browserEngineVer . " against a Toaster NodeJS server: " . $chheadlessserver."<br/>");
+				// chrome remote
+			if(strpos($chheadlessserver,"http") === false)
+				$chheadlessserver = 'http://' .$chheadlessserver;
+
+			// remote headless chrome
+			if($OS == "Windows")
 			{
-				// local server
-				if($OS == "Windows")
-				{	
-
-						// local chrome headless
-					
-						// use psexec to start in background, pipe stderr to stdout to capture pid
-						$command = '"c:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --enable-logging --remote-debugging-port=9222';
-						$res = exec("win_tools\pstools\PsExec64 -s -d -accepteula $command 2>&1", $output);
-						//echo $res . "<br/>";
-						// capture pid on the 6th line
-						preg_match('/ID (\d+)/', $output[6], $matches);
-						$pid = $matches[1];
-						//echo "Chrome process id = " . $pid . "<br/>";
-						//print_r($output);
-						// launch headless chrome
-		//				exec('start chrome --headless --disable-gpu --enable-logging --remote-debugging-port=9222',$output,$rv);
-
-		//echo "Google Chrome launched with PID "  . $pid . "<br/>";
-						// get screenshot
-						//echo "getting screenshot<br/>";
-						exec("node win_tools/chromeremote/take_screenshot.js --url " . $urlforbrowserengine . " --pathname " . $imgname . " --viewportHeight " . $height . " --viewportWidth " . $width. " 2>&1", $output, $rv);
-						//echo implode("\n", $output);
-						//echo $imgname.  " - rv = " . $rv . "<br/>";
-
-						// get har
-						//echo "generating HAR file to " . $harname . "<br/>";
-						exec("node win_tools/chromeremote/node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --output " . $harname . " --height " . $height . " --width " . $width . " --agent \"" . $uar . "\" 2>&1", $output2, $rv);
-						//echo implode("\n", $output2);
-						//echo "rv = " . $rv. "<br/>";
-
-						// get HTML DOM, after age end with injections
-						$outpath = realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput;
-						//echo "dumping HTML after page load to " . $outpath . "<br/>";
-						exec("node win_tools/chromeremote/dump.js --url " . $urlforbrowserengine. " --pathname " . $outpath . " 2>&1", $output2, $rv);
-						//echo implode("\n", $output2);
-						//echo "rv = " . $rv. "<br/>";
-
-						// get testresults as HAR
-						$uploadedHARFileName = $harname;
-						$wptHAR = false;
-						$uploadedHAR = true;
-
-						// kill remote headless chrome instance
-						exec("win_tools\pstools\PsKill -t $pid", $output);
-					
-				} // end if windows local
-				else
-				{ // linux local
-					
-					// set port
-					$port = "9221";
-					// launch headless chrome on a given port
-					$res = exec("google-chrome --remote-debugging-port=" . $port . " --headless > /dev/null 2>&1 & echo $!", $output);
-					// capture pid
-					$pid = (int)$output[0];
-	//echo "Chrome process id = " . $pid . "<br/>";
-	//print_r($output);
-
-					//get har
-					// $harname = '/var/sites/w/webpagetoaster.com/subdomains/toast/test.har';
-					// $height = 800;
-					// $width = 1200;
-					// $urlforbrowserengine = 'http://www.daish.net';
-					$uar = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
-
-	//echo "generating HAR file to " . $harname . "<br/>";
-					exec("node node_modules/chrome-har-capturer/bin/cli.js " . $urlforbrowserengine . " --port " . $port . " --output " . $harname . " 2>&1", $output2, $rv);
-					//echo implode("\n", $output2);
-	//echo "rv = " . $rv. "<br/>";
-
-					sleep (1);
-					// get screenshot and dom dump
-	//				echo "getting dom, saving to " . $dumpname . "<br/>";
-	//echo "saving screenshot to " . $imgname . "<br/>";
-					exec('node node_modules/cri-toaster.js --url ' . $urlforbrowserengine . " --fullPage true --width " . $width . " --height " . $height . " --imgpath " . $imgname . " --dompath " . $dumpname . " --port " . $port . " 2>&1", $output, $rv);
-	//echo implode("\n", $output);
-	//echo $imgname.  " - rv = " . $rv . "<br/>";
-
-					sleep (1);
-					// // kill headless chrome
-					$command = 'kill -9 ' . $pid ;
-					$res = exec($command . " 2>&1", $output);
-	//print_r($output);
-	//echo PHP_EOL . " all done";
-				
-					// get testresults as HAR
-					$uploadedHARFileName = $harname;
-					$wptHAR = true;
-					$uploadedHAR = true;
-
-				}
-			}
-			else
-			{ // chrome remote
-				if(strpos($chheadlessserver,"http") === false)
-					$chheadlessserver = 'http://' .$chheadlessserver;
-
-				// remote headless chrome
-				if($OS == "Windows")
-				{
 //echo ("Windows running headless chrome on remote server " . $chheadlessserver. PHP_EOL);
-					//echo("headless chrome command path: " . $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test<br/>");
-					$page = file_get_contents( $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".urlencode($urlforbrowserengine)."&action=test");
+				//echo("headless chrome command path: " . $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test<br/>");
+				$page = file_get_contents( $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".urlencode($urlforbrowserengine)."&action=test");
 
 //echo($chheadlessserver . "?tid=". $toasterid . "&action=gethar". "<br/>");
-					$har = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=gethar");
+				$har = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=gethar");
 //echo "saving har file to " . $harname. "<br/>";
-					$res = file_put_contents($harname,$har);
+				$res = file_put_contents($harname,$har);
 //echo "file save result: " . $res. "<br/>";
-					$pagedom = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getdom");
-					file_put_contents($dumpname,$pagedom);
-					$pagescreenshot = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getimg");
-					file_put_contents($imgname,$pagescreenshot);
-				}
-				else
-				{
+				$pagedom = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getdom");
+				file_put_contents($dumpname,$pagedom);
+				$pagescreenshot = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getimg");
+				file_put_contents($imgname,$pagescreenshot);
+			}
+			else
+			{
 //echo ("Windows running headless chrome on remote server " . $chheadlessserver. PHP_EOL);
-					//echo("headless chrome command path: " . $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test<br/>");
-					$page = file_get_contents( $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test");
-		
-					$har = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=gethar");
-					file_put_contents($harname,$har);
-					$pagedom = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getdom");
-					file_put_contents($dumpname,$pagedom);
-					$pagescreenshot = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getimg");
-					file_put_contents($imgname,$pagescreenshot);
-				}
+				//echo("headless chrome command path: " . $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test<br/>");
+				$page = file_get_contents( $chheadlessserver . "?tid=". $toasterid . "&content=0&url=".$urlforbrowserengine."&action=test");
+	
+				$har = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=gethar");
+				file_put_contents($harname,$har);
+				$pagedom = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getdom");
+				file_put_contents($dumpname,$pagedom);
+				$pagescreenshot = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getimg");
+				file_put_contents($imgname,$pagescreenshot);
+			}
+			// get the prepared files and save them
+// echo "saving returned headless chrome files to:<br/>";
+// echo "saving returned harfile: " . $harname. "<br/>";
+// echo "saving returned domdump: " . $dumpname. "<br/>";
+// echo "saving returned screenshot: " . $imgname. "<br/>";
 
-				// get the prepared files and save them
-	// echo "saving returned headless chrome files to:<br/>";
-	// echo "saving returned harfile: " . $harname. "<br/>";
-	// echo "saving returned domdump: " . $dumpname. "<br/>";
-	// echo "saving returned screenshot: " . $imgname. "<br/>";
-
-
-				$uploadedHARFileName = $harname;
-				$wptHAR = false;
-				$chhHAR = true;
-				$uploadedHAR = true;
-			} // end if chrome remote
-				break;
-			case 8: // public wpt - to do - get har file
+			$uploadedHARFileName = $harname;
+			$wptHAR = false;
+			$chhHAR = true;
+			$uploadedHAR = true;
+			break;
+		case 8: // public wpt - to do - get har file
 
 	} // end switch
 

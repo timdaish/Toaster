@@ -123,27 +123,24 @@
       // determine server capabailities
       var optPhantomJS21 = false;
       var optPhantomJS25 = false;
-      var optLocalNodeChromeHeadless = false;
-      var optRemoteNodeChromeHeadless = false;
+      var optNodeChromeHeadless = false;
       var optWPTPrivateInstance = false;
       var optWPTPublic = false;
       switch(svrname)
       {
         case "www.webpagetoaster.com": // public web page toaster
           // only local
-          optRemoteNodeChromeHeadless = true;
+          optNodeChromeHeadless = true;
           optWPTPublic = true;
           break;
         case "hpdev": // private web page toaster hosted on a local server
-          optLocalNodeChromeHeadless = false;
-          optRemoteNodeChromeHeadless = true;
+          optNodeChromeHeadless = true;
           optWPTPrivateInstance = true;
           optPhantomJS25 = true;
           break;
         case "localhost": // private web page toaster hosted on the local machine
           optPhantomJS25 = true;
-          optLocalNodeChromeHeadless = false;
-          optRemoteNodeChromeHeadless = true;
+          optNodeChromeHeadless = true;
           optWPTPrivateInstance = true;
           optWPTPublic = true;
         default:
@@ -151,7 +148,7 @@
       // populate wbengine fields depending upon server
       // console.log("pjs", optPhantomJS);
       // console.log("LocalNodeChromeHeadless", optLocalNodeChromeHeadless);
-      // console.log("RemoteNodeChromeHeadless", optRemoteNodeChromeHeadless);
+      // console.log("RemoteNodeChromeHeadless", optNodeChromeHeadless);
       // console.log("WPTPublic", optWPTPublic);
       // console.log("WPTPrivateInstance", optWPTPrivateInstance);
       if(optPhantomJS21 == false)
@@ -166,7 +163,7 @@
         // remove phantomjs fields
         $(".wbpjs25").hide();
       }
-      if(optLocalNodeChromeHeadless == false && optRemoteNodeChromeHeadless == false)
+      if(optNodeChromeHeadless == false)
       {
 //console.log("removing chrome headless");
         // remove chrome headless fields
@@ -195,13 +192,7 @@
         if ($('#chromeheadless').prop('checked')) {
 //console.log('chrome headless is checked!');
           // add remote port option
-          if(optLocalNodeChromeHeadless == true)
-          {
-            $("#wbengineoptions").append('<label for="chlocalurlandport">Local URL and Port</label><input id="chlocalurlandport" name="chlocalurlandport" placeholder="local" hidden></input>');
-          }
-          else{
-            $("#wbengineoptions").append('<label for="chremoteurlandport">Remote URL and Port</label><input id="chremoteurlandport" name="chremoteurlandport" placeholder="remote"></input>');
-          }
+            $("#wbengineoptions").append('<label for="chremoteurlandport">Remote URL and Port</label><input id="chremoteurlandport" name="chremoteurlandport" placeholder="enter server address and port"></input>');
           $storedchhserver = localStorage.getItem('chhserver');
           $('#chremoteurlandport').val($storedchhserver);
         }
