@@ -1578,7 +1578,6 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
 		@unlink($pjsckfile);
 		@unlink($pjspdfile);
     	$jsonstr = implode($res);
-echo "browser engine: processing additional resources for $url<br/>";
     	debug("<br/><?php echo $browserEngineVer;?>: processing additional resources for",$url);
        //echo("Phantom JS har file<pre>");
        //var_dump($res);
@@ -1590,7 +1589,7 @@ echo "browser engine: processing additional resources for $url<br/>";
 	else
 		$pjspostdataJSON = '';
 
-echo ($browserEngineVer . ": processing additional resources for url: " . $url . "<br.>");
+//echo ($browserEngineVer . ": processing additional resources for url: " . $url . "<br.>");
 
     // add onContentLoad as PhantomJS fails to add it
     //$har = str_replace('"onLoad"','"onContentLoad": -1,    "onLoad"',$har);
