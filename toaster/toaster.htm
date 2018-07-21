@@ -329,7 +329,6 @@ function startRefresh()
               statusToDisplay = statusToDisplay.substr(1, 25) + ".." + statusToDisplay.slice(-25);
             }
             else
-
               $('#statusdetail').html(statusToDisplay);
             //if (obj.mimetype == '')
             //  obj.mimetype = 'application_x_mswinurl';
@@ -480,7 +479,6 @@ function startRefresh()
               console.log(errorThrown + ": " + $('#urlfield').val() + ": " + " " + message + ": " + debug);
               // pagecount = 0;
               // urlcount = 0;
-              $('#urlfield').val('');
               $('#toasturl').text('');
               $('#status').text('Ready to Toast');
               $('#statusdetail').html("&nbsp;");
@@ -501,7 +499,6 @@ function startRefresh()
               $('#harfile').val('');
               $('body').removeClass('busy');
               $('#submit').removeAttr('disabled');
-              $('#urlfield').val('');
               $('#submit').removeAttr('disabled');
               $('#submit').removeClass("grey");
               $('#statusdetail').html("&nbsp;");
