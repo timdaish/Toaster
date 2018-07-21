@@ -15,6 +15,20 @@ var renderstarttime = 0;
 var domloadtime = 0;
 var fullyloadedtime = 0;
 var onloadtime = 0;
+var rstitle = "Render Start";
+var analysisOwner = '';
+var analysisSite = '';
+var analysisURL = '';
+var analysisDisplayDate = new Date();
+var analysisYear = analysisDisplayDate.getFullYear();
+function loadConfigFile(configFile) {
+    $.getJSON('config.json', function(data) {
+//console.log("owner",data.owner);
+        analysisOwner = data.owner;
+        analysisSite = data.site;
+        analysisURL = data.url;
+    });
+  }
 function SanitiseTimings(input){
 	
 	if (input < 0) {
@@ -70,7 +84,7 @@ function TruncateURL (inputURL) {
 }
 
 function renderHAR(harfile){
-	console.log("HAR processing invoked - ncc_har.js");
+	console.log("HAR processing invoked - toaster har.js");
 //    console.log(harfile);
 
 	//Parse HAR file
@@ -102,13 +116,22 @@ function renderHAR(harfile){
 		if ("_renderStart" in pagesdata.pageTimings && pagesdata.id){
 			pages.RenderStartTime = SanitiseTimings(pagesdata.pageTimings._renderStart);
 		}
+		if ("FirstMeaningfulPaint" in pagesdata.pageTimings){ // Headless Chrome - Chrome Har Capturer
+			pages.FirstMeaningfulPaint = SanitiseTimings(pagesdata.pageTimings.FirstMeaningfulPaint);
+		}
 
 		if ("_fullyLoaded" in pagesdata){
 			pages.FullyLoadedTime = SanitiseTimings(pagesdata._fullyLoaded);
 		}
+		if ("TotalTime" in pagesdata.pageTimings){
+			pages.FullyLoadedTime = SanitiseTimings(pagesdata.pageTimings.TotalTime);
+		}
 
 		if ("_domContentLoadedEventStart" in pagesdata){
 			pages.DomContentStartTime = SanitiseTimings(pagesdata._domContentLoadedEventStart);
+		}
+		if ("DomContentLoaded" in pagesdata.pageTimings){
+			pages.DomContentStartTime = SanitiseTimings(pagesdata.pageTimings.DomContentLoaded);
 		}
 		if ("onContentLoad" in pagesdata && pagesdata.id){
 			pages.onContentLoad = SanitiseTimings(pagesdata.onContentLoad);
@@ -470,7 +493,12 @@ var group = '';
 		//renderstart (WPT)
 		options.yAxis.plotLines[1].value = val.RenderStartTime;
 		options.yAxis.plotLines[1].label.text = "Render Start (" + val.RenderStartTime + ")";
-
+		if(val.FirstMeaningfulPaint > 0)
+		{
+			options.yAxis.plotLines[1].value = val.FirstMeaningfulPaint;
+			options.yAxis.plotLines[1].label.text = "First Meaningful Paint (" + val.FirstMeaningfulPaint + ")";
+			rstitle = "First Meaningful Paint";
+		}
 		options.yAxis.plotLines[2].value = val.DomContentStartTime;
 		options.yAxis.plotLines[2].label.text = "DOM ContentLoaded Start (" + val.DomContentStartTime + ")";
 
@@ -580,7 +608,7 @@ function display3PTagWaterfall(tagwfmode){
 
 	$.each(HARpages.pages, function(i,val) {
 		
-console.log("page...");
+console.log("HAR page Timings...");
 console.log(val);
 
 		if(val.id == "page_0" || val.id == "page_1_0" || val.id == "page_1_0_1") // former HTTPWatch iPhone / latter WPT
@@ -592,10 +620,10 @@ console.log(val);
 		}
 		else
 		{
-			renderstarttime = "undefined";
+			renderstarttime = val.FirstMeaningfulPaint;
 			domloadtime = val.onContentLoad;
 			onloadtime = val.onLoadTime;
-			fullyloadedtime = "undefined";
+			fullyloadedtime = val.FullyLoadedTime;
 		}
 
 		x++;
@@ -603,8 +631,8 @@ console.log(val);
 
 		$.each(val.objects, function(j,objects) {
 			y++;
-//  console.log("object...");
-//  console.log(objects);
+ console.log("object...");
+ console.log(objects);
 
 
 
@@ -889,7 +917,7 @@ console.log(val);
 	// mode 2
 	var dataSeriesMode2 = [
 		{
-			'name':'Before Render Start',
+			'name':'Before ' + "render/firstpaint",
 			'color':'rgba(0,136,0,0.25)',
 			'data':dataNavTiming1
 		},
@@ -970,7 +998,7 @@ console.log("plotting data for mode " + tagwfmode.toString());
 		tagtext = 'Tags by Content Type and Total Size (incl. response header) against page load duration';
 	}
 
-console.log("render start time: " + renderstarttime);
+console.log("render start time/First Meaningful Paint: " + renderstarttime + " = " + rstitle);
 // blitz all nav timings if render not present
 // if(typeof renderstarttime === "undefined" )
 // {
@@ -980,11 +1008,11 @@ console.log("render start time: " + renderstarttime);
 // 	fullyloadedtime = "undefined"
 // }
 //console.log("timing dataseries",dataSeries);
-if(fullyloadedtime === "undefined")
+if(fullyloadedtime === undefined)
 	var xaxismaxvalue = Math.max(onloadtime, maxtiming ) + 1;
 else
-var xaxismaxvalue = Math.max(onloadtime, fullyloadedtime, maxtiming ) + 1;
-//console.log("max x value", onloadtime,fullyloadedtime, maxtiming);
+	var xaxismaxvalue = Math.max(onloadtime, fullyloadedtime, maxtiming ) + 1;
+console.log(rstitle + " ; max x value", onloadtime,fullyloadedtime, maxtiming);
     $(function () {
         $('#container_3Ptagwaterfall').highcharts({
 
@@ -1025,7 +1053,7 @@ var xaxismaxvalue = Math.max(onloadtime, fullyloadedtime, maxtiming ) + 1;
                     style: {
                         fontStyle: 'normal'
                     },
-                    text: 'Render Start',
+                    text: rstitle,
                     x: -10
                 },
                 zIndex: 3
