@@ -1,1 +1,5 @@
 dbconnect.php
+api-config.php
+ca-bundle.crt
+cacert.pem
+**/devtest
