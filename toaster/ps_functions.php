@@ -280,15 +280,26 @@ function getStyleIDandClasess($initurl)
         debug("Func get_SourceURL", $url);
 //echo "get_SourceURL: ",$url."<br/>";
         $u = parseUrl($url);
+        if(empty($u))
+            $u = parse_url($url);
         @ $h = $u["host"];
-        @ $subd = $u["subdomain"];
-        @ $d = $u["domain"];
+        if(isset($u["subdomain"]))
+            @ $subd = $u["subdomain"];
+        else
+            $subd = '';
+        if(isset($u["domain"]))
+            @ $d = $u["domain"];
+        else
+            $d = '';
         if (isset($u["path"]))
             $path = $u["path"];
         else
             $path = '';
         $pu = parse_url($url);
-        @ $s = $pu["scheme"];
+        if(isset($pu["scheme"]))
+            @ $s = $pu["scheme"];
+        else
+            $s = "http";
         if (isset($u["file"]))
             $f = $u["file"];
         else

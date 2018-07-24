@@ -1554,8 +1554,10 @@ Function UpdateDomainLocationFromHeader($inurl,$xservedby,$xpx,$xedgelocation,$s
         $ip4 = filter_var(substr($cdnparts[3],0,3), FILTER_SANITIZE_NUMBER_INT);
         $ip = $ip1 . '.' . $cdnparts[1] .'.' . $cdnparts[2] . '.' . $ip4 ;
 //echo("Akamai IP: ".$ip."<br/>");
-        list($edgeloc, $city,$region,$country,$lat,$long) = lookupLocationforIP($ip);
+		list($edgeloclatlong, $city,$region,$country,$lat,$long) = lookupLocationforIP($ip);
+		$edgeloc = implode(",", array_filter([ $city, $region, $country])) ;
 //echo("Akamai edgeloc: ".$edgeloc."<br/>");
+//lookupLocationForLatLong();
 		if ($country == '' || $country == "United Kingdom")
 		{
 			// fill in values
@@ -1973,6 +1975,9 @@ function lookupIATAAirportCode($code)
 			
 		
 			  $airportlocation = $item->city.", ".$item->state .", ".$item->country;
+			  $lat = $item->lat;
+			  $long = $item->lon;
+			  $latlong = $lat . ", " . $lon;
 //echo "airport location = " .$airportlocation;
 		
 				  break;
@@ -2588,11 +2593,16 @@ function lookupLocationforIP($inIP)
 	$api_key= 'api_key=' . $apikey_dbip;
 	$parameters = '?'.$addr . '&' . $api_key;
 	$response = '';
+//echo (__FUNCTION__ . " - IP lookup using " . $geoIPLookupMethod);
 	if($geoIPLookupMethod == 0)
 	{
-		return array("","","","","","");
+		// use inbuilt service via MaxMind GeoLite2
+		list($inIP,$countryName,$countryisoCode,$stateprovName,$stateprovCode,$city,$citycode,$lat,$long) = getIPLoc($inIP);
+//echo ($inIP . " " . $countryName. " " .$countryisoCode. " " . $stateprovName. " " . $stateprovCode. " " .  $city. " " .$citycode. " " .  $lat. " " .$long);
+		$tc = $lat.",".$long;
+		return array($tc,$city,$stateprovName,$countryName,$lat,$long);
 	}
-//echo (__FUNCTION__ . " - IP lookup using " . $geoIPLookupMethod);
+
 	// METHOD 1 - DBIP - uses API KEY
 	if($geoIPLookupMethod == 1)
 	{
@@ -2913,7 +2923,7 @@ function lookupReverseIP($inDomain)
 function NSlookup($DomainOrIP)
 {
 	global $debug;
-	$strNslookup  = 'nslookup -timeout=20 '.$DomainOrIP . "<br/>";
+	$strNslookup  = 'nslookup -timeout=20 '.$DomainOrIP;
 	exec($strNslookup,$res);
 	if($debug == true)
 	{

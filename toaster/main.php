@@ -38,6 +38,7 @@ include 'class.GifDecoder.php';
 include 'ttfInfo.class.php';
 include 'wpt_functions.php';
 include '3ptags_nccgroup_db.php';
+include 'getiploc.php';
 $toasterid=generateRandomString();
 if($OS == "Windows")
 {
@@ -272,6 +273,7 @@ else
 		$getipgeo = $_REQUEST["ip"];
 		//echo "get geo IP status: ".$getipgeo."<br/>";
 	}
+	$getipgeo = "all";
 	if (isset($_REQUEST["ipapi"]))
 	{
 		switch ($_REQUEST["ipapi"])
@@ -289,9 +291,13 @@ else
 				$geoIPLookupMethod = 4;
 				break;
 			default:
-				$geoIPLookupMethod = 0; // none
+				$geoIPLookupMethod = 0; // none - use local maxmind  db
 		}
 //echo "geo IP API provider: ".$geoIPLookupMethod."<br/>";
+	}
+	else
+	{
+		$geoIPLookupMethod = 0; // none - use local maxmind  db
 	}
 	if (isset($_REQUEST["wbengine"]))
 	{
@@ -385,18 +391,18 @@ if(isset($_REQUEST["chremoteurlandport"]))
 			$b3pdbPublic = false; // forces use of the internal third party database, not the public one
             break;
         default:
-        	// list($externalloc,$city,$stateprov,$country,$lat,$long) = lookupLocationforIP($externalIp);
-            // $geoExtLocStaticMarker = "&markers=color:red%7Clabel:U%7CUser".$city.",".$stateprov.",".$country;
-            // $geoExtLoc = $city.", ".$stateprov.", ".$country;
-			// $geoMarkerLetter = "U";
+        	list($externalloc,$city,$stateprov,$country,$lat,$long) = lookupLocationforIP($externalIp);
+            $geoExtLocStaticMarker = "&markers=color:red%7Clabel:U%7CUser".$city.",".$stateprov.",".$country;
+            $geoExtLoc = $city.", ".$stateprov.", ".$country;
+			$geoMarkerLetter = "S";
 			
-			$lat = "51.6667";
-            $long = "-0.8333";
-            $city = "Slough";
-            $stateprov = "Berkshire";
-            $country = "England";
-            $geoExtLoc = "Slough, Berkshire, England";
-			$externalloc = "Slough, Berkshire, England";
+			// $lat = "51.6667";
+            // $long = "-0.8333";
+            // $city = "Slough";
+            // $stateprov = "Berkshire";
+            // $country = "England";
+            // $geoExtLoc = "Slough, Berkshire, England";
+			// $externalloc = "Slough, Berkshire, England";
 			$geoMarkerLetter = "S";
 			$b3pdbPublic = true;
 			$geoExtLocStaticMarker = "&markers=color:red%7Clabel:U%7CUser".$city.",".$stateprov.",".$country;
@@ -556,7 +562,7 @@ if(isset($_REQUEST["chremoteurlandport"]))
 		{
 			$rootloc = lookupLocationForLatLong($lat,$lon);
 			$rootloc = $edgeloc;
-echo ('main named rootloc '.$rootloc.' was latlong, reset to edgeloc<br/>');
+//echo ('main named rootloc '.$rootloc.' was latlong, reset to edgeloc<br/>');
 		}
 		// override rootloc for testing
 		//$rootloc = "Oslo,Oslo,NO";
@@ -2009,13 +2015,19 @@ if($har != '')
 							{
 								$ObjURL = substr($ObjURL, 0, -1);
 							}
-							// WPTTIMING
-	//echo("Found HARfile object : $ObjURL --- $url<br/>");
-							@$debugTiming = $ObjURL . "; allms: " . $value['_all_ms']. "<br/>";
+
+							if(isset($value['_all_ms']))
+								@$debugTiming = $ObjURL . "; allms: " . $value['_all_ms']. "<br/>";
+								else
+								if(isset($value['time']))
+									@$debugTiming = $ObjURL . "; allms: " . $value['time']. "<br/>";
 							//echo("root: " . $debugTiming);
 							// update object timings if they exist (in WPT test)
 							if($browserengine == 6 or $browserengine == 8)
-							{
+							{				
+											// WPTTIMING
+								//echo("Found HARfile object : $ObjURL --- $url<br/>");
+
 								$arr = array(
 								"Object source" => $ObjURL,
 								"offsetDuration" => $value['_ttfb_start'],							
@@ -2224,7 +2236,8 @@ if($har != '')
 			$geoIPprovider = 'HackerTarget';
 			break;
 		default:
-			$geoIPprovider = 'none';
+			$geoIPprovider = 'This product includes GeoLite2 data created by MaxMind, available from
+			<a href="http://www.maxmind.com">http://www.maxmind.com</a>.'; // use local 
 	}
 	// DEBUG INFO EXTRA - ALL OBJECT INFO - ANY non-printable chars here will prevent JS operation
 	// echo("array page objects before converting to JS<pre>");
