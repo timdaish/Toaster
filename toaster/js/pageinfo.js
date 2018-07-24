@@ -6,6 +6,7 @@
  * 
  */
 // globals
+var toasterid = '';
 var headerfields = '';
 var headeranalysis = '';
 var gzipanalysis = '';
@@ -4379,7 +4380,7 @@ function displayTableOptObj(tbltype) {
     initImageOptimisation(container);
     // init thumbnails
     addThumbnails(container);
-} // end datatables - image optmisation
+} // end datatables - image optimisation
 
 function initImageOptimisation(container) {
     $(container + ' .btnoptimise').click(function () {
@@ -4421,7 +4422,7 @@ function initImageOptimisation(container) {
         var d = JSON.stringify(TableData);
         console.log(d);
         //console.log(location.protocol + '//' + location.host);
-        $opturl = "/toaster/optimise_images.php";
+        $opturl = "/toaster/optimise_images.php?" + toasterid;
         // if(location.host == "toast.webpagetoaster.com");
         //     $opturl = "https://www.webpagetoaster.com/toaster/optimise_images.php"
         $.ajax({

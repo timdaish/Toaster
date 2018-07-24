@@ -461,6 +461,7 @@ function startRefresh()
                 $('#comment').val('');
                 $('#harfile').val('');
                 $('#status').text('Ready to Toast');
+                $('div#toastingnow > img').remove();
                 return (false);
               }
 
@@ -515,6 +516,7 @@ function startRefresh()
               $('#fileupdate img').attr("src", '');
               $('#comment').val('');
               $('#harfile').val('');
+              $('div#toastingnow > img').remove();
 
 // console.log("main.php error - stopping refresh status timer");
               clearInterval(refreshStatus);
@@ -537,7 +539,7 @@ function startRefresh()
               $('#submit').removeAttr('disabled');
               $('#submit').removeClass("grey");
               $('#statusdetail').html("&nbsp;");
-
+              $('div#toastingnow > img').remove();
               //console.log("stopping refresh status timer");
               clearInterval(refreshStatus);
             }

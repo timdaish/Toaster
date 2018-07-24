@@ -3062,7 +3062,9 @@ function downloadObject($key,$valuearray)
 										if($name != "MakerNote" and !is_null($val) )
 										{
 											$str = preg_replace('/[^\P{C}\s]+/u', '',$val);
-											@$exifstr .= "$key.$name: $str<br/>";
+											if(is_array($str))
+												$str = implode($str);
+											@$exifstr .= " " .$key . $name . ": " .$str;
 										}
 										//else
 											//$exifstr .= "$key.$name: [not shown]<br/>";

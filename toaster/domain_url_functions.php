@@ -1977,7 +1977,7 @@ function lookupIATAAirportCode($code)
 			  $airportlocation = $item->city.", ".$item->state .", ".$item->country;
 			  $lat = $item->lat;
 			  $long = $item->lon;
-			  $latlong = $lat . ", " . $lon;
+			  $latlong = $lat . ", " . $long;
 //echo "airport location = " .$airportlocation;
 		
 				  break;

@@ -3016,8 +3016,11 @@ function decodePNG($content,$lf)
             $chunklength = intval($shortString);
             $iccbytes = $chunklength;
 
-            // get profile size from 2nd part
-            $iccdata = $chunkinfo[1];
+			// get profile size from 2nd part
+			if(isset($chunkinfo[1]))
+			{
+				$iccdata = $chunkinfo[1];
+
             //echo('png chunk ICCP data:' . $iccdata."<br/>");
             $arriccdata = explode('entries,',$iccdata);
             $nparts = count($arriccdata);
@@ -3028,7 +3031,11 @@ function decodePNG($content,$lf)
             $arriccdata2 = explode('bytes] ',$arriccdata[1]);
 
             $shortString = $arriccdata2[0];
-
+			}
+			else
+			{
+				$iccdata = $shortString;
+			}
             //echo('png chunk ICCP shortstring2:' . $shortString."<br/>");
             $iccbytes = intval($shortString);
             break;

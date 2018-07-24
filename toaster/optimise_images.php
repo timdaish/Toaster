@@ -6,7 +6,7 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
   $windows = defined('PHP_WINDOWS_VERSION_MAJOR');
     //echo 'This is a server using Windows! '. $windows."<br/>";
     $OS = "Windows";
-    $debuglog = "c:\\temp\\optimg_debug.txt";
+    $debuglog = "c:\\temp\\".$toasterid."_debug_optimg.txt";
 }
 else {
     //echo 'This is a server not using Windows!'."<br/>";
@@ -14,10 +14,10 @@ else {
         //set path for webpagetoaster server and others
 	if( strpos($hostname,"gridhost.co.uk") != false)
     {
-		$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/debug_optimg.txt";
+		$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/".$toasterid."_debug_optimg.txt";
 	}
 	else{
-		$debuglog = "/usr/share/toast/debug_optimg.txt";
+		$debuglog = "/usr/share/toast/".$toasterid."_debug_optimg.txt";
 	}
 }
 ini_set("log_errors", 1);
@@ -65,13 +65,13 @@ foreach ($djson as $value) {
   if($OS == 'Windows')
     $savepath = str_replace("/","\\",$savepath);
   else
-    // if( strpos($hostname,"gridhost.co.uk") != false)
-    // {
-	// 	$savepath= "/var/sites/w/webpagetoaster.com/subdomains/toast/";
-	// }
-	// else{
-	// 	$savepath = "/usr/share/toast/";
-	// }
+    if( strpos($hostname,"gridhost.co.uk") != false)
+    {
+		$savepath= "/var/sites/w/webpagetoaster.com/subdomains/toast/";
+	}
+	else{
+		$savepath = "/usr/share/toast/";
+	}
 
 
  error_log("opt image save path: ".$savepath);

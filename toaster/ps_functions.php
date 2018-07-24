@@ -36,6 +36,7 @@ else
 }
 define ( CURL_HTTP_VERSION_2TLS , 4);
 //echo "cookie jar file: ". $cookie_jar."<br/>" ;
+$encodingoptions = "gzip,deflate"; // br brotli disabled - php curl won't get it
 $b3pdbPublic = true;
 $filepath_domainsavedir = '';
 $filepath_domainsaverootdir = '';
@@ -454,7 +455,7 @@ function getStyleIDandClasess($initurl)
     function readURLandSaveToFilePath($url, $sfn)
     {
         debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $url . "; " . $sfn);
-        global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath;
+        global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath,$encodingoptions;
         debug('<br/>function readURLandSaveToFilePath called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br />');
 //echo('<br/>function readURLandSaveToFilePath called for '.$url. '<br/> saving file to '.$sfn.'<br />');
 //echo ("opening file $url: $sfn<br/>");
@@ -471,7 +472,7 @@ function getStyleIDandClasess($initurl)
         $charset = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
         $conn = 'Connection: Keep-Alive';
         $ka = 'Keep-Alive: 300';
-        $enc = 'Accept-Encoding:gzip,deflate,br';
+        $enc = 'Accept-Encoding:'.$encodingoptions;
         $akamaiDebug = 'Pragma: akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-check-cacheable, akamai-x-get-cache-key, akamai-x-get-true-cache-key, akamai-x-get-extracted-values, akamai-x-get-ssl-client-session-id, akamai-x-serial-no, akamai-x-get-request-id, akamai-x-feo-trace';
         $akamaiDebugLocOnly = 'Pragma: akamai-x-cache-on';
         if ($boolakamaiDebug == false)
@@ -511,7 +512,7 @@ function getStyleIDandClasess($initurl)
             curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $rqheaders); // add additional request headers
-        curl_setopt($ch, CURLOPT_ENCODING, "gzip, deflate, br");
+        curl_setopt($ch, CURLOPT_ENCODING, $encodingoptions);
         $result = curl_exec($ch);
         $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 //echo "REQUEST HEADER<br/>".$headerSent."<br/>";
@@ -531,7 +532,7 @@ function getStyleIDandClasess($initurl)
             $error_message = curl_strerror($errno);
 //echo ("CURL error $url ({$errno}): "." {$error_message}"."<br/>");
             debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
-//die(curl_error($ch));
+die(curl_error($ch));
         }
         else
             if ($errno = curl_errno($ch))
@@ -585,7 +586,7 @@ function getStyleIDandClasess($initurl)
     function readURLandSaveToFilePathNoFollow($url, $sfn)
     {
         debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $url . "; " . $sfn);
-        global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath;
+        global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath,$encodingoptions;
         debug('<br/>function readURLandSaveToFilePathNoFollow called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br />');
 //echo('<br/>function readURLandSaveToFilePath called for '.$url. '<br/> saving file to '.$sfn.'<br />');
 //echo ("opening file $url: $sfn<br/>");
@@ -597,7 +598,7 @@ function getStyleIDandClasess($initurl)
         $charset = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
         $conn = 'Connection: Keep-Alive';
         $ka = 'Keep-Alive: 300';
-        $enc = 'Accept-Encoding:gzip,deflate,br';
+        $enc = 'Accept-Encoding:'.$encodingoptions;
         $akamaiDebug = 'Pragma: akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-check-cacheable, akamai-x-get-cache-key, akamai-x-get-true-cache-key, akamai-x-get-extracted-values, akamai-x-get-ssl-client-session-id, akamai-x-serial-no, akamai-x-get-request-id, akamai-x-feo-trace';
         $akamaiDebugLocOnly = 'Pragma: akamai-x-cache-on';
         if ($boolakamaiDebug == false)
@@ -637,7 +638,7 @@ function getStyleIDandClasess($initurl)
             curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $rqheaders); // add additional request headers
-        curl_setopt($ch, CURLOPT_ENCODING, "gzip, deflate, br");
+        curl_setopt($ch, CURLOPT_ENCODING, $encodingoptions);
         $result = curl_exec($ch);
         $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 //echo "REQUEST HEADER<br/>".$headerSent."<br/>";
@@ -711,7 +712,7 @@ function getStyleIDandClasess($initurl)
     function readURLWithExtraCookieandSaveToFilePath($url, $sfn, $extracookies)
     {
         debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $url . "; " . $sfn);
-        global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath;
+        global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath,$encodingoptions;
         debug('<br/>readURLWithExtraCookieandSaveToFilePath called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br/>');
 //echo('<br/>function readURLWithExtraCookieandSaveToFilePath '.$url. '<br/> saving file to '.$sfn.'<br />');
 //echo ('extra cookies set: ' . $extracookies.'<br>');
@@ -724,7 +725,7 @@ function getStyleIDandClasess($initurl)
         $charset = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
         $conn = 'Connection: Keep-Alive';
         $ka = 'Keep-Alive: 300';
-        $enc = 'Accept-Encoding:gzip,deflate,br';
+        $enc = 'Accept-Encoding:'.$encodingoptions;
         $akamaiDebug = 'Pragma: akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-check-cacheable, akamai-x-get-cache-key, akamai-x-get-true-cache-key, akamai-x-get-extracted-values, akamai-x-get-ssl-client-session-id, akamai-x-serial-no, akamai-x-get-request-id, akamai-x-feo-trace';
         $akamaiDebugLocOnly = 'Pragma: akamai-x-cache-on';
         if ($boolakamaiDebug == false)
@@ -762,7 +763,7 @@ function getStyleIDandClasess($initurl)
             curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $rqheaders); // add additional request headers
-        curl_setopt($ch, CURLOPT_ENCODING, "gzip, deflate, br");
+        curl_setopt($ch, CURLOPT_ENCODING, $encodingoptions);
         $result = curl_exec($ch);
         $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 //echo "REQUEST HEADER on retry<br/>".$headerSent."<br/>";
@@ -812,7 +813,7 @@ function getStyleIDandClasess($initurl)
     function readURLWithExtraCookieandSaveToFilePathNoFollow($url, $sfn, $extracookies)
     {
         debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $url . "; " . $sfn);
-        global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath;
+        global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath,$encodingoptions;
         debug('<br/>readURLWithExtraCookieandSaveToFilePathNoFollow called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br/>');
 //echo('<br/>function readURLWithExtraCookieandSaveToFilePath '.$url. '<br/> saving file to '.$sfn.'<br />');
 //echo ('extra cookies set: ' . $extracookies.'<br>');
@@ -825,7 +826,7 @@ function getStyleIDandClasess($initurl)
         $charset = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
         $conn = 'Connection: Keep-Alive';
         $ka = 'Keep-Alive: 300';
-        $enc = 'Accept-Encoding:gzip,deflate,br';
+        $enc = 'Accept-Encoding:'.$encodingoptions;
         $akamaiDebug = 'Pragma: akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-check-cacheable, akamai-x-get-cache-key, akamai-x-get-true-cache-key, akamai-x-get-extracted-values, akamai-x-get-ssl-client-session-id, akamai-x-serial-no, akamai-x-get-request-id, akamai-x-feo-trace';
         $akamaiDebugLocOnly = 'Pragma: akamai-x-cache-on';
         if ($boolakamaiDebug == false)
@@ -864,7 +865,7 @@ function getStyleIDandClasess($initurl)
             curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $rqheaders); // add additional request headers
-        curl_setopt($ch, CURLOPT_ENCODING, "gzip, deflate, br");
+        curl_setopt($ch, CURLOPT_ENCODING, $encodingoptions);
         $result = curl_exec($ch);
         $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 //echo "REQUEST HEADER on retry<br/>".$headerSent."<br/>";
@@ -915,7 +916,7 @@ function getStyleIDandClasess($initurl)
     function readURLandSaveToFilePathOnly($url, $sfn)
     {
         debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $url . "; " . $sfn);
-        global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath;
+        global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath,$encodingoptions;
         debug('<br/>function readURLandSaveToFilePath called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br />');
 //echo('<br/>function readURLandSaveToFilePath called for '.$url. '<br/> saving file to '.$sfn.'<br />');
 //echo ("opening file $url: $sfn<br/>");
@@ -932,7 +933,7 @@ function getStyleIDandClasess($initurl)
         $charset = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
         $conn = 'Connection: Keep-Alive';
         $ka = 'Keep-Alive: 300';
-        $enc = 'Accept-Encoding:gzip,deflate,br';
+        $enc = 'Accept-Encoding:'.$encodingoptions;
         $akamaiDebug = 'Pragma: akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-check-cacheable, akamai-x-get-cache-key, akamai-x-get-true-cache-key, akamai-x-get-extracted-values, akamai-x-get-ssl-client-session-id, akamai-x-serial-no, akamai-x-get-request-id, akamai-x-feo-trace';
         $akamaiDebugLocOnly = 'Pragma: akamai-x-cache-on';
         if ($boolakamaiDebug == false)
@@ -972,7 +973,7 @@ function getStyleIDandClasess($initurl)
             curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $rqheaders); // add additional request headers
-        curl_setopt($ch, CURLOPT_ENCODING, "gzip, deflate, br");
+        curl_setopt($ch, CURLOPT_ENCODING, $encodingoptions);
         $result = curl_exec($ch);
         $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 //echo "REQUEST HEADER<br/>".$headerSent."<br/>";
@@ -4176,7 +4177,7 @@ $jsasync = "ASYNC";
 
     function processStyleLinks($str, $cssref, $from, $parentfile)
     {
-        global $html, $arrayListOfStylesheets, $arrayListOf3PStylesheets, $roothost, $arrayOfObjects, $arrayOf3PObjects, $objcount, $arrayListOfImages, $host_domain, $host_domain_path, $ua, $fullurlpath, $parname, $cssimgs, $username, $password, $filepath_domainsavedir, $RootRedirURL, $boolakamaiDebug, $cookie_jar;
+        global $html, $arrayListOfStylesheets, $arrayListOf3PStylesheets, $roothost, $arrayOfObjects, $arrayOf3PObjects, $objcount, $arrayListOfImages, $host_domain, $host_domain_path, $ua, $fullurlpath, $parname, $cssimgs, $username, $password, $filepath_domainsavedir, $RootRedirURL, $boolakamaiDebug, $cookie_jar,$encodingoptions;
 //echo("processStyleLinks called from '" . $from. "' for External StyleSheet URL: ".$str."<br/>");
         debug($from . ": External StyleSheet URL", $str);
         debug("External StyleSheet URL", $str);
@@ -4299,7 +4300,7 @@ $jsasync = "ASYNC";
         $charset = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
         $conn = 'Connection: Keep-Alive';
         $ka = 'Keep-Alive: 300';
-        $enc = 'Accept-Encoding:gzip,deflate,br';
+        $enc = 'Accept-Encoding:'.$encodingoptions;
         if ($boolRootRedirect = true)
         {
             $ref = $RootRedirURL;
@@ -4326,7 +4327,7 @@ $jsasync = "ASYNC";
         $charset = 'ISO-8859-1,utf-8;q=0.7,*;q=0.3';
         $conn = 'Connection: Keep-Alive';
         $ka = 'Keep-Alive: 300';
-        $enc = 'Accept-Encoding:gzip,deflate,br'; // remove encoding to save file
+        $enc = 'Accept-Encoding:'.$encodingoptions; // remove encoding to save file
         $akamaiDebug = 'Pragma: akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-check-cacheable, akamai-x-get-cache-key, akamai-x-get-true-cache-key, akamai-x-get-extracted-values, akamai-x-get-ssl-client-session-id, akamai-x-serial-no, akamai-x-get-request-id, akamai-x-feo-trace';
         $akamaiDebugLocOnly = 'Pragma: akamai-x-cache-on';
         if ($boolakamaiDebug == false)
@@ -4352,14 +4353,13 @@ $jsasync = "ASYNC";
         curl_setopt($chc, CURLOPT_COOKIEJAR, $cookie_jar);
         curl_setopt($chc, CURLOPT_COOKIEFILE, $cookie_jar);
 //curl_setopt($chc, CURLOPT_PROXY, '127.0.0.1:8888');
-        curl_setopt($chc, CURLOPT_ENCODING, '');
         if ($username != '' and $password != '')
         {
             curl_setopt($chc, CURLOPT_USERPWD, $username . ":" . $password);
             curl_setopt($chc, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         }
         curl_setopt($chc, CURLOPT_HTTPHEADER, $rqheaders); // add additional request headers
-        curl_setopt($chc, CURLOPT_ENCODING, "gzip, deflate, br");
+        curl_setopt($chc, CURLOPT_ENCODING, $encodingoptions);
         $result = curl_exec($chc);
         $headerSent = curl_getinfo($chc, CURLINFO_HEADER_OUT);
 //echo "REQUEST HEADER<br/>".$headerSent."<br/>";
@@ -7422,6 +7422,9 @@ debug("Found image to copy", $local);
     {
         global $host_domain, $arrayHost3PFiles, $arrayDomains, $arraySelfHosted3pDescriptions;
 // 1) extract comments
+        if(!file_exists($lfn))
+            return false;
+
         $filecontent = file_get_contents($lfn);
 //echo("<pre>");
 //print_r($filecontent);

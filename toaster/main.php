@@ -2752,6 +2752,7 @@ var cookietext = '<?php echo utf8_converter($cookiedata); ?>';
 // inline script needed due to use of PHP
 	var datenowMS = Date.now();
 	var url = "<?php echo $url_page; ?>";
+	toasterid = "<?php echo $toasterid; ?>";
 	//console.log(url);
 	var domain = "<?php echo $host_domain; ?>";
 	//console.log(domain);
