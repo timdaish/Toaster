@@ -11,6 +11,5 @@ if(isset($_SESSION['status']))
   header('Content-Type: application/json');
   $arr = array('status' => $sdata,  'mimetype' => $mdata, 'object' => $odata, 'imagepath' => $idata, 'toastedfile' => $fdata);
   echo json_encode( $arr);
-
 }
 ?>

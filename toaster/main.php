@@ -16,6 +16,7 @@ $_SESSION['object'] = '';
 $_SESSION['mimetype'] = '';
 $_SESSION['imagepath'] = '';
 $_SESSION['toastedfile']  = '';
+session_write_close();
 date_default_timezone_set('UTC');
 set_time_limit(0);
 ini_set("auto_detect_line_endings", true);
@@ -40,17 +41,17 @@ include '3ptags_nccgroup_db.php';
 $toasterid=generateRandomString();
 if($OS == "Windows")
 {
-    $debuglog = "c:\\temp\\debug.txt";
+    $debuglog = "c:\\temp\\" . $toasterid . "_debug.txt";
 }
 else
 {
     //set path for webpagetoaster server and others
 	if( strpos($hostname,"gridhost.co.uk") != false)
     {
-		$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/debug.txt";
+		$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/" . $toasterid . "_debug.txt";
 	}
 	else{
-		$debuglog = "/usr/share/toast/debug.txt";
+		$debuglog = "/usr/share/toast/" . $toasterid . "_debug.txt";
 	}
 }
 file_put_contents($debuglog, "DEBUG LOG started" . PHP_EOL);
@@ -168,19 +169,30 @@ if (isset($_REQUEST["url"]))
 //echo "processing each ua" . PHP_EOL;
 	foreach ($config as $key => $value) {
 //echo ($key . ": " .$value['ua'] . " " . $value["res"] . " " . $value["uastr"] . PHP_EOL);
-		if($key == $i)
+		if(strtolower($key) == strtolower($i))
 		{
 			$ua = $value['ua'];
-			$res = $value["res"];
+			$resolution = $value["res"];
 			$uastr = $value["uastr"];
 			break;
 		}
 	}
     if($i == "Googlebot" or $i == "Custom")
-        echo "User agent: " . $ua."</br>";
-    $reswh = explode("x",$res);
+		echo "User agent: " . $ua."</br>";
+if(!$resolution)
+{
+	// set defaults
+	$ua = "Mozilla/5.0 (Windows NT 10.0, WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.2526.73 Safari/537.36";
+	$width = 1920;
+	$height = 1080;
+	$uastr = "Chrome_Desktop";
+}
+else
+{
+    $reswh = explode("x",$resolution);
     $width = $reswh[0];
-    $height = $reswh[1];
+	$height = $reswh[1];
+}
     //echo $height."<br/>";
 	if (isset($_REQUEST["chklinks"]))
 	{
@@ -195,7 +207,6 @@ if (isset($_REQUEST["url"]))
 	// always use 3rd party database
 	//if (isset($_REQUEST["dbusage"])) 
 	{
-        session_start();
         $_SESSION['status'] = 'Reading local shard data';
         session_write_close();
 		$dbusage = true;
@@ -277,6 +288,8 @@ if (isset($_REQUEST["url"]))
             case "hackertarget":
 				$geoIPLookupMethod = 4;
 				break;
+			default:
+				$geoIPLookupMethod = 0; // none
 		}
 //echo "geo IP API provider: ".$geoIPLookupMethod."<br/>";
 	}
@@ -450,7 +463,7 @@ if(isset($_REQUEST["chremoteurlandport"]))
     debug ('roothost ',$roothost);
 	$arrayroothost = array($host_domain);
 	getRootDomainAndSubDomains($arrayroothost);
-error_log("Toasting " . $url .  PHP_EOL);
+	error_log("Toasting " . $url .  PHP_EOL);
     //echo ('roothost '.$roothost.'<br/>');
 	// root geo IP lookup
 	$rootloc  = '';
@@ -677,8 +690,9 @@ echo ('main named rootloc '.$rootloc.' was latlong, reset to edgeloc<br/>');
 
 	//echo("save path dir = $filepath_domainsavedir<br/>");
 	//echo("save screenshot = $imgname<br/>");
-	// delete the previous debug log
-    @unlink($filepath_domainsavedir.DIRECTORY_SEPARATOR."debug.txt");
+	// delete the previous debug log if it exists
+	if(file_exists($filepath_domainsavedir.DIRECTORY_SEPARATOR."debug.txt"))
+    	@unlink($filepath_domainsavedir.DIRECTORY_SEPARATOR."debug.txt");
 	//echo("save path img =$imgname<br/>");
 	//echo("save path rootdir=$filepath_domainsavedir<br/>");
 	//echo("vpath=$localvpath<br/>");
@@ -762,7 +776,9 @@ echo ('main named rootloc '.$rootloc.' was latlong, reset to edgeloc<br/>');
 debug ("toast filepathname: " .$toastedfilepathname,1);
 // echo ("toast filepathname: " .$toastedfilepathname."<br/>");
 // echo ("toast webname: " .$toastedwebname."<br/>");
+session_start();
 	$_SESSION['status'] = 'Processing hostname';
+	session_write_close();
 	if( strpos($hostname,"gridhost.co.uk") != false)
 	{
 		$toastedwebname = 'http://toast.webpagetoaster.com/'. $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"] . "/toasted_".$thispagenameext;
@@ -911,7 +927,7 @@ error_log("MAIN redirs: new localfile: " .$localfilename);
 		"Combined Files" => ""
 		);
 		$arrayOfObjects[] = $arr;
-$retbodylen = strlen($body);
+		$retbodylen = strlen($body);
             //error_log("3 returned body lengh = ". $retbodylen);
 		//new
 		// update array
@@ -1207,6 +1223,7 @@ $retbodylen = strlen($body);
 	// outputs the username that owns the running php/httpd process
 	// (on a system with the "whoami" executable in the path)
 	$res = array();
+	$har = '';
 	//exec('win_tools\phantomjs --web-security=no netlogresponses.js '. $url,$res); // responses only
 	//echo("PhantomJS sniffing network traffic with ".$ua."<br/>");
 	//exec('win_tools\phantomjs --cookies-file=c:\temp\cookies.txt --proxy=127.0.0.1:8888 --ignore-ssl-errors=true --ssl-protocol=tlsv1 netsniff.js '. $originalurl . " " . $height . " " . $width . " " . $imgname . " '" . $ua ."'" ." ".$username. " ". $password ,$res); //responses & sniff
@@ -1389,7 +1406,7 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
 //echo "saving har file to " . $harname. "<br/>";
 				$res = file_put_contents($harname,$har);
 //echo "file save result: " . $res. "<br/>";
-				$pagedom = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getdom");
+				$pagedom = file($chheadlessserver . "?tid=". $toasterid . "&action=getdom");
 				file_put_contents($dumpname,$pagedom);
 				$pagescreenshot = file_get_contents($chheadlessserver . "?tid=". $toasterid . "&action=getimg");
 				file_put_contents($imgname,$pagescreenshot);
@@ -1492,536 +1509,542 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
 
 //echo ($browserEngineVer . ": processing additional resources for url: " . $url . "<br.>");
 
-    // add onContentLoad as PhantomJS fails to add it
-    //$har = str_replace('"onLoad"','"onContentLoad": -1,    "onLoad"',$har);
-	// remove ant HAR formatting errors before "log":
-	$logpos = strpos($har,'{');
-	//echo ("logpos = " . $logpos. "<br/>");
-	if ($logpos >1)
-		$har = substr($har,$logpos);
-    // delete PhantomJS errors
-    $har = str_replace("'unsafe-inline'",'',$har);
-    $har = str_replace("'unsafe-eval'",'',$har);
-    $har = str_replace("'self'",'',$har);
-    //$har = str_replace('"','\"',$har);
-    $har = preg_replace( "/\s+/", " ", $har );
-    $har = str_replace(chr(34),'"',$har);
-    $endtext = "Unsafe JavaScript attempt";
-	$firstchar = substr($har,0,1);
-	//echo ("logpos = " . $logpos. "<br/>");
-	if ($firstchar != '{')
-    {
-        //echo ("har log adding initial {<br/>");
-        $har = '{'.$har;
-    }
-   	$logendpos = strpos($har,'}'.$endtext);
-    //echo ("logendpos = " . $logendpos. "<br/>");
-	if ( $logendpos > 0)
-		$har = substr($har,0,$logendpos+1);
-	$harjson = json_decode($har,true);
+// prepare to process a har file if present
+$rstime_ms = 0;
+$domCompletetime_ms = 0;
+$rstime_sec = 0;
+$onload_ms = 0;
+$docTime_ms = 0;
+if($har != '')
+	{
+		// add onContentLoad as PhantomJS fails to add it
+		//$har = str_replace('"onLoad"','"onContentLoad": -1,    "onLoad"',$har);
+		// remove ant HAR formatting errors before "log":
+		$logpos = strpos($har,'{');
+		//echo ("logpos = " . $logpos. "<br/>");
+		if ($logpos >1)
+			$har = substr($har,$logpos);
+		// delete PhantomJS errors
+		$har = str_replace("'unsafe-inline'",'',$har);
+		$har = str_replace("'unsafe-eval'",'',$har);
+		$har = str_replace("'self'",'',$har);
+		//$har = str_replace('"','\"',$har);
+		$har = preg_replace( "/\s+/", " ", $har );
+		$har = str_replace(chr(34),'"',$har);
+		$endtext = "Unsafe JavaScript attempt";
+		$firstchar = substr($har,0,1);
+		//echo ("logpos = " . $logpos. "<br/>");
+		if ($firstchar != '{')
+		{
+			//echo ("har log adding initial {<br/>");
+			$har = '{'.$har;
+		}
+		$logendpos = strpos($har,'}'.$endtext);
+		//echo ("logendpos = " . $logendpos. "<br/>");
+		if ( $logendpos > 0)
+			$har = substr($har,0,$logendpos+1);
+		$harjson = json_decode($har,true);
 
-	//save HAR file from browser engine
-	file_put_contents($localfilename.".har",$har,FILE_APPEND);
-	$harfilelength = strlen($har);
-//echo("reading har file of length . " . $harfilelength . "<br/>");
-    session_start();
-    $_SESSION['status'] = 'Reading HAR file';
-    session_write_close();
-    // override the HAR file if not for WPT or headless chrome
-    if($uploadedHAR == True and $wptHAR == false and $chhHAR == false)
-    {
-        $har = file_get_contents($uploadedHARFileName);
-//echo($uploadedHARFileName . ' - overriding HAR file from engine<br/>');
-        $harjson = json_decode($har,true);
-        $harfile =$uploadedHARFileName;
-	}
-//echo("main processing har file<br/>");
-//debug HAR JSON string
-// echo("har<code><pre>");
-// print_r($har);
-// echo("</pre></code><br/>");
-	$rstime_ms = 0;
-	$domCompletetime_ms = 0;
-	$rstime_sec = 0;
-	$onload_ms = 0;
-	$docTime_ms = 0;
-    // escape the HAR json for onward processing by the waterfall chart
-	// process the HAR
-	// 1) identify objects and add to the list of page objects if unknown
-	// 2) identify key timing points and score info and save to scorearray
-	$scoreArray = array ();
-	$har = json_esc($har);
-	$domLoadEnd = 0;
-    foreach ($harjson['log'] as $logtype => $logval)
-    {
-//echo("har<code> ".$logtype . " ". $logval->text."</code> <br/>");
-        switch ($logtype)
-            {
-                case 'pages':
-                	foreach ($logval as $key => $value) {
-//echo("HAR PAGES log level 1: ".$key . " ". $value);
-                    $evalue =json_encode($value);
-//echo "startedDateTime: ".$value['startedDateTime']."<br/>";
-//echo "render: ".$value['_render']."<br/>";
-					// add render time to array
-					switch($browserengine)
-					{
-						case 6: // WPT private
-						case 8: // WPT public
-							$rst = $value['_render'];
-							$onLoad = $value['_docTime'];
-							$domLoadStart = $value['_domContentLoadedEventStart'];
-							$domLoadEnd = $value['_domContentLoadedEventEnd'];
-							$doct = $value['_fullyLoaded'];
-							$statname = "Render Start Time";
-							break;
-						case 7: //headless chrome
-							$rst = $value['FirstMeaningfulPaint'];
-							$domLoadStart = $value['onContentLoad'];
-							$onLoad = $value['OnLoad'];
-							$doct = $value['TotalTime'];
-							$statname = "First Meaningful Paint";
-							break;
-						default:
-							$rst = 0;
-							$doct = 0;
-							$onLoad = 0;
-					} // end switch $browserengine
-					$arr = array("renderms"=> $rst);
-					$rstime_ms = $rst;
-					$domCompletetime_ms = $domLoadEnd;
-					$rstime_sec = $rstime_ms/1000;
-					$onload_ms = $onLoad;
-					$docTime_ms = $doct;
-					$scoreArray[] = $arr;
-					addStatToFileListAnalysis(number_format($rstime_sec,3), "Seconds", $statname, "info");
+		//save HAR file from browser engine
+		file_put_contents($localfilename.".har",$har,FILE_APPEND);
+		$harfilelength = strlen($har);
+	//echo("reading har file of length . " . $harfilelength . "<br/>");
+		session_start();
+		$_SESSION['status'] = 'Reading HAR file';
+		session_write_close();
+		// override the HAR file if not for WPT or headless chrome
+		if($uploadedHAR == True and $wptHAR == false and $chhHAR == false)
+		{
+			$har = file_get_contents($uploadedHARFileName);
+	//echo($uploadedHARFileName . ' - overriding HAR file from engine<br/>');
+			$harjson = json_decode($har,true);
+			$harfile =$uploadedHARFileName;
+		}
+	//echo("main processing har file<br/>");
+	//debug HAR JSON string
+	// echo("har<code><pre>");
+	// print_r($har);
+	// echo("</pre></code><br/>");
+		// escape the HAR json for onward processing by the waterfall chart
+		// process the HAR
+		// 1) identify objects and add to the list of page objects if unknown
+		// 2) identify key timing points and score info and save to scorearray
+		$scoreArray = array ();
+		$har = json_esc($har);
+		$domLoadEnd = 0;
+		foreach ($harjson['log'] as $logtype => $logval)
+		{
+	//echo("har<code> ".$logtype . " ". $logval->text."</code> <br/>");
+			switch ($logtype)
+				{
+					case 'pages':
+						foreach ($logval as $key => $value) {
+	//echo("HAR PAGES log level 1: ".$key . " ". $value);
+						$evalue =json_encode($value);
+	//echo "startedDateTime: ".$value['startedDateTime']."<br/>";
+	//echo "render: ".$value['_render']."<br/>";
+						// add render time to array
+						switch($browserengine)
+						{
+							case 6: // WPT private
+							case 8: // WPT public
+								$rst = $value['_render'];
+								$onLoad = $value['_docTime'];
+								$domLoadStart = $value['_domContentLoadedEventStart'];
+								$domLoadEnd = $value['_domContentLoadedEventEnd'];
+								$doct = $value['_fullyLoaded'];
+								$statname = "Render Start Time";
+								break;
+							case 7: //headless chrome
+								$rst = $value['pageTimings']['FirstMeaningfulPaint'];
+								$domLoadStart = $value['pageTimings']['onContentLoad'];
+								$onLoad = $value['pageTimings']['onLoad'];
+								$doct = $value['pageTimings']['TotalTime'];
+								$statname = "First Meaningful Paint";
+								break;
+							default:
+								$rst = 0;
+								$doct = 0;
+								$onLoad = 0;
+						} // end switch $browserengine
+						$arr = array("renderms"=> $rst);
+						$rstime_ms = $rst;
+						$domCompletetime_ms = $domLoadEnd;
+						$rstime_sec = $rstime_ms/1000;
+						$onload_ms = $onLoad;
+						$docTime_ms = $doct;
+						$scoreArray[] = $arr;
+						addStatToFileListAnalysis(number_format($rstime_sec,3), "Seconds", $statname, "info");
+						break;
+					} // end for each page
 					break;
-				} // end for each page
-              case 'entries':
-            	$pjsObjCnt = 0;
-            	$pjsObjCntExisting = 0;
-            	$pjsObjCntNew = 0;
-            	$pjsredircount = 0;
-            	$starturl = '';
-            	$endurl = '';
-                foreach ($logval as $key => $value) {
-//echo("log level 1: ".$key . " ". $value."<br/>");
-                    $evalue =json_encode($value);
-                    //echo "<br/>entry $key<br/>";
-                    //echo "startedDateTime: ".$value['startedDateTime']."<br/>";
-                    //echo "time: ".$value['time']."<br/>";
-                    //echo "request array: ".implode($value['request'])."<br/>";
-                    //echo "response array: ".implode($value['response'])."<br/>";
-                    //echo "cache array: ".implode($value['cache'])."<br/>";
-                    //echo "timings array: ".implode($value['timings'])."<br/>";
-                    $request =$value['request'];
-                    $ObjURL = $request['url'];
-                    $response =$value['response'];
-                    $httpstatus = $response['status'];
-                    $pageref = $value['pageref'];
-					$requestheaders = $request['headers'];
-					$timings = $value['timings'];
-					// get WPT values for timings
-					switch($browserengine)
-					{
-						case 6: // WPT private
-						case 8: // WPT public
-							$requestStartMS = $value['_ttfb_start'];
-							$ttfbMS = $value['_ttfb_ms'];
-							$contentDownloadMS = $value['_download_ms'];
-							$allMS = $value['_all_ms'];
-							$allStartMS = $value['_all_start'];
-							$allEndMS = $value['_all_end'];
-							$cacheTime = $value['_cache_time'];
-							break;
-						case 7: // headless chrome
-							$requestStartMS = 0;
-							$ttfbMS = 0;
-							$contentDownloadMS = 0;
-							$allMS = 0;
-							$allStartMS = 0;
-							$allEndMS = 0;
-							$cacheTime = 0;
-							break;
-//echo ($ObjURL . "; allms =  " . $allMS . ";<br/>");
-						default:
-							$requestStartMS = 0;
-							$ttfbMS = 0;
-							$contentDownloadMS = 0;
-							$allMS = 0;
-							$allStartMS = 0;
-							$allEndMS = 0;
-							$cacheTime = 0;
-					} // end switch $browserengine
-                    foreach ($requestheaders as $reqhdrkey => $reqhdrvalue) {
-                        //echo ("req hdr key ". $reqhdrkey. " ".$reqhdrvalue."<br/>");
-                        if($reqhdrvalue['name'] == 'Referer')
-                        {
-                            $referer = $reqhdrvalue['value'];
-                            continue;
-                        }
-                        else
-                            $referer = '';
-                        if($reqhdrvalue['name'] == 'Content-Type')
-                            $mimetype = $reqhdrvalue['value'];
-                    }
-                    //echo("<pre>Response");
-                    //print_r($response);
-                    //echo("</pre><br/>");
-                    //echo "request url: ".$ObjURL."<br/>";
-                    //echo "response status code: ".$httpstatus."<br/>";
-                    //echo "pageref: ".$pageref."<br/>";
-                    //if ($referer != '')
-                     //   echo "referer: ".$referer."<br/>";
-                    if($referer == '')
-                        $parent = $pageref;
-                    else
-                        $parent = $referer;
-            		if($httpstatus >= 300 and $httpstatus <400)
-            			{
-            				$pjsredircount += 1;
-            		//		if($pjsredircount > 1)
-            			//		continue;
-            			}
-            		if($pjsredircount >= 1)
-            		{
-            			$starturl = '';
-            			$pjsredircount = 0;
-            		//	continue;
-            		}
-            		// weed out duff URL references
-            		if($ObjURL == 'http:/')
-            			continue;
-//echo("HAR processing: url: ".$ObjURL." stage: ".$pjsStage."<br/>");
-            		//echo("HAR REDIRECTION: ".$ObjURL. " = ".$httpstatus."<br/>");
-            		debug("HARfile object original: ",$ObjURL);
-            		$urlencoded = strpos($ObjURL,'&amp;');
-            		if($urlencoded != false)
-            		{
-            			$ObjURL = html_entity_decode($ObjURL);
-            			debug("HARfile object decoded : ",$ObjURL);
-            		}
-            		//echo "HARfile object: $ObjURL<br/>";
-            		// need to urlencode the querystring
-            		$posQM = strpos($ObjURL,"?");
-            		if ($posQM > 0)
-            		{
-            			$ObjURL = substr($ObjURL,0,$posQM)."?".html_entity_decode(htmlentities(substr($ObjURL,$posQM +1)));
-            			debug("HARfile with Querystring (htmlentities): ",$ObjURL);
-            			//echo("HARfile with Querystring (htmlentities): ".$ObjURL."<br/>");
-            		}
-            		else
-            		{
-            			//echo("HARfile w/o Querystring: ".$ObjURL."<br/>");
-            		}
-            		$ObjURL = htmlentities($ObjURL);
-            		$ObjMimeType = trim($mimetype);
-            		$ct = explode(";",$ObjMimeType);
-            		$contenttype = trim($ct[0]);
-            		if($contenttype != $ObjMimeType)
-            		{
-            			//echo ("HARfile content type full: ". $ObjMimeType."<br/>");
-            			//echo ("HARfile content type 1st: ". $contenttype."<br/>");
-            			$ObjMimeType = $contenttype;
-            		}
-            		//echo ("<br/>HARfile object $ObjURL : ". $obj['contentType'] ." ; content type = ". $ObjMimeType."<br/>");
-            		// only proceed with the END stage
-            		$objType = 'TBD';
-            		switch (trim($ObjMimeType))
-            			{
-            			case "text/html":
-            				$objType = 'HTML';
-            				break;
-            			case "text/css":
-            				$objType = 'StyleSheet';
-            				break;
-            			case "application/javascript":
-            			case "application/x-javascript":
-            			case "text/javascript":
-            			case "text/x-js":
-            				$objType = 'JavaScript';
-            				break;
-            			case "text/plain":
-            			case "text/xml":
-            			case "application/xml":
-            			case "application/json":
-            				$objType = 'Data';
-            				break;
-            			case "image/jpeg":
-            			case "image/gif":
-            			case "image/png":
-            			case "image/webp":
-							$objType = 'Image';
-							break;
-						case "image/svg+xml":
-            				$objType = $ObjMimeType;
-            				break;
-            			case "application/x-font-woff":
-            			case "application/x-font-ttf":
-            			case "application/x-font-truetype":
-            			case "application/x-font-opentype":
-            			case "application/vnd.ms-fontobject":
-            			case "application/font-sfnt":
-            				$objType = "Font";
-            				break;
-            			default:
-            				$objType = $ObjMimeType;
-            				break;
-            			}
-					$pjsObjCnt += 1;
-					// HAR add object
-//echo("Checking HARfile object against root: $ObjURL --- $url<br/>");
-            		if($ObjURL != $url."/" )
-            		//if($ObjURL != $url and $ObjURL != $url."/" )
-            		{
-            			list($id,$lfn) = lookupPageObject($ObjURL);
-            			//echo("HARfile object lookup: $ObjURL; ".$id."; localfilename: ".$lfn. "<br/>");
-            			if (!is_numeric($id))
-            			{
-//echo ("HARfile new object: ".$ObjURL.": " . $ObjMimeType  ."<br/>");
-            				$pjsObjCntNew += 1;
-            				list($hd, $hp) = getDomainHostFromURL($ObjURL,false,"main processing objects from" . $browserengine);
-            			}
-            			else
-            			{
-//echo ("HARfile existing object ($id): ".$ObjURL.": " . $ObjMimeType  ."<br/>");
-            				$pjsObjCntExisting += 1;
-							// UPDATE HARFile stats
-							// update existing object timing
-							switch ($browserengine)
+				case 'entries':
+					$pjsObjCnt = 0;
+					$pjsObjCntExisting = 0;
+					$pjsObjCntNew = 0;
+					$pjsredircount = 0;
+					$starturl = '';
+					$endurl = '';
+					foreach ($logval as $key => $value) {
+	//echo("log level 1: ".$key . " ". $value."<br/>");
+						$evalue =json_encode($value);
+						//echo "<br/>entry $key<br/>";
+						//echo "startedDateTime: ".$value['startedDateTime']."<br/>";
+						//echo "time: ".$value['time']."<br/>";
+						//echo "request array: ".implode($value['request'])."<br/>";
+						//echo "response array: ".implode($value['response'])."<br/>";
+						//echo "cache array: ".implode($value['cache'])."<br/>";
+						//echo "timings array: ".implode($value['timings'])."<br/>";
+						$request =$value['request'];
+						$ObjURL = $request['url'];
+						$response =$value['response'];
+						$httpstatus = $response['status'];
+						$pageref = $value['pageref'];
+						$requestheaders = $request['headers'];
+						$timings = $value['timings'];
+						// get WPT values for timings
+						switch($browserengine)
+						{
+							case 6: // WPT private
+							case 8: // WPT public
+								$requestStartMS = $value['_ttfb_start'];
+								$ttfbMS = $value['_ttfb_ms'];
+								$contentDownloadMS = $value['_download_ms'];
+								$allMS = $value['_all_ms'];
+								$allStartMS = $value['_all_start'];
+								$allEndMS = $value['_all_end'];
+								$cacheTime = $value['_cache_time'];
+								break;
+							case 7: // headless chrome
+								$requestStartMS = 0;
+								$ttfbMS = 0;
+								$contentDownloadMS = 0;
+								$allMS = 0;
+								$allStartMS = 0;
+								$allEndMS = 0;
+								$cacheTime = 0;
+								break;
+	//echo ($ObjURL . "; allms =  " . $allMS . ";<br/>");
+							default:
+								$requestStartMS = 0;
+								$ttfbMS = 0;
+								$contentDownloadMS = 0;
+								$allMS = 0;
+								$allStartMS = 0;
+								$allEndMS = 0;
+								$cacheTime = 0;
+						} // end switch $browserengine
+						foreach ($requestheaders as $reqhdrkey => $reqhdrvalue) {
+							//echo ("req hdr key ". $reqhdrkey. " ".$reqhdrvalue."<br/>");
+							if($reqhdrvalue['name'] == 'Referer')
 							{
-								case 6: // wpt private
-								case 8: // wpt public
-									$requestStartMS = $value['_ttfb_start'];
-									$ttfbMS = $value['_ttfb_ms'];
-									$contentDownloadMS = $value['_download_ms'];
-									$allMS = $value['_all_ms'];
-									$allStartMS = $value['_all_start'];
-									$allEndMS = $value['_all_end'];
-									$cacheTime = $value['_cache_time'];
-									break;
-//echo ("update " . $ObjURL . "; allms =  " . $allMS . ";<br/>");
-								case 7: // headless chrome
-									$requestStartMS = $value['blocked'];
-									$ttfbMS = $value['wait'];
-									$contentDownloadMS = $value['receive'];
-									$allMS = 0;
-									$allStartMS = 0;
-									$allEndMS = 0;
-									$cacheTime = 0;
-									break;
-								default:
-									$requestStartMS = 0;
-									$ttfbMS = 0;
-									$contentDownloadMS = 0;
-									$allMS = 0;
-									$allStartMS = 0;
-									$allEndMS = 0;
-									$cacheTime = 0;
-							} // end switch $browserengine
-							$arr = array(
-            				"Object source" => $ObjURL,
-							"offsetDuration" => $requestStartMS,
-							"ttfbMS" => $ttfbMS,
-							"downloadDuration" => $contentDownloadMS,
-							"allMS" => $allMS,
-							"allStartMS" => $allStartMS,
-							"allEndMS" => $allEndMS,
-							"cacheSeconds" => $cacheTime,
-            				);
-            				addUpdatePageObject($arr);
-            				continue;
-            			}
-            			//test if this file is on a CDN
-            			$testdomain = $hd;
-            			//echo("HARfile checking CDN+3P: roothost: $roothost - testdomain: $hd<br/>");
-            			if ($roothost == $hd)
-            			{
-            				debug("External '.$browserEngineVer.' FILE", "'".$ObjURL."'");
-            				$domref = 'Primary';
-            			}
-            			else
-            			{
-            				$domsrc = IsThisDomainaCDNofTheRootDomain($roothost,$testdomain);
-            				switch($domsrc)
-            				{
-            					case 'CDN':
-                                case 'cdn':
-            						debug("CDN External File", "'".$ObjURL."'");
-            						$domref = 'CDN';
-            						break;
-               					case 'Shard':
-            					case 'shard':
-            						debug("Shard External File", "'".$ObjURL."'");
-            						$domref = 'Shard';
-            						break;
-            					default:
-            						debug("3rd party External File", "'".$ObjURL."'");
-            						$domref = '3P';
-            				}
-            			}
-            			//$ObjMimeType = $obj['url'];
-            			// check for Base64 file - image, font, something else
-            			$qspos = strpos($ObjURL,'?');
-            			if($qspos != 0)
-            				$nonqs = strtolower(substr($ObjURL,0,$qspos));
-            			else
-            				$nonqs =  $ObjURL;
-            			//echo("HARfile checking data: in filename: ".$nonqs."<br/>");
-            			$datafound = strpos($nonqs,"data:");
-            			//echo("HARfile checking data: pos = ".$datafound."<br/>");
-            			if( $datafound !== false)			{
-            				debug("<br/>PROCESSING DATA","BASE64");
-            				debug("PJS Embedded Data","Base 64");
-            				$hd = '';
-            				$domref = "Embedded";
-            				//echo("HARfile B64 local filename: ".$lfn."<br/>"); // lfn will be derived when object is added
-            			}
-						// strip $ObjURL - last char if /
-// strip ending slash if present
-						$lastchar = substr($ObjURL, -1);
-						if($lastchar == '/')
-						{
-							$ObjURL = substr($ObjURL, 0, -1);
+								$referer = $reqhdrvalue['value'];
+								continue;
+							}
+							else
+								$referer = '';
+							if($reqhdrvalue['name'] == 'Content-Type')
+								$mimetype = $reqhdrvalue['value'];
 						}
-            			// add FILE From HARfile to array
-            				$arr = array(
-            				"Object type" => $objType,
-            				"Object source" => $ObjURL,
-            				"Object file" => '',
-            				"Object parent" => $parent,
-            				"Mime type" => $ObjMimeType,
-            				"Domain" => $hd,
-            				"Domain ref" => $domref,
-            				"HTTP status" => '',
-            				"File extension" => '',
-            				"CSS ref" => '',
-            				"Header size" => '',
-            				"Content length transmitted" => 0,
-            				"Content size downloaded" => 0,
-            				"Compression" => '',
-            				"Content size compressed" => '',
-            				"Content size uncompressed" => '',
-            				"Content size minified uncompressed" => '',
-            				"Content size minified compressed" => '',
-            				"Combined files" => 0,
-            				"JS defer" => '',
-            				"JS async" => '',
-                            "JS docwrite" => '',
-            				"Image type" => '',
-            				"Image encoding" => '',
-                            "Image responsive" => '',
-                            "Image display size" => '',
-            				"Image actual size" => '',
-            				"Metadata bytes" => '',
-            				"EXIF bytes" => '',
-            				"APP12 bytes" => '',
-            				"IPTC bytes" => '',
-            				"XMP bytes" => '',
-            				"Comment" => '',
-            				"Comment bytes" => '',
-            				"ICC colour profile bytes" => '',
-            				"Colour type" => '',
-            				"Colour depth" => '',
-            				"Interlace" => '',
-            				"Est. quality" => '',
-            				"Photoshop quality" => '',
-            				"Chroma subsampling" => '',
-            				"Animation" => '',
-                            "Font name" => '',
-            				"hdrs_Server" => '',
-            				"hdrs_Protocol" => '',
-            				"hdrs_responsecode" => '',
-            				"hdrs_age" => '',
-            				"hdrs_date" => '',
-            				"hdrs_lastmodifieddate" => '',
-            				"hdrs_cachecontrol" => '',
-            				"hdrs_cachecontrolPrivate" => '',
-            				"hdrs_cachecontrolPublic" => '',
-            				"hdrs_cachecontrolMaxAge" => '',
-            				"hdrs_cachecontrolSMaxAge" => '',
-            				"hdrs_cachecontrolNoCache" => '',
-            				"hdrs_cachecontrolNoStore" => '',
-            				"hdrs_cachecontrolNoTransform" => '',
-            				"hdrs_cachecontrolMustRevalidate" => '',
-            				"hdrs_cachecontrolProxyRevalidate" => '',
-            				"hdrs_connection" => '',
-            				"hdrs_contentencoding" => '',
-            				"hdrs_contentlength" => '',
-            				"hdrs_expires" => '',
-            				"hdrs_etag" => '',
-            				"hdrs_keepalive" => '',
-            				"hdrs_pragma" => '',
-            				"hdrs_setcookie" => '',
-            				"hdrs_upgrade" => '',
-            				"hdrs_vary" => '',
-            				"hdrs_via" => '',
-            				"hdrs_xservedby" => '',
-            				"hdrs_xcache" => '',
-            				"hdrs_xpx" => '',
-            				"hdrs_xedgelocation" => '',
-            				"hdrs_cfray" => '',
-            				"hdrs_xcdngeo" => '',
-                            "hdrs_xcdn" => '',
-            				"response_datetime" => '',
-                            "file_section" => '',
-                       		"file_timing" => '',
-							"offsetDuration" => $requestStartMS,
-							"ttfbMS" => $ttfbMS,
-							"downloadDuration" => $contentDownloadMS,
-							"allMS" => $allMS,
-							"allStartMS" => $allStartMS,
-							"allEndMS" => $allEndMS,
-							"cacheSeconds" => $cacheTime,
-            				);
-//echo ("adding HARfile object: " . $ObjURL."<br/>");
-            				addUpdatePageObject($arr);
-//							$debugTiming = $ObjURL . "; allms: " . $value['_all_ms']. "<br/>";
-//echo($debugTiming);
-            				}
-            		else
-            		{ // 
-						// strip $ObjURL - last char if /
-// strip ending slash if present
-						$lastchar = substr($ObjURL, -1);
-						if($lastchar == '/')
+						//echo("<pre>Response");
+						//print_r($response);
+						//echo("</pre><br/>");
+						//echo "request url: ".$ObjURL."<br/>";
+						//echo "response status code: ".$httpstatus."<br/>";
+						//echo "pageref: ".$pageref."<br/>";
+						//if ($referer != '')
+						//   echo "referer: ".$referer."<br/>";
+						if($referer == '')
+							$parent = $pageref;
+						else
+							$parent = $referer;
+						if($httpstatus >= 300 and $httpstatus <400)
+							{
+								$pjsredircount += 1;
+						//		if($pjsredircount > 1)
+							//		continue;
+							}
+						if($pjsredircount >= 1)
 						{
-							$ObjURL = substr($ObjURL, 0, -1);
+							$starturl = '';
+							$pjsredircount = 0;
+						//	continue;
 						}
-						// WPTTIMING
-//echo("Found HARfile object : $ObjURL --- $url<br/>");
-						@$debugTiming = $ObjURL . "; allms: " . $value['_all_ms']. "<br/>";
-						//echo("root: " . $debugTiming);
-						// update object timings if they exist (in WPT test)
-						if($browserengine == 6 or $browserengine == 8)
+						// weed out duff URL references
+						if($ObjURL == 'http:/')
+							continue;
+	//echo("HAR processing: url: ".$ObjURL." stage: ".$pjsStage."<br/>");
+						//echo("HAR REDIRECTION: ".$ObjURL. " = ".$httpstatus."<br/>");
+						debug("HARfile object original: ",$ObjURL);
+						$urlencoded = strpos($ObjURL,'&amp;');
+						if($urlencoded != false)
 						{
-							$arr = array(
-            				"Object source" => $ObjURL,
-							"offsetDuration" => $value['_ttfb_start'],							
-							"ttfbMS" => $value['_ttfb_ms'],
-							"downloadDuration" => $value['_download_ms'],
-							"allMS" => $value['_all_ms'],
-							"allStartMS" => $value['_all_start'],
-							"allEndMS" => $value['_all_end'],
-							"cacheSeconds" => $value['_cache_time'],
-            				);
-            				addUpdatePageObject($arr);
+							$ObjURL = html_entity_decode($ObjURL);
+							debug("HARfile object decoded : ",$ObjURL);
 						}
-            		}
-                } // end for each entry in the entries array (in switch statement)
-               break;
-             default:
-        } // end switch
-    } // end for har log reading
-    //var_dump($harjson);
-  // end reading of urls from har from PhantomJS/SlimerJS/WPT
-	// echo ("HARfile object: total: ".$pjsObjCnt."<br/>");
-	// echo ("HARfile object: new: ".$pjsObjCntNew."<br/>");
-	// echo ("HARfile object: existing: ".$pjsObjCntExisting."<br/>");
+						//echo "HARfile object: $ObjURL<br/>";
+						// need to urlencode the querystring
+						$posQM = strpos($ObjURL,"?");
+						if ($posQM > 0)
+						{
+							$ObjURL = substr($ObjURL,0,$posQM)."?".html_entity_decode(htmlentities(substr($ObjURL,$posQM +1)));
+							debug("HARfile with Querystring (htmlentities): ",$ObjURL);
+							//echo("HARfile with Querystring (htmlentities): ".$ObjURL."<br/>");
+						}
+						else
+						{
+							//echo("HARfile w/o Querystring: ".$ObjURL."<br/>");
+						}
+						$ObjURL = htmlentities($ObjURL);
+						$ObjMimeType = trim($mimetype);
+						$ct = explode(";",$ObjMimeType);
+						$contenttype = trim($ct[0]);
+						if($contenttype != $ObjMimeType)
+						{
+							//echo ("HARfile content type full: ". $ObjMimeType."<br/>");
+							//echo ("HARfile content type 1st: ". $contenttype."<br/>");
+							$ObjMimeType = $contenttype;
+						}
+						//echo ("<br/>HARfile object $ObjURL : ". $obj['contentType'] ." ; content type = ". $ObjMimeType."<br/>");
+						// only proceed with the END stage
+						$objType = 'TBD';
+						switch (trim($ObjMimeType))
+							{
+							case "text/html":
+								$objType = 'HTML';
+								break;
+							case "text/css":
+								$objType = 'StyleSheet';
+								break;
+							case "application/javascript":
+							case "application/x-javascript":
+							case "text/javascript":
+							case "text/x-js":
+								$objType = 'JavaScript';
+								break;
+							case "text/plain":
+							case "text/xml":
+							case "application/xml":
+							case "application/json":
+								$objType = 'Data';
+								break;
+							case "image/jpeg":
+							case "image/gif":
+							case "image/png":
+							case "image/webp":
+								$objType = 'Image';
+								break;
+							case "image/svg+xml":
+								$objType = $ObjMimeType;
+								break;
+							case "application/x-font-woff":
+							case "application/x-font-ttf":
+							case "application/x-font-truetype":
+							case "application/x-font-opentype":
+							case "application/vnd.ms-fontobject":
+							case "application/font-sfnt":
+								$objType = "Font";
+								break;
+							default:
+								$objType = $ObjMimeType;
+								break;
+							}
+						$pjsObjCnt += 1;
+						// HAR add object
+	//echo("Checking HARfile object against root: $ObjURL --- $url<br/>");
+						if($ObjURL != $url."/" )
+						//if($ObjURL != $url and $ObjURL != $url."/" )
+						{
+							list($id,$lfn) = lookupPageObject($ObjURL);
+							//echo("HARfile object lookup: $ObjURL; ".$id."; localfilename: ".$lfn. "<br/>");
+							if (!is_numeric($id))
+							{
+	//echo ("HARfile new object: ".$ObjURL.": " . $ObjMimeType  ."<br/>");
+								$pjsObjCntNew += 1;
+								list($hd, $hp) = getDomainHostFromURL($ObjURL,false,"main processing objects from" . $browserengine);
+							}
+							else
+							{
+	//echo ("HARfile existing object ($id): ".$ObjURL.": " . $ObjMimeType  ."<br/>");
+								$pjsObjCntExisting += 1;
+								// UPDATE HARFile stats
+								// update existing object timing
+								switch ($browserengine)
+								{
+									case 6: // wpt private
+									case 8: // wpt public
+										$requestStartMS = $value['_ttfb_start'];
+										$ttfbMS = $value['_ttfb_ms'];
+										$contentDownloadMS = $value['_download_ms'];
+										$allMS = $value['_all_ms'];
+										$allStartMS = $value['_all_start'];
+										$allEndMS = $value['_all_end'];
+										$cacheTime = $value['_cache_time'];
+										break;
+	//echo ("update " . $ObjURL . "; allms =  " . $allMS . ";<br/>");
+									case 7: // headless chrome
+										$requestStartMS = $value['timings']['blocked'];
+										$ttfbMS = $value['timings']['wait'];
+										$contentDownloadMS = $value['timings']['receive'];
+										$allMS = 0;
+										$allStartMS = 0;
+										$allEndMS = 0;
+										$cacheTime = 0;
+										break;
+									default:
+										$requestStartMS = 0;
+										$ttfbMS = 0;
+										$contentDownloadMS = 0;
+										$allMS = 0;
+										$allStartMS = 0;
+										$allEndMS = 0;
+										$cacheTime = 0;
+								} // end switch $browserengine
+								$arr = array(
+								"Object source" => $ObjURL,
+								"offsetDuration" => $requestStartMS,
+								"ttfbMS" => $ttfbMS,
+								"downloadDuration" => $contentDownloadMS,
+								"allMS" => $allMS,
+								"allStartMS" => $allStartMS,
+								"allEndMS" => $allEndMS,
+								"cacheSeconds" => $cacheTime,
+								);
+								addUpdatePageObject($arr);
+								continue;
+							}
+							//test if this file is on a CDN
+							$testdomain = $hd;
+							//echo("HARfile checking CDN+3P: roothost: $roothost - testdomain: $hd<br/>");
+							if ($roothost == $hd)
+							{
+								debug("External '.$browserEngineVer.' FILE", "'".$ObjURL."'");
+								$domref = 'Primary';
+							}
+							else
+							{
+								$domsrc = IsThisDomainaCDNofTheRootDomain($roothost,$testdomain);
+								switch($domsrc)
+								{
+									case 'CDN':
+									case 'cdn':
+										debug("CDN External File", "'".$ObjURL."'");
+										$domref = 'CDN';
+										break;
+									case 'Shard':
+									case 'shard':
+										debug("Shard External File", "'".$ObjURL."'");
+										$domref = 'Shard';
+										break;
+									default:
+										debug("3rd party External File", "'".$ObjURL."'");
+										$domref = '3P';
+								}
+							}
+							//$ObjMimeType = $obj['url'];
+							// check for Base64 file - image, font, something else
+							$qspos = strpos($ObjURL,'?');
+							if($qspos != 0)
+								$nonqs = strtolower(substr($ObjURL,0,$qspos));
+							else
+								$nonqs =  $ObjURL;
+							//echo("HARfile checking data: in filename: ".$nonqs."<br/>");
+							$datafound = strpos($nonqs,"data:");
+							//echo("HARfile checking data: pos = ".$datafound."<br/>");
+							if( $datafound !== false)			{
+								debug("<br/>PROCESSING DATA","BASE64");
+								debug("PJS Embedded Data","Base 64");
+								$hd = '';
+								$domref = "Embedded";
+								//echo("HARfile B64 local filename: ".$lfn."<br/>"); // lfn will be derived when object is added
+							}
+							// strip $ObjURL - last char if /
+	// strip ending slash if present
+							$lastchar = substr($ObjURL, -1);
+							if($lastchar == '/')
+							{
+								$ObjURL = substr($ObjURL, 0, -1);
+							}
+							// add FILE From HARfile to array
+								$arr = array(
+								"Object type" => $objType,
+								"Object source" => $ObjURL,
+								"Object file" => '',
+								"Object parent" => $parent,
+								"Mime type" => $ObjMimeType,
+								"Domain" => $hd,
+								"Domain ref" => $domref,
+								"HTTP status" => '',
+								"File extension" => '',
+								"CSS ref" => '',
+								"Header size" => '',
+								"Content length transmitted" => 0,
+								"Content size downloaded" => 0,
+								"Compression" => '',
+								"Content size compressed" => '',
+								"Content size uncompressed" => '',
+								"Content size minified uncompressed" => '',
+								"Content size minified compressed" => '',
+								"Combined files" => 0,
+								"JS defer" => '',
+								"JS async" => '',
+								"JS docwrite" => '',
+								"Image type" => '',
+								"Image encoding" => '',
+								"Image responsive" => '',
+								"Image display size" => '',
+								"Image actual size" => '',
+								"Metadata bytes" => '',
+								"EXIF bytes" => '',
+								"APP12 bytes" => '',
+								"IPTC bytes" => '',
+								"XMP bytes" => '',
+								"Comment" => '',
+								"Comment bytes" => '',
+								"ICC colour profile bytes" => '',
+								"Colour type" => '',
+								"Colour depth" => '',
+								"Interlace" => '',
+								"Est. quality" => '',
+								"Photoshop quality" => '',
+								"Chroma subsampling" => '',
+								"Animation" => '',
+								"Font name" => '',
+								"hdrs_Server" => '',
+								"hdrs_Protocol" => '',
+								"hdrs_responsecode" => '',
+								"hdrs_age" => '',
+								"hdrs_date" => '',
+								"hdrs_lastmodifieddate" => '',
+								"hdrs_cachecontrol" => '',
+								"hdrs_cachecontrolPrivate" => '',
+								"hdrs_cachecontrolPublic" => '',
+								"hdrs_cachecontrolMaxAge" => '',
+								"hdrs_cachecontrolSMaxAge" => '',
+								"hdrs_cachecontrolNoCache" => '',
+								"hdrs_cachecontrolNoStore" => '',
+								"hdrs_cachecontrolNoTransform" => '',
+								"hdrs_cachecontrolMustRevalidate" => '',
+								"hdrs_cachecontrolProxyRevalidate" => '',
+								"hdrs_connection" => '',
+								"hdrs_contentencoding" => '',
+								"hdrs_contentlength" => '',
+								"hdrs_expires" => '',
+								"hdrs_etag" => '',
+								"hdrs_keepalive" => '',
+								"hdrs_pragma" => '',
+								"hdrs_setcookie" => '',
+								"hdrs_upgrade" => '',
+								"hdrs_vary" => '',
+								"hdrs_via" => '',
+								"hdrs_xservedby" => '',
+								"hdrs_xcache" => '',
+								"hdrs_xpx" => '',
+								"hdrs_xedgelocation" => '',
+								"hdrs_cfray" => '',
+								"hdrs_xcdngeo" => '',
+								"hdrs_xcdn" => '',
+								"response_datetime" => '',
+								"file_section" => '',
+								"file_timing" => '',
+								"offsetDuration" => $requestStartMS,
+								"ttfbMS" => $ttfbMS,
+								"downloadDuration" => $contentDownloadMS,
+								"allMS" => $allMS,
+								"allStartMS" => $allStartMS,
+								"allEndMS" => $allEndMS,
+								"cacheSeconds" => $cacheTime,
+								);
+	//echo ("adding HARfile object: " . $ObjURL."<br/>");
+								addUpdatePageObject($arr);
+	//							$debugTiming = $ObjURL . "; allms: " . $value['_all_ms']. "<br/>";
+	//echo($debugTiming);
+								}
+						else
+						{ // 
+							// strip $ObjURL - last char if /
+	// strip ending slash if present
+							$lastchar = substr($ObjURL, -1);
+							if($lastchar == '/')
+							{
+								$ObjURL = substr($ObjURL, 0, -1);
+							}
+							// WPTTIMING
+	//echo("Found HARfile object : $ObjURL --- $url<br/>");
+							@$debugTiming = $ObjURL . "; allms: " . $value['_all_ms']. "<br/>";
+							//echo("root: " . $debugTiming);
+							// update object timings if they exist (in WPT test)
+							if($browserengine == 6 or $browserengine == 8)
+							{
+								$arr = array(
+								"Object source" => $ObjURL,
+								"offsetDuration" => $value['_ttfb_start'],							
+								"ttfbMS" => $value['_ttfb_ms'],
+								"downloadDuration" => $value['_download_ms'],
+								"allMS" => $value['_all_ms'],
+								"allStartMS" => $value['_all_start'],
+								"allEndMS" => $value['_all_end'],
+								"cacheSeconds" => $value['_cache_time'],
+								);
+								addUpdatePageObject($arr);
+							}
+						}
+					} // end for each entry in the entries array (in switch statement)
+				break;
+				default:
+			} // end switch
+		} // end for har log reading
+		//var_dump($harjson);
+	// end reading of urls from har from PhantomJS/SlimerJS/WPT
+		// echo ("HARfile object: total: ".$pjsObjCnt."<br/>");
+		// echo ("HARfile object: new: ".$pjsObjCntNew."<br/>");
+		// echo ("HARfile object: existing: ".$pjsObjCntExisting."<br/>");
+
+		@diagnostics($browserEngineVer ." objects: total=".$pjsObjCnt,"new=".$pjsObjCntNew,"existing=".$pjsObjCntExisting);
+	} // end processing a har file if present
 
 
 
-	@diagnostics($browserEngineVer ." objects: total=".$pjsObjCnt,"new=".$pjsObjCntNew,"existing=".$pjsObjCntExisting);
     session_start();
     $_SESSION['status'] = 'Processing Objects from '. $browserEngineVer;
     $_SESSION['imagepath'] = $jsimgname;
@@ -2037,12 +2060,18 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
 		if($browserengine != 7)
 		{
 //echo "looking for dump in: " . realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput;
-			$modrootfilecontent = file_get_contents(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput);
 			$dumpname = realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput;
+			if(file_exists($dumpname))
+				$modrootfilecontent = file_get_contents(realpath( '.' ).DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$browserengineoutput);
+			else
+				$modrootfilecontent = '';
 		}
 		else
 		{
-			$modrootfilecontent = file_get_contents($dumpname);
+			if(file_exists($dumpname))
+				$modrootfilecontent = file_get_contents($dumpname);
+			else
+				$modrootfilecontent = '';
 			$browserengineoutput = $dumpname;
 //echo "looking for chrome remote dump in: " .$dumpname;
 		}
@@ -2193,7 +2222,9 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
 			break;
         case 4:
 			$geoIPprovider = 'HackerTarget';
-            break;
+			break;
+		default:
+			$geoIPprovider = 'none';
 	}
 	// DEBUG INFO EXTRA - ALL OBJECT INFO - ANY non-printable chars here will prevent JS operation
 	// echo("array page objects before converting to JS<pre>");
@@ -2819,7 +2850,7 @@ var cookietext = '<?php echo utf8_converter($cookiedata); ?>';
 <!-- Latest compiled and minified JavaScript -->
 <script>
 	var browserEngineVer = <?php echo "'".$browserEngineVer."'";?>;
-	loadConfigFile();
+	console.log("starting mainDisplay JS");
 	mainDisplay(browserEngineVer);
 </script>
 <script type="text/javascript" src="/toaster/js/jquery.tools.min.js"></script>
@@ -2865,16 +2896,22 @@ var cookietext = '<?php echo utf8_converter($cookiedata); ?>';
     // add the image for all browser engines
 	$('#pjspageimg').prepend('<img id="theImg" src="'+ PageImage +'" />');
     console.log("adding screenshot to summary: " + PageImage);
-    //console.log(hardata);
+    console.log("hardata",hardata);
 	//drawWaterfall(data,"MyChart");
-    renderHAR(hardata);
+	if(hardata)
+		renderHAR(hardata);
+	else
+	{
+		console.log("bypassing HAR processing - no file to process");
+	}
     document.title = 'Toasted - ' + url;
 </script>
  </div> <!-- class="container-fluid" -->
 </body>
 </html>
 <?php
-@unlink($cookie_jar);
+if(file_exists($cookie_jar))
+	@unlink($cookie_jar);
 session_start();
 $_SESSION['imagepath'] = '';
 $_SESSION['status']  = 'Ready to Toast';
@@ -2887,7 +2924,10 @@ $toastfileresult = file_put_contents($toastedfilepathname, ob_get_contents(),LOC
 // add generated file to lists of tests
 $dt = date("Y-m-d H:i:s");
 $line = $array = array($url,$toastedwebname,trim($dt),str_replace("_"," ",$uastr),htmlentities(trim($pagetitle)),trim($uploadedHARFileName),trim($jsimgname),$runnotes,);
-$toastedlist = $filepath_basesavedir.DIRECTORY_SEPARATOR."toasted.csv";
+if(substr($filepath_basesavedir,-1) != DIRECTORY_SEPARATOR)
+	$toastedlist = $filepath_basesavedir.DIRECTORY_SEPARATOR."toasted.csv";
+else
+$toastedlist = $filepath_basesavedir."toasted.csv";
 $handle = fopen($toastedlist, "a");
 fputcsv($handle, $line,',');
 fclose($handle);

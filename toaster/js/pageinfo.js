@@ -56,7 +56,7 @@ var analysisDisplayDate = new Date();
 var analysisYear = analysisDisplayDate.getFullYear();
 function loadConfigFile(configFile) {
     $.getJSON('config.json', function(data) {
-//console.log("owner",data.owner);
+console.log("config.json read: owner",data.owner);
         analysisOwner = data.owner;
         analysisSite = data.site;
         analysisURL = data.url;
@@ -1399,6 +1399,7 @@ function gm_markers() {
     });
 }
 function mainDisplay(browserenginever) {
+    loadConfigFile(); // get config file;
     browserengineversion = browserenginever; // rescope the variable
     $('#input_output').remove();
     //document.getElementById("ttime").innerHTML= ttime;

@@ -1,7 +1,6 @@
 <?php
 header("Content-type:text/plain");
-include 'main.php';
-echo "ok - main.php".PHP_EOL;
+
 include 'ps_functions.php';
 echo "ok - ps_functions.php".PHP_EOL;
 include 'downloadObject.php';
@@ -32,5 +31,6 @@ include 'wpt_functions.php';
 echo "ok - wpt_functions.php".PHP_EOL;
 include '3ptags_nccgroup_db.php';
 echo "ok - 3ptags_nccgroup_db".PHP_EOL;
+
 echo "ALL includes ok".PHP_EOL;
 ?>

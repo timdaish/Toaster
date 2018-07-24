@@ -1,12 +1,22 @@
 <?php
 $today = date("Ymd");
 //$cookie_jar tempnam('/tmp','cookie');
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    $windows = defined('PHP_WINDOWS_VERSION_MAJOR');
+  //echo 'This is a server using Windows! '. $windows."<br/>";
+      $OS = "Windows";
+  }
+  else {
+  //echo 'This is a server not using Windows!'."<br/>";
+      $OS = PHP_OS;
+  }
 if ($OS == "Windows")
 {
     $cookie_jar = tempnam("c:\\temp\\", "cky");
     $drv = substr(__DIR__, 0, 1);
     $filepath_basesavedir = $drv . ":\\toast\\";
-    $perlbasedir = $drv . ":\\xampp\\perl\bin\\";
+    //$perlbasedir = $drv . ":\\xampp\\perl\bin\\";
+    $perlbasedir = "e:\\xampp\\perl\bin\\";
 }
 else
 {
@@ -151,10 +161,11 @@ function debug($info1, $info2 = '')
     if (is_array($info2))
         $info2 = implode($info2);
     $info2 = (string) $info2; // force a string
-$debug == true;
     if ($debug == true)
+    {
         echo date("H:i:s") . " " . $info1 . ": " . $info2 . "<br/>";
-    error_log($info1 . ": " . $info2);
+        error_log($info1 . ": " . $info2);
+    }
 //file_put_contents($filepath_domainsavedir."\\debug.htm", $info1.": ".$info2."<br/>", FILE_APPEND);
 }
 
@@ -479,7 +490,6 @@ function getStyleIDandClasess($initurl)
         curl_setopt($ch, CURLOPT_REFERER, $fullurlpath);
 //curl_setopt($ch, CURLOPT_COOKIE, $cookies);
 //if(strpos($url,"FileMerge") != false);
-//curl_setopt($ch, CURLOPT_COOKIE, "ASP.NET_SessionId=czd33tbyhkmcixrdvgoz0ljr; SiteCurrentCulture_1=en-GB; _ga=GA1.3.520702782.1439707644; flxpxlPv_652307=2|0; flxpxlPv_652308=2|0; J250KbXbTDTvWqHKGpaMTOHA6dXEq6NOLz2WSnbLsd8%3D=; QU%2Fxy0p8BQVtZZndVWZVo%2FmsFC9IARDu5c%2BoAdnc%2FGE%3D=; flxpxlTs_652309=12029|0; visid_incap_318169=Iiov4Gx4Q/uolCBYd0U7Pfwx0FUAAAAAQUIPAAAAAACudp6mO0kW9TN0uvIYpJR9; incap_ses_47_318169=x8MWDxZTuQlzTQqKZfqmAJ980FUAAAAAYMl4PUuAGy0EtYlv+rdxOA==; ___utmvmaButyyw=LnzRZUyJGyy; ___utmvbaButyyw=UZN XhSOjalg: zt");
         curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_jar);
         curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_jar);
         curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -606,7 +616,6 @@ function getStyleIDandClasess($initurl)
         curl_setopt($ch, CURLOPT_REFERER, $fullurlpath);
 //curl_setopt($ch, CURLOPT_COOKIE, $cookies);
 //if(strpos($url,"FileMerge") != false);
-//curl_setopt($ch, CURLOPT_COOKIE, "ASP.NET_SessionId=czd33tbyhkmcixrdvgoz0ljr; SiteCurrentCulture_1=en-GB; _ga=GA1.3.520702782.1439707644; flxpxlPv_652307=2|0; flxpxlPv_652308=2|0; J250KbXbTDTvWqHKGpaMTOHA6dXEq6NOLz2WSnbLsd8%3D=; QU%2Fxy0p8BQVtZZndVWZVo%2FmsFC9IARDu5c%2BoAdnc%2FGE%3D=; flxpxlTs_652309=12029|0; visid_incap_318169=Iiov4Gx4Q/uolCBYd0U7Pfwx0FUAAAAAQUIPAAAAAACudp6mO0kW9TN0uvIYpJR9; incap_ses_47_318169=x8MWDxZTuQlzTQqKZfqmAJ980FUAAAAAYMl4PUuAGy0EtYlv+rdxOA==; ___utmvmaButyyw=LnzRZUyJGyy; ___utmvbaButyyw=UZN XhSOjalg: zt");
         curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_jar);
         curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_jar);
         curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -732,9 +741,6 @@ function getStyleIDandClasess($initurl)
         curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'read_header');
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // false for https
         curl_setopt($ch, CURLOPT_REFERER, $fullurlpath);
-//if(strpos($url,"FileMerge") != false);
-//curl_setopt($ch, CURLOPT_COOKIE, "ASP.NET_SessionId=czd33tbyhkmcixrdvgoz0ljr; SiteCurrentCulture_1=en-GB; _ga=GA1.3.520702782.1439707644; flxpxlPv_652307=2|0; flxpxlPv_652308=2|0; J250KbXbTDTvWqHKGpaMTOHA6dXEq6NOLz2WSnbLsd8%3D=; QU%2Fxy0p8BQVtZZndVWZVo%2FmsFC9IARDu5c%2BoAdnc%2FGE%3D=; flxpxlTs_652309=12029|0; visid_incap_318169=Iiov4Gx4Q/uolCBYd0U7Pfwx0FUAAAAAQUIPAAAAAACudp6mO0kW9TN0uvIYpJR9; incap_ses_47_318169=x8MWDxZTuQlzTQqKZfqmAJ980FUAAAAAYMl4PUuAGy0EtYlv+rdxOA==; ___utmvmaButyyw=LnzRZUyJGyy; ___utmvbaButyyw=UZN XhSOjalg: zt");
-//curl_setopt($ch, CURLOPT_COOKIE, $extracookies . " ASP.NET_SessionId=czd33tbyhkmcixrdvgoz0ljr; SiteCurrentCulture_1=en-GB;");
 //curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_jar);
 //curl_setopt($ch, CURLOPT_COOKIEJAR,$cookie_jar);
         curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -837,8 +843,6 @@ function getStyleIDandClasess($initurl)
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // false for https
         curl_setopt($ch, CURLOPT_REFERER, $fullurlpath);
 //if(strpos($url,"FileMerge") != false);
-//curl_setopt($ch, CURLOPT_COOKIE, "ASP.NET_SessionId=czd33tbyhkmcixrdvgoz0ljr; SiteCurrentCulture_1=en-GB; _ga=GA1.3.520702782.1439707644; flxpxlPv_652307=2|0; flxpxlPv_652308=2|0; J250KbXbTDTvWqHKGpaMTOHA6dXEq6NOLz2WSnbLsd8%3D=; QU%2Fxy0p8BQVtZZndVWZVo%2FmsFC9IARDu5c%2BoAdnc%2FGE%3D=; flxpxlTs_652309=12029|0; visid_incap_318169=Iiov4Gx4Q/uolCBYd0U7Pfwx0FUAAAAAQUIPAAAAAACudp6mO0kW9TN0uvIYpJR9; incap_ses_47_318169=x8MWDxZTuQlzTQqKZfqmAJ980FUAAAAAYMl4PUuAGy0EtYlv+rdxOA==; ___utmvmaButyyw=LnzRZUyJGyy; ___utmvbaButyyw=UZN XhSOjalg: zt");
-//curl_setopt($ch, CURLOPT_COOKIE, $extracookies . " ASP.NET_SessionId=czd33tbyhkmcixrdvgoz0ljr; SiteCurrentCulture_1=en-GB;");
 //curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_jar);
 //curl_setopt($ch, CURLOPT_COOKIEJAR,$cookie_jar);
         curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -947,7 +951,6 @@ function getStyleIDandClasess($initurl)
         curl_setopt($ch, CURLOPT_REFERER, $fullurlpath);
 //curl_setopt($ch, CURLOPT_COOKIE, $cookies);
 //if(strpos($url,"FileMerge") != false);
-//curl_setopt($ch, CURLOPT_COOKIE, "ASP.NET_SessionId=czd33tbyhkmcixrdvgoz0ljr; SiteCurrentCulture_1=en-GB; _ga=GA1.3.520702782.1439707644; flxpxlPv_652307=2|0; flxpxlPv_652308=2|0; J250KbXbTDTvWqHKGpaMTOHA6dXEq6NOLz2WSnbLsd8%3D=; QU%2Fxy0p8BQVtZZndVWZVo%2FmsFC9IARDu5c%2BoAdnc%2FGE%3D=; flxpxlTs_652309=12029|0; visid_incap_318169=Iiov4Gx4Q/uolCBYd0U7Pfwx0FUAAAAAQUIPAAAAAACudp6mO0kW9TN0uvIYpJR9; incap_ses_47_318169=x8MWDxZTuQlzTQqKZfqmAJ980FUAAAAAYMl4PUuAGy0EtYlv+rdxOA==; ___utmvmaButyyw=LnzRZUyJGyy; ___utmvbaButyyw=UZN XhSOjalg: zt");
         curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_jar);
         curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_jar);
         curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -1749,9 +1752,9 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
         {
 //echo "addobject lookup - not found: " . $id . ": source url = " . $remoteurl . "<br/>";
         }
-
-        @ $extn = $inarr["File extension"];
-        if (!isset($extn))
+        if(isset($inarr["File extension"]))
+            $extn = $inarr["File extension"];
+        else
             $extn = 'ext';
         if (substr($extn, 0, 1) == '.')
         {
@@ -1935,308 +1938,214 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
          //       diagnostics("Updating URL in PageObject array",$remoteurl,$localfile);
 // update the object by its key#
                 debug("Updating data for source url in object array", $remoteurl);
-                $update = @ $inarr["Object type"];
-                if (isset($update))
+                if (isset($inarr["Object type"]))
                 {
                     $arrayPageObjects[$foundkey]["Object type"] = $inarr["Object type"];
     //echo("Update dl page object array: ".$key . "; objtype ". $update. "<br/>");
                 }
-                $update = @ $inarr["Object source"];
-                if (isset($update))
+                if (isset($inarr["Object source"]))
                     $arrayPageObjects[$foundkey]["Object source"] = $inarr["Object source"];
-                $update = @ $inarr["Object file"];
-                if (isset($update) and $update <> '')
+                if(isset($inarr["Object file"]))
+                    $update = $inarr["Object file"];
+                if (isset($inarr["Object file"]) and $update <> '')
                 {
                     $arrayPageObjects[$foundkey]["Object file"] = $inarr["Object file"];
 //echo("updating local file to " . $update."<br/>");
                 }
-                $update = @ $inarr["Object parent"];
-                if (isset($update) and $update <> '')
+                if (isset($inarr["Object parent"]))
                     $arrayPageObjects[$foundkey]["Object parent"] = $inarr["Object parent"];
-                $update = @ $inarr["HTTP status"];
-                if (isset($update))
+                if (isset($inarr["HTTP status"]))
                 {
     //echo("updating object data; $foundkey - $lfn<br/>");
     //var_dump($inarr);
                     $arrayPageObjects[$foundkey]["HTTP status"] = $inarr["HTTP status"];
     //echo("updated status = ".$arrayPageObjects[$foundkey]["HTTP status"]."<br/>");
                 }
-                $update = @ $inarr["Domain"];
-                if (isset($update))
+                if (isset($inarr["Domain"]))
                     $arrayPageObjects[$foundkey]["Domain"] = $inarr["Domain"];
-                $update = @ $inarr["Domain ref"];
-                if (isset($update))
+                if (isset($inarr["Domain ref"]))
                     $arrayPageObjects[$foundkey]["Domain ref"] = $inarr["Domain ref"];
-                $update = @ $inarr["Mime type"];
-                if (isset($update))
+                if (isset($inarr["Mime type"]))
                     $arrayPageObjects[$foundkey]["Mime type"] = $inarr["Mime type"];
-                $update = @ $inarr["hdrs_Server"];
-                if (isset($update))
+                if (isset($inarr["hdrs_Server"]))
                     $arrayPageObjects[$foundkey]["hdrs_Server"] = $inarr["hdrs_Server"];
-                $update = @ $inarr["hdrs_Protocol"];
-                if (isset($update))
+                if (isset($inarr["hdrs_Protocol"]))
                     $arrayPageObjects[$foundkey]["hdrs_Protocol"] = $inarr["hdrs_Protocol"];
-                $update = @ $inarr["hdrs_responsecode"];
-                if (isset($update))
+                if (isset($inarr["hdrs_responsecode"]))
                     $arrayPageObjects[$foundkey]["hdrs_responsecode"] = $inarr["hdrs_responsecode"];
-                $update = @ $inarr["hdrs_lastmodifieddate"];
-                if (isset($update))
+                if (isset($inarr["hdrs_lastmodifieddate"]))
                     $arrayPageObjects[$foundkey]["hdrs_lastmodifieddate"] = $inarr["hdrs_lastmodifieddate"];
-                $update = @ $inarr["hdrs_age"];
-                if (isset($update))
+                if (isset($inarr["hdrs_age"]))
                     $arrayPageObjects[$foundkey]["hdrs_age"] = $inarr["hdrs_age"];
-                $update = @ $inarr["hdrs_date"];
-                if (isset($update))
+                if (isset($inarr["hdrs_date"]))
                     $arrayPageObjects[$foundkey]["hdrs_date"] = $inarr["hdrs_date"];
-                $update = @ $inarr["hdrs_cachecontrol"];
-                if (isset($update))
+                if (isset($inarr["hdrs_cachecontrol"]))
                     $arrayPageObjects[$foundkey]["hdrs_cachecontrol"] = $inarr["hdrs_cachecontrol"];
-                $update = @ $inarr["hdrs_cachecontrolPrivate"];
-                if (isset($update))
+                if (isset($inarr["hdrs_cachecontrolPrivate"]))
                     $arrayPageObjects[$foundkey]["hdrs_cachecontrolPrivate"] = $inarr["hdrs_cachecontrolPrivate"];
-                $update = @ $inarr["hdrs_cachecontrolPublic"];
-                if (isset($update))
+                if (isset($inarr["hdrs_cachecontrolPublic"]))
                     $arrayPageObjects[$foundkey]["hdrs_cachecontrolPublic"] = $inarr["hdrs_cachecontrolPublic"];
-                $update = @ $inarr["hdrs_cachecontrolMaxAge"];
-                if (isset($update))
+                if (isset($inarr["hdrs_cachecontrolMaxAge"]))
                     $arrayPageObjects[$foundkey]["hdrs_cachecontrolMaxAge"] = $inarr["hdrs_cachecontrolMaxAge"];
-                $update = @ $inarr["hdrs_cachecontrolSMaxAge"];
-                if (isset($update))
+                if (isset($inarr["hdrs_cachecontrolSMaxAge"]))
                     $arrayPageObjects[$foundkey]["hdrs_cachecontrolSMaxAge"] = $inarr["hdrs_cachecontrolSMaxAge"];
-                $update = @ $inarr["hdrs_cachecontrolNoCache"];
-                if (isset($update))
+                if (isset($inarr["hdrs_cachecontrolNoCache"]))
                     $arrayPageObjects[$foundkey]["hdrs_cachecontrolNoCache"] = $inarr["hdrs_cachecontrolNoCache"];
-                $update = @ $inarr["hdrs_cachecontrolNoStore"];
-                if (isset($update))
+                if (isset($inarr["hdrs_cachecontrolNoStore"]))
                     $arrayPageObjects[$foundkey]["hdrs_cachecontrolNoStore"] = $inarr["hdrs_cachecontrolNoStore"];
-                $update = @ $inarr["hdrs_cachecontrolNoTransform"];
-                if (isset($update))
+                 if (isset($inarr["hdrs_cachecontrolNoTransform"]))
                     $arrayPageObjects[$foundkey]["hdrs_cachecontrolNoTransform"] = $inarr["hdrs_cachecontrolNoTransform"];
-                $update = @ $inarr["hdrs_cachecontrolMustRevalidate"];
-                if (isset($update))
+                if (isset($inarr["hdrs_cachecontrolMustRevalidate"]))
                     $arrayPageObjects[$foundkey]["hdrs_cachecontrolMustRevalidate"] = $inarr["hdrs_cachecontrolMustRevalidate"];
-                $update = @ $inarr["hdrs_cachecontrolProxyRevalidate"];
-                if (isset($update))
+                if (isset($inarr["hdrs_cachecontrolProxyRevalidate"]))
                     $arrayPageObjects[$foundkey]["hdrs_cachecontrolProxyRevalidate"] = $inarr["hdrs_cachecontrolProxyRevalidate"];
-                $update = @ $inarr["hdrs_connection"];
-                if (isset($update))
+                if (isset($inarr["hdrs_connection"]))
                     $arrayPageObjects[$foundkey]["hdrs_connection"] = $inarr["hdrs_connection"];
-                $update = @ $inarr["hdrs_contentlength"];
-                if (isset($update))
+                if (isset($inarr["hdrs_contentlength"]))
                     $arrayPageObjects[$foundkey]["hdrs_contentlength"] = $inarr["hdrs_contentlength"];
-                $update = @ $inarr["hdrs_expires"];
-                if (isset($update))
+                if (isset($inarr["hdrs_expires"]))
                     $arrayPageObjects[$foundkey]["hdrs_expires"] = $inarr["hdrs_expires"];
-                $update = @ $inarr["hdrs_etag"];
-                if (isset($update))
+                if (isset($inarr["hdrs_etag"]))
                     $arrayPageObjects[$foundkey]["hdrs_etag"] = $inarr["hdrs_etag"];
-                $update = @ $inarr["hdrs_keepalive"];
-                if (isset($update))
+                if (isset($inarr["hdrs_keepalive"]))
                     $arrayPageObjects[$foundkey]["hdrs_keepalive"] = $inarr["hdrs_keepalive"];
-                $update = @ $inarr["hdrs_pragma"];
-                if (isset($update))
+                if (isset($inarr["hdrs_pragma"]))
                     $arrayPageObjects[$foundkey]["hdrs_pragma"] = $inarr["hdrs_pragma"];
-                $update = @ $inarr["hdrs_setcookie"];
-                if (isset($update))
+                if (isset($inarr["hdrs_setcookie"]))
                     $arrayPageObjects[$foundkey]["hdrs_setcookie"] = $inarr["hdrs_setcookie"];
-                $update = @ $inarr["hdrs_upgrade"];
-                if (isset($update))
+                if (isset($inarr["hdrs_upgrade"]))
                     $arrayPageObjects[$foundkey]["hdrs_upgrade"] = $inarr["hdrs_upgrade"];
-                $update = @ $inarr["hdrs_vary"];
-                if (isset($update))
+                if (isset($inarr["hdrs_vary"]))
                     $arrayPageObjects[$foundkey]["hdrs_vary"] = $inarr["hdrs_vary"];
-                $update = @ $inarr["hdrs_via"];
-                if (isset($update))
+                if (isset($inarr["hdrs_via"]))
                     $arrayPageObjects[$foundkey]["hdrs_via"] = $inarr["hdrs_via"];
-                $update = @ $inarr["hdrs_xservedby"];
-                if (isset($update))
+                if (isset($inarr["hdrs_xservedby"]))
                     $arrayPageObjects[$foundkey]["hdrs_xservedby"] = $inarr["hdrs_xservedby"];
-                $update = @ $inarr["hdrs_xcache"];
-                if (isset($update))
+                if (isset($inarr["hdrs_xcache"]))
                     $arrayPageObjects[$foundkey]["hdrs_xcache"] = $inarr["hdrs_xcache"];
-                $update = @ $inarr["hdrs_xpx"];
-                if (isset($update))
+                if (isset($inarr["hdrs_xpx"]))
                     $arrayPageObjects[$foundkey]["hdrs_xpx"] = $inarr["hdrs_xpx"];
-                $update = @ $inarr["hdrs_xedgelocation"];
-                if (isset($update))
+                if (isset($inarr["hdrs_xedgelocation"]))
                     $arrayPageObjects[$foundkey]["hdrs_xedgelocation"] = $inarr["hdrs_xedgelocation"];
-                $update = @ $inarr["hdrs_cfray"];
-                if (isset($update))
+                if (isset($inarr["hdrs_cfray"]))
                     $arrayPageObjects[$foundkey]["hdrs_cfray"] = $inarr["hdrs_cfray"];
-                $update = @ $inarr["hdrs_xcdngeo"];
-                if (isset($update))
+                if (isset($inarr["hdrs_xcdngeo"]))
                     $arrayPageObjects[$foundkey]["hdrs_xcdngeo"] = $inarr["hdrs_xcdngeo"];
-                $update = @ $inarr["hdrs_xcdn"];
-                if (isset($update))
+                if (isset($inarr["hdrs_xcdn"]))
                     $arrayPageObjects[$foundkey]["hdrs_xcdn"] = $inarr["hdrs_xcdn"];
-                $update = @ $inarr["response_datetime"];
-                if (isset($update))
+                if (isset($inarr["response_datetime"]))
                     $arrayPageObjects[$foundkey]["response_datetime"] = $inarr["response_datetime"];
-                $update = @ $inarr["File extension"];
-                if (isset($update))
+                if (isset($inarr["File extension"]))
                     $arrayPageObjects[$foundkey]["File extension"] = $extn;
-                $update = @ $inarr["Header size"];
-                if (isset($update))
+                if (isset($inarr["Header size"]))
                     $arrayPageObjects[$foundkey]["Header size"] = $inarr["Header size"];
-                $update = @ $inarr["Content length transmitted"];
-                if (isset($update))
+                 if (isset($inarr["Content length transmitted"]))
                     $arrayPageObjects[$foundkey]["Content length transmitted"] = $inarr["Content length transmitted"];
-                $update = @ $inarr["Content size downloaded"];
-                if (isset($update))
+                if (isset($inarr["Content size downloaded"]))
                     $arrayPageObjects[$foundkey]["Content size downloaded"] = $inarr["Content size downloaded"];
-                $update = @ $inarr["Compression"];
-                if (isset($update))
+                if (isset($inarr["Compression"]))
                     $arrayPageObjects[$foundkey]["Compression"] = trim($inarr["Compression"]);
-                $update = @ $inarr["Content size compressed"];
-                if (isset($update))
+                if (isset($inarr["Content size compressed"]))
                 {
                     $arrayPageObjects[$foundkey]["Content size compressed"] = $inarr["Content size compressed"];
                     if ($arrayPageObjects[$foundkey]["Object type"] == 'Image' and $arrayPageObjects[$foundkey]["Compression"] == '')
                         $arrayPageObjects[$foundkey]["Content size compressed"] = '';
                 }
-                $update = @ $inarr["Content size uncompressed"];
-                if (isset($update))
+                if (isset($inarr["Content size uncompressed"]))
                 {
                     $arrayPageObjects[$foundkey]["Content size uncompressed"] = $inarr["Content size uncompressed"];
                     if ($arrayPageObjects[$foundkey]["Object type"] == 'Image' and $arrayPageObjects[$foundkey]["Compression"] == '')
                         $arrayPageObjects[$foundkey]["Content size uncompressed"] = '';
                 }
-                $update = @ $inarr["Combined files"];
-                if (isset($update))
+                if (isset($inarr["Combined files"]))
                     $arrayPageObjects[$foundkey]["Combined files"] = $inarr["Combined files"];
-                $update = @ $inarr["Content size minified uncompressed"];
-                if (isset($update))
+                if (isset($inarr["Content size minified uncompressed"]))
                 {
                     $arrayPageObjects[$foundkey]["Content size minified uncompressed"] = $inarr["Content size minified uncompressed"];
                     if ($arrayPageObjects[$foundkey]["Object type"] == 'Image' and $arrayPageObjects[$foundkey]["Compression"] == '')
                         $arrayPageObjects[$foundkey]["Content size minified uncompressed"] = '';
                 }
-                $update = @ $inarr["Content size minified compressed"];
-                if (isset($update))
+                if (isset($inarr["Content size minified compressed"]))
                 {
                     $arrayPageObjects[$foundkey]["Content size minified compressed"] = $inarr["Content size minified compressed"];
                     if ($arrayPageObjects[$foundkey]["Object type"] == 'Image' and $arrayPageObjects[$foundkey]["Compression"] == '')
                         $arrayPageObjects[$foundkey]["Content size minified compressed"] = '';
                 }
-                $update = @ $inarr["CSS ref"];
-                if (isset($update))
+                if (isset($inarr["CSS ref"]))
                     $arrayPageObjects[$foundkey]["CSS ref"] = $inarr["CSS ref"];
-                $update = @ $inarr["JS defer"];
-                if (isset($update))
+                if (isset($inarr["JS defer"]))
                 {
                     if ($arrayPageObjects[$foundkey]["JS defer"] != "DEFER")
                         $arrayPageObjects[$foundkey]["JS defer"] = $inarr["JS defer"];
                 }
-                $update = @ $inarr["JS async"];
-                if (isset($update))
+                if (isset($inarr["JS async"]))
                 {
                     if ($arrayPageObjects[$foundkey]["JS async"] != "ASYNC")
                         $arrayPageObjects[$foundkey]["JS async"] = $inarr["JS async"];
                 }
-                $update = @ $inarr["JS docwrite"];
-                if (isset($update))
+                if (isset($inarr["JS docwrite"]))
                     $arrayPageObjects[$foundkey]["JS docwrite"] = $inarr["JS docwrite"];
-                $update = @ $inarr["Metadata bytes"];
-                if (isset($update))
+                if (isset($inarr["Metadata bytes"]))
                     $arrayPageObjects[$foundkey]["Metadata bytes"] = $inarr["Metadata bytes"];
-                $update = @ $inarr["EXIF bytes"];
-                if (isset($update))
+                if (isset($inarr["EXIF bytes"]))
                     $arrayPageObjects[$foundkey]["EXIF bytes"] = $inarr["EXIF bytes"];
-                $update = @ $inarr["APP12 bytes"];
-                if (isset($update))
+                if (isset($inarr["APP12 bytes"]))
                     $arrayPageObjects[$foundkey]["APP12 bytes"] = $inarr["APP12 bytes"];
-                $update = @ $inarr["IPTC bytes"];
-                if (isset($update))
+                if (isset($inarr["IPTC bytes"]))
                     $arrayPageObjects[$foundkey]["IPTC bytes"] = $inarr["IPTC bytes"];
-                $update = @ $inarr["XMP bytes"];
-                if (isset($update))
+                if (isset($inarr["XMP bytes"]))
                     $arrayPageObjects[$foundkey]["XMP bytes"] = $inarr["XMP bytes"];
-                $update = @ $inarr["Comment"];
-                if (isset($update))
+                if (isset($inarr["Comment"]))
                     $arrayPageObjects[$foundkey]["Comment"] = $inarr["Comment"];
-                $update = @ $inarr["Comment bytes"];
-                if (isset($update))
+                if (isset($inarr["Comment bytes"]))
                     $arrayPageObjects[$foundkey]["Comment bytes"] = $inarr["Comment bytes"];
-                $update = @ $inarr["ICC colour profile bytes"];
-                if (isset($update))
+                if (isset($inarr["ICC colour profile bytes"]))
                     $arrayPageObjects[$foundkey]["ICC colour profile bytes"] = $inarr["ICC colour profile bytes"];
-                $update = @ $inarr["Image type"];
-                if (isset($update))
+                if (isset($inarr["Image type"]))
                     $arrayPageObjects[$foundkey]["Image type"] = $inarr["Image type"];
-                $update = @ $inarr["Image encoding"];
-                if (isset($update))
+                if (isset($inarr["Image encoding"]))
                     $arrayPageObjects[$foundkey]["Image encoding"] = $inarr["Image encoding"];
-                $update = @ $inarr["Image responsive"];
-                if (isset($update))
+                if (isset($inarr["Image responsive"]))
                     $arrayPageObjects[$foundkey]["Image responsive"] = $inarr["Image responsive"];
-                $update = @ $inarr["Image display size"];
-                if (isset($update))
+                if (isset($inarr["Image display size"]))
                     $arrayPageObjects[$foundkey]["Image display size"] = $inarr["Image display size"];
-                $update = @ $inarr["Image actual size"];
-                if (isset($update))
+                if (isset($inarr["Image actual size"]))
                     $arrayPageObjects[$foundkey]["Image actual size"] = $inarr["Image actual size"];
-                $update = @ $inarr["Colour type"];
-                if (isset($update))
+                if (isset($inarr["Colour type"]))
                     $arrayPageObjects[$foundkey]["Colour type"] = $inarr["Colour type"];
-                $update = @ $inarr["Colour depth"];
-                if (isset($update))
+                if (isset($inarr["Colour depth"]))
                     $arrayPageObjects[$foundkey]["Colour depth"] = $inarr["Colour depth"];
-                $update = @ $inarr["Interlace"];
-                if (isset($update))
+                if (isset($inarr["Interlace"]))
                     $arrayPageObjects[$foundkey]["Interlace"] = $inarr["Interlace"];
-                $update = @ $inarr["Est. quality"];
-                if (isset($update))
+                if (isset($inarr["Est. quality"]))
                     $arrayPageObjects[$foundkey]["Est. quality"] = $inarr["Est. quality"];
-                $update = @ $inarr["Photoshop quality"];
-                if (isset($update))
+                if (isset($inarr["Photoshop quality"]))
                     $arrayPageObjects[$foundkey]["Photoshop quality"] = $inarr["Photoshop quality"];
-                $update = @ $inarr["Chroma subsampling"];
-                if (isset($update))
+                if (isset($inarr["Chroma subsampling"]))
                     $arrayPageObjects[$foundkey]["Chroma subsampling"] = $inarr["Chroma subsampling"];
-                $update = @ $inarr["Animation"];
-                if (isset($update))
+                if (isset($inarr["Animation"]))
                     $arrayPageObjects[$foundkey]["Animation"] = $inarr["Animation"];
-                $update = @ $inarr["Font name"];
-                if (isset($update))
+                if (isset($inarr["Font name"]))
                     $arrayPageObjects[$foundkey]["Font name"] = $inarr["Font name"];
-                $update = @ $inarr["file_section"];
-                if (isset($update))
+                if (isset($inarr["file_section"]))
                     $arrayPageObjects[$foundkey]["file_section"] = $inarr["file_section"];
-                $update = @ $inarr["file_timing"];
-                if (isset($update))
+                if (isset($inarr["file_timing"]))
                     $arrayPageObjects[$foundkey]["file_timing"] = $inarr["file_timing"];
-
-                $update = @ $inarr["offsetDuration"];
-                if (isset($update))
+                if (isset($inarr["offsetDuration"]))
                     $arrayPageObjects[$foundkey]["offsetDuration"] = $inarr["offsetDuration"];
-
-                $update = @ $inarr["ttfbMS"];
-                if (isset($update))
+                if (isset($inarr["ttfbMS"]))
                     $arrayPageObjects[$foundkey]["ttfbMS"] = $inarr["ttfbMS"];
-
-                $update = @ $inarr["downloadDuration"];
-                if (isset($update))
+                if (isset($inarr["downloadDuration"]))
                     $arrayPageObjects[$foundkey]["downloadDuration"] = $inarr["downloadDuration"];
-
-                $update = @ $inarr["allMS"];
-                if (isset($update))
+                if (isset($inarr["allMS"]))
                     $arrayPageObjects[$foundkey]["allMS"] = $inarr["allMS"];
-
-                $update = @ $inarr["allStartMS"];
-                if (isset($update))
+                if (isset($inarr["allStartMS"]))
                     $arrayPageObjects[$foundkey]["allStartMS"] = $inarr["allStartMS"];
-
-
-                $update = @ $inarr["allEndMS"];
-                if (isset($update))
+                if (isset($inarr["allEndMS"]))
                     $arrayPageObjects[$foundkey]["allEndMS"] = $inarr["allEndMS"];
-
-                $update = @ $inarr["cacheSeconds"];
-                if (isset($update))
+                if (isset($inarr["cacheSeconds"]))
                     $arrayPageObjects[$foundkey]["cacheSeconds"] = $inarr["cacheSeconds"];
-
             }
-
         }
         return true;
     }
@@ -4187,6 +4096,8 @@ $jsasync = "ASYNC";
 
     function utf8_converter($array)
     {
+        if(!is_array($array))
+            return $array;
         array_walk_recursive($array, function(&$item, $key){
             if(!is_object($item))
             {
@@ -6378,8 +6289,11 @@ debug ("creating basefilepath ",$path);
     function getArrayOfErrors()
     {
         global $arrayErrors;
-        @ $unique = array_values(array_unique($arrayErrors));
-        return $unique;
+        if(is_array($arrayErrors))
+            $arrayErrors = array_values(array_unique($arrayErrors,SORT_REGULAR));
+        else
+            $arrayErrors = array();
+        return $arrayErrors;
     }
 
 
@@ -6842,6 +6756,7 @@ debug ("creating basefilepath ",$path);
     function copyImageFilesToFolders()
     {
         global $arrayPageObjects, $filepath_domainsavedir, $filepath_domainsaverootdir;
+        debug("COPY IMAGE FILES TO FOLDERS","");
 //echo ($filepath_domainsavedir.'<br/>');
 //echo ($filepath_domainsaverootdir.'<br/>');
         $nooffiles = count($arrayPageObjects);
@@ -6859,7 +6774,7 @@ debug ("creating basefilepath ",$path);
                 $path_parts = pathinfo($local);
                 $filename = $path_parts['filename'];
                 $ext = $path_parts['extension'];
-//echo ("Found $ftype image to copy: $local ($filename.$ext)<br/>");
+debug("Found image to copy", $local);
                 $folder = '_Extracted_Images';
                 $baseImgfolder = $filepath_domainsavedir . $folder;
                 if (!file_exists($baseImgfolder))
@@ -6881,8 +6796,16 @@ debug ("creating basefilepath ",$path);
                 $Imgfolder = $baseImgfolder . $folder;
                 if (!file_exists($Imgfolder))
                     @ mkdir($Imgfolder, 0777, true);
+                $result = false;
                 if (file_exists($local))
-                    copy($local, $Imgfolder . $filename . "." . $ext);
+                {
+                    error_log( "trying to copy image " . $filename);
+                    $result = copy($local, $Imgfolder . $filename . "." . $ext);
+                }
+                if($result == true)
+                    error_log( "image copy successful" . $filename . $result);
+                else
+                error_log( "image copy failed " . $filename . $result);
             } // an image
         }
     }

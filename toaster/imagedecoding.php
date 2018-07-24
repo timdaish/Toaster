@@ -2959,13 +2959,24 @@ function decodePNG($content,$lf)
             $xmppos = strpos('XML',$pngchunk);
             if($xmppos === false)
             {
-              $chunkinfo = explode(':  | ',$pngchunk);
-              if(isset($chunkinfo[1]))
-              {
-                $chunkdata = explode(' = ',$chunkinfo[1]);
-                $keyword = $chunkdata[0];
-                $arrtextchunkkeywords[] = $keyword;
-              }
+			  $chunkinfo = explode(':  | ',$pngchunk);
+				if(isset($chunkinfo[1]))
+				{
+					$chunkinfo2 = explode(' | ',$pngchunk);
+					if(isset($chunkinfo2[2]))
+					{
+						$chunkdata2 = explode(' = ',$chunkinfo2[2]);
+						$keyword = $chunkdata2[0];
+						$arrtextchunkkeywords[] = $keyword;
+					}
+					else
+					{
+							$chunkdata = explode(' = ',$chunkinfo[1]);
+							$keyword = $chunkdata[0];
+							$keyword = str_replace(":","",$keyword); // colons need to be replaced
+							$arrtextchunkkeywords[] = $keyword;
+					}
+				}
             }
             else
             {
@@ -2973,8 +2984,28 @@ function decodePNG($content,$lf)
             }
             break;
         case 'iCCP':
-            $chunkinfo = explode(':',$pngchunk);
-            $fullString = $chunkinfo[0];
+		$chunkinfo = explode(':  | ',$pngchunk);
+		if(isset($chunkinfo[1]))
+		{
+			$chunkinfo2 = explode(' | ',$pngchunk);
+			if(isset($chunkinfo2[2]))
+			{
+				$chunkdata2 = explode(' = ',$chunkinfo2[2]);
+				$keyword = $chunkdata2[0];
+				$arrtextchunkkeywords[] = $keyword;
+			}
+			else
+			{
+					$chunkdata = explode(' = ',$chunkinfo[1]);
+					$keyword = $chunkdata[0];
+					$keyword = str_replace(":","",$keyword); // colons need to be replaced
+					$arrtextchunkkeywords[] = $keyword;
+			}
+		}
+			if(isset($chunkinfo2))
+				$fullString = $chunkinfo2[0];
+			else
+				$fullString = $chunkinfo[0];
             $start = 6; //strpos('(', $fullString);
             $end = strlen($fullString) - strpos(')', $fullString);
             $shortString = substr($fullString, $start, $end)    ;
@@ -3044,7 +3075,7 @@ function decodePNG($content,$lf)
   //print_r($pngtext_all);
   //echo('</pre>');
 
-  $comment_text = $pngtext_all;
+  $comment_text = '';//$pngtext_all;
   $comment_bytes = $pngbytes_all;
 // Get the content that is in the buffer and put it in your file //
 

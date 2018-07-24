@@ -85,6 +85,7 @@ function TruncateURL (inputURL) {
 
 function renderHAR(harfile){
 	console.log("HAR processing invoked - toaster har.js");
+	loadConfigFile();
 //    console.log(harfile);
 
 	//Parse HAR file

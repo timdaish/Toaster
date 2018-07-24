@@ -496,9 +496,12 @@ function url_to_absolute( $baseUrl, $relativeUrl )
     if ( $r['path'][0] != '/')
     {
 		//echo "converting url - rel does not start with /: $relativeUrl <br/>";
-        $base = @mb_strrchr( $b['path'], '/', TRUE, 'UTF-8' );
+		if(isset($b['path']))
+			$base = @mb_strrchr( $b['path'], '/', TRUE, 'UTF-8' );
+		else
+			$base = @mb_strrchr('/', TRUE, 'UTF-8' );
         if ( $base === FALSE ) $base = '';
-        $r['path'] = $base . '/' . $r['path'];
+        	$r['path'][0] = $base . '/' . $r['path'];
     }
 	else
 	{
@@ -1528,7 +1531,9 @@ Function UpdateDomainLocationFromHeader($inurl,$xservedby,$xpx,$xedgelocation,$s
 	global $arrayDomains,$userlat,$userlong;
 	$cdnIATACode = '';
 	$service = '';
-    $network = '';
+	$network = '';
+	$edgeloc = '';
+	$method = '';
 	if($xservedby == '' and $xpx == '' and $xedgelocation == '' and $server == '' and $cfray == '' and $xcdngeo == '' and $xcdn == '' and $via = '' and $xcache = '')
 		return false;
 //echo("<br>UpdateDomainLocationFromHeader called from ".$debuginfo."<br/>");
@@ -1794,15 +1799,18 @@ Function UpdateDomainLocationFromHeader($inurl,$xservedby,$xpx,$xedgelocation,$s
 		//	echo( "Found domain ".$hostdomain);
         //echo($hostdomain. '(locheader): lat='.$lat. '; long='.$long."<br/>");
 		//get distance to user location
-		$distance = round(distance($userlat, $userlong ,$lat,$long,"M"),0);
+		if(isset($lat) and isset($long))
+			$distance = round(distance($userlat, $userlong ,$lat,$long,"M"),0);
+		else
+			$distance = "N/A";
 		// update domain
 		if($network !='')
 			$arrayDomains[$keyfound]["Network"] = $network;
 		if($edgeloc !='')	
 			$arrayDomains[$keyfound]["Edge Loc"] = $edgeloc;
-		if($lat !='')	
+		if(isset($lat) and $lat !='')	
 			$arrayDomains[$keyfound]["Latitude"] = $lat;
-		if($long!='')		
+		if(isset($long) and $long!='')		
 			$arrayDomains[$keyfound]["Longitude"] = $long;
 		if($distance !='')	
 			$arrayDomains[$keyfound]["Distance"] = $distance;
@@ -1976,9 +1984,9 @@ function lookupIATAAirportCode($code)
         {
 //echo ("checking in airports.dat" . PHP_EOL);
 			if($OS == "Windows")
-            	$str = file_get_contents("toaster_tools\airports.dat");
+            	$str = file("toaster_tools\airports.dat");
         	else
-				$str = file_get_contents("toaster_tools/airports.dat");
+				$str = file("toaster_tools/airports.dat");
 			
 			// Loop through our array, show HTML source as HTML source; and line numbers too.
 			foreach ($str as $line_num => $line) {
@@ -1988,7 +1996,7 @@ function lookupIATAAirportCode($code)
 //var_dump($data);
 				if(strToLower($data[4]) == strToLower($code))
 					{
-						$found == true;
+						$found = true;
 //echo "Line #<b>{$line_num}</b> : " . htmlspecialchars($line) . "<br />\n";
 						// for ($x = 0; $x < count($data); $x++)
 						// {
@@ -2153,8 +2161,8 @@ function lookup3PDescriptionDirect($domain)
 // echo "</pre>";
             $domain3P = $objjson->domain;
             $objproduct = $objjson->product;
-       	    $objcompany= $objproduct->company;
-            $domainprovider = $objjson->company->name;
+       	    $objcompany = $objjson->company;
+            $domainprovider = $objcompany->name;
     		$domaindesc = html_entity_decode($objproduct->description);
 			$domaindesc = str_replace('"','',$domaindesc);
 			$domaindesc = str_replace("'","",$domaindesc);
@@ -2449,7 +2457,7 @@ function IsThisDomainaCDNofTheRootDomain($rootDomain,$testDomain)
 		//echo("checking the test domain of: ".$testdomain."<br/>");
 	//}
 	$firstdot = strpos($rootdomain,'.');
-	$maindomain = substr($rootdomain,0,$firstdot);
+	$maindomain = $rootdomain; //substr($rootdomain,0,$firstdot);
 	if($maindomain == '')
 	{
 		//echo("error checking for main domain on: ".$maindomain."<br/>");
@@ -2469,7 +2477,7 @@ function IsThisDomainaCDNofTheRootDomain($rootDomain,$testDomain)
 //    else
 //    {
       //echo("Is this a defined shard? : "."checking file for '". $testDomain."' for record of '". $rootDomain."'<br/>");
-        if(FileLookupDomainShard($rootDomain,$testDomain))
+        if(FileLookupDomainShard($rootDomain,$testDomain) == true)
         {
           // file lookup
           //echo("Found a defined shard : "."checking shard file for '". $testDomain."' for record of '". $rootDomain."'<br/>");
@@ -2516,7 +2524,9 @@ function readShardsFromFile()
 function FileLookupDomainShard($rootDomain,$testDomain)
 {
 	global $arrayShards;
-    $result = false;
+	$result = false;
+	if(empty($arrayShards) or implode(null,$arrayShards)==null)
+		return $result;
 	foreach ($arrayShards as $line_num => $line) {
 	    $arr = explode(",",$line);
 		$hostdomain = html_entity_decode($arr[0]);
@@ -2578,6 +2588,10 @@ function lookupLocationforIP($inIP)
 	$api_key= 'api_key=' . $apikey_dbip;
 	$parameters = '?'.$addr . '&' . $api_key;
 	$response = '';
+	if($geoIPLookupMethod == 0)
+	{
+		return array("","","","","","");
+	}
 //echo (__FUNCTION__ . " - IP lookup using " . $geoIPLookupMethod);
 	// METHOD 1 - DBIP - uses API KEY
 	if($geoIPLookupMethod == 1)
@@ -2948,8 +2962,10 @@ else
 {
 	$edgeaddress  = gethostbyname($DomainOrIP);
 //echo $edgeaddress ;
-
-	$edgename = gethostbyaddr($hostip );
+	if(isset($hostip ))
+		$edgename = gethostbyaddr($hostip );
+	else	
+		$edgename = '';
 // echo $edgename;
 }
 	if($debug == true)
