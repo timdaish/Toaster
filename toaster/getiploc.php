@@ -1,5 +1,5 @@
 <?php
-require '..\GeoLite2-City\geoip2.phar';
+require '../GeoLite2-City/geoip2.phar'; // linux
 header("Content-Type: text/plain");
 use GeoIp2\Database\Reader;
 
@@ -7,7 +7,7 @@ function getIPLoc($ip)
 {
 // This creates the Reader object, which should be reused across
 // lookups.
-$reader = new Reader('..\GeoLite2-City\GeoLite2-City.mmdb');
+$reader = new Reader('../GeoLite2-City/GeoLite2-City.mmdb'); // linux
 
 $record = $reader->city($ip);
 
