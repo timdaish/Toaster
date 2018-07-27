@@ -6,7 +6,7 @@ function downloadObject($key,$valuearray)
 	global $url,$filepath_domainsavedir,$filepath_domainsaverootdir,$filepath_basesavedir,$ua,$host_domain,$arrayOfObjects,$bool_b64,$sourceurlparts,$body,$objcount,$objcountimg,
      $arrayListOfImages,$arrayPageObjects,$debug,$boolHTTPCompressRoot,$compressionlevel,$totfilesize,$embeddedfile_count,$embeddedcount,$objcountcss,$objcountscript,$objcountimg,
      $totbytesdownloaded,$noof404Errors,$pagespeedcount,$objcountfont,$plainsvgid,$plainsvgelement,$OS,$perlbasedir,$basescheme,
-     $amplience_dynamic_images_found,$amplience_dynamic_images_strip,$amplience_dynamic_images_stripnone,$amplience_dynamic_images_chroma,$loadContentFromHAR;
+     $amplience_dynamic_images_found,$amplience_dynamic_images_strip,$amplience_dynamic_images_stripnone,$amplience_dynamic_images_chroma,$loadContentFromHAR,$wptHAR,$chhHAR;
 
 		$dlError = '';
 		$bool_b64 = false;
@@ -985,6 +985,10 @@ function downloadObject($key,$valuearray)
 				if($loadContentFromHAR == true)
 				{
 //echo ("<br/><br/>DO: Extracting object from HAR: key: $key  objno: $pageobjectno;  file: ".$value.";<br/>local filename: $local<br/>");
+
+
+
+
 				}
 				else
 				{
@@ -1470,11 +1474,15 @@ function downloadObject($key,$valuearray)
 					else
 					{
 						$redirs = array ();
-
-                    	if($redir_count == 0){
+//echo (__FILE__ . " " .__FUNCTION__ . " " . __LINE__ . "; " . $sourcefile . ": wpthar: " .$wptHAR. "; chhhar: " . $chhHAR . "<br/>");
+                    	if($redir_count == 0 and $wptHAR == false and $chhHAR == false){
 //echo ("(download): saving the headers against the object: no redirs: $sourcefile<br/>");
     						addPageHeaders($sourcefile,$hdrs);
-					    }
+						}
+						else
+						{
+//echo ("(download): bypass saving the headers against the object due to HAR processed: $sourcefile<br/>");
+						}
 
                     }
 
@@ -2603,13 +2611,6 @@ function downloadObject($key,$valuearray)
             $truemimetype = ''; // set for non images
 			if(intval($sc) == 200 or strpos($embeddedfile,"data:") !== false)
 			{
-				if(strpos($embeddedfile,"data:") !== false)
-				{
-//echo "processing embedded data file: ".$embeddedfile. "; mimetype =  " . $mimetype . "<br/>";
-
-        		}
-
-
 
 					// IMAGE STUFF
 					$truemimetype = '';
@@ -2632,9 +2633,6 @@ function downloadObject($key,$valuearray)
 					    error_log($lfn . ": image mimetype given ". $mimetype . "<br/>");
 
 
-
-
-
 					// check file signature irrespective of the stated mimetype - it may be wrong - get true mmime type for file
 					if($mimetype == 'image/gif' or $mimetype == 'image/png' or $mimetype == 'image/jpeg' or $mimetype == 'image/jpg' or $mimetype == 'image/webp' or $mimetype == 'image/jp2' or $mimetype == 'image/svg+xml' or $mimetype == "image/x-ms-bmp" or $mimetype == "image/bmp" or $mimetype = '' or $mimetype = 'application/octet-stream' or $mimetype = 'text/plain')
 					{
@@ -2655,6 +2653,17 @@ function downloadObject($key,$valuearray)
 							{
 								//addImageData($sourcefile,"DUMMY",'');
 								$truemimetype = getMimeTypeFromImageSignature($lfn);
+
+
+								if(strpos($embeddedfile,"data:") !== false)
+								{
+				//echo "processing embedded data file: ".$embeddedfile. "; mimetype =  " . $mimetype . "<br/>";
+									if($mimetype != $truemimetype)
+									{
+										error_log($lfn . ": image mimetype incorrect ". $mimetype . " should be " . $truemimetype . "<br/>");
+										addErrors($sourcefile,"Embedded image has incorrect mimetype: ". $mimetype . " set but should be " . $truemimetype);
+									}
+								}
 
 								@$get    = getimagesize($lfn);
 								if(isset($get))
@@ -3192,11 +3201,6 @@ function downloadObject($key,$valuearray)
 //echo($sourcefile.': Adding image structure: '.$structure);
 				addImageData($sourcefile,"Structure",$structure);
 			}
-
-
-
-
-
 
 }; // function DownloadObject
 

@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html>
 
@@ -34,7 +37,7 @@
       <label>Page URL</label>
       <input type="text" name="url" id="urlfield" size="70" maxlength="10000" value="" class="long" required autofocus>
       <label>Real(*WPT)/Emulated Device</label>
-      <select id="ualist" name="ua"  class="long" required>
+      <select id="ualist" name="ua" class="long" required>
       </select>
       <div class="checkbox">
         <label for="cssimgs">Get All Available Objects</label>
@@ -68,7 +71,7 @@
       <label>Auth Password</label>
       <input type="text" name="password" size="60" width="60" class="long" value="">
       <label>Notes</label>
-      <textarea id="comment" name="comment" placeholder="Enter text here..."  class="long"></textarea>
+      <textarea id="comment" name="comment" placeholder="Enter text here..." class="long"></textarea>
       <!-- The data encoding type, enctype, MUST be specified as below -->
       <!-- MAX_FILE_SIZE must precede the file input field -->
       <!--<label for="fileupload">Upload HAR</label>-->
@@ -397,7 +400,7 @@ console.log('status toastedfilename: ' + toastedfilename);
  
     });  // end ajax
 
-  }, 300
+  }, 200
   );
 } // end function startRefresh
 

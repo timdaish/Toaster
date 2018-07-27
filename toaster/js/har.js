@@ -117,14 +117,14 @@ function renderHAR(harfile){
 		if ("_renderStart" in pagesdata.pageTimings && pagesdata.id){
 			pages.RenderStartTime = SanitiseTimings(pagesdata.pageTimings._renderStart);
 		}
-		if ("FirstMeaningfulPaint" in pagesdata.pageTimings){ // Headless Chrome - Chrome Har Capturer
+		if ("_firstMeaningfulPaint" in pagesdata.pageTimings){ // Headless Chrome - Chrome Har Capturer
 			pages.FirstMeaningfulPaint = SanitiseTimings(pagesdata.pageTimings.FirstMeaningfulPaint);
 		}
 
 		if ("_fullyLoaded" in pagesdata){
 			pages.FullyLoadedTime = SanitiseTimings(pagesdata._fullyLoaded);
 		}
-		if ("TotalTime" in pagesdata.pageTimings){
+		if ("_totalTime" in pagesdata.pageTimings){
 			pages.FullyLoadedTime = SanitiseTimings(pagesdata.pageTimings.TotalTime);
 		}
 

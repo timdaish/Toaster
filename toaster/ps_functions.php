@@ -36,7 +36,7 @@ else
 }
 define ( CURL_HTTP_VERSION_2TLS , 4);
 //echo "cookie jar file: ". $cookie_jar."<br/>" ;
-$encodingoptions = "gzip,deflate"; // br brotli disabled - php curl won't get it
+$encodingoptions = "gzip,deflate,br"; // br brotli - not all php curls get it so try first and adapt if necessary
 $b3pdbPublic = true;
 $filepath_domainsavedir = '';
 $filepath_domainsaverootdir = '';
@@ -108,8 +108,11 @@ $amplience_dynamic_images_chroma = 0;
 // db
 $dbcon = '';
 $dbusage = false;
+// har
 $uploadedHAR = false;
 $uploadedHARFileName = '';
+$wptHAR = false;
+$chhHAR = false;
 //
 $boolNewCookieSessionSet = false;
 // arrays for simple lists
@@ -516,23 +519,38 @@ function getStyleIDandClasess($initurl)
         $result = curl_exec($ch);
         $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 //echo "REQUEST HEADER<br/>".$headerSent."<br/>";
-        debug("REQUEST HEADER", $headerSent);
+        debug("REQUEST HEADER 1", $headerSent);
 // Check if any error occurred
         if (!$ch)
         {
             die("Couldn't initialize a CURL handle");
         }
+        
         if (empty($result) or !$result)
         {
 // some kind of an error happened
             adderrors($url, 'Curl error: ' . curl_error($ch));
 //echo("curl error getting $url <br/>");
-            $curl_info = false;
             $errno = curl_errno($ch);
             $error_message = curl_strerror($errno);
 //echo ("CURL error $url ({$errno}): "." {$error_message}"."<br/>");
             debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
-die(curl_error($ch));
+            //echo "ch: " . $ch . PHP_EOL;
+            
+            if($errno == 61 or $errno == 23)
+            {
+              // echo ("Brotli decoding was not supported CURL error $url ({$errno}): " . " {$error_message}  - " . $url);
+               echo ("Brotli was available from the host but decoding was not supported by the version of CURL on this server.");
+                    // can't decode brotli in the current version of curl, so remove it
+                    $encodingoptions = "gzip,deflate";
+                    // and retry request again without brotli
+                    list($curl_info, $curlheader) = readURLandSaveToFilePath($url, $sfn);
+            }
+            else
+            {
+                echo ("CURL error $url ({$errno}): " . " {$error_message}  - " . $url);
+                die(curl_error($ch));
+            }
         }
         else
             if ($errno = curl_errno($ch))
@@ -540,12 +558,12 @@ die(curl_error($ch));
                 $error_message = curl_strerror($errno);
 //echo ("CURL error $url ({$errno}): "." {$error_message}"."<br/>");
                 debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
-                adderrors($url, 'Curl error: ' . $error_message);
+             //   adderrors($url, 'Curl error: ' . $error_message);
             }
             else
             {
-                $curl_info = curl_getinfo($ch);
-        }
+                    $curl_info = curl_getinfo($ch);
+            }
         $dlfilesize = curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD);
         $dlstatuscode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 // close file connection
@@ -642,7 +660,7 @@ die(curl_error($ch));
         $result = curl_exec($ch);
         $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 //echo "REQUEST HEADER<br/>".$headerSent."<br/>";
-        debug("REQUEST HEADER", $headerSent);
+        debug("REQUEST HEADER 2", $headerSent);
 // Check if any error occurred
         if (!$ch)
         {
@@ -651,7 +669,7 @@ die(curl_error($ch));
         if (empty($result) or !$result)
         {
 // some kind of an error happened
-            adderrors($url, 'Curl error: ' . curl_error($ch));
+         //   adderrors($url, 'Curl error: ' . curl_error($ch));
 //echo("curl error getting $url <br/>");
             $curl_info = false;
             $errno = curl_errno($ch);
@@ -666,7 +684,7 @@ die(curl_error($ch));
                 $error_message = curl_strerror($errno);
 //echo ("CURL error $url ({$errno}): "." {$error_message}"."<br/>");
                 debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
-                adderrors($url, 'Curl error: ' . $error_message);
+            //    adderrors($url, 'Curl error: ' . $error_message);
             }
             else
             {
@@ -767,7 +785,7 @@ die(curl_error($ch));
         $result = curl_exec($ch);
         $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 //echo "REQUEST HEADER on retry<br/>".$headerSent."<br/>";
-        debug("REQUEST HEADER", $headerSent);
+        debug("REQUEST HEADER 3", $headerSent);
 // Check if any error occurred
         if (!$ch)
         {
@@ -776,7 +794,7 @@ die(curl_error($ch));
         if (empty($result) or !$result)
         {
 // some kind of an error happened
-            adderrors($url, 'Curl error: ' . curl_error($ch));
+          //  adderrors($url, 'Curl error: ' . curl_error($ch));
 //echo("curl error getting $url <br/>");
             $curl_info = false;
             $errno = curl_errno($ch);
@@ -791,7 +809,7 @@ die(curl_error($ch));
                 $error_message = curl_strerror($errno);
 //echo ("CURL error $url ({$errno}): "." {$error_message}"."<br/>");
                 debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
-                adderrors($url, 'Curl error: ' . $error_message);
+          //      adderrors($url, 'Curl error: ' . $error_message);
             }
             else
             {
@@ -869,7 +887,7 @@ die(curl_error($ch));
         $result = curl_exec($ch);
         $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 //echo "REQUEST HEADER on retry<br/>".$headerSent."<br/>";
-        debug("REQUEST HEADER", $headerSent);
+        debug("REQUEST HEADER 4", $headerSent);
 // Check if any error occurred
         if (!$ch)
         {
@@ -878,7 +896,7 @@ die(curl_error($ch));
         if (empty($result) or !$result)
         {
 // some kind of an error happened
-            adderrors($url, 'Curl error: ' . curl_error($ch));
+         //   adderrors($url, 'Curl error: ' . curl_error($ch));
 //echo("curl error getting $url <br/>");
             $curl_info = false;
             $errno = curl_errno($ch);
@@ -893,7 +911,7 @@ die(curl_error($ch));
                 $error_message = curl_strerror($errno);
 //echo ("CURL error $url ({$errno}): "." {$error_message}"."<br/>");
                 debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
-                adderrors($url, 'Curl error: ' . $error_message);
+             //   adderrors($url, 'Curl error: ' . $error_message);
             }
             else
             {
@@ -977,7 +995,7 @@ die(curl_error($ch));
         $result = curl_exec($ch);
         $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 //echo "REQUEST HEADER<br/>".$headerSent."<br/>";
-        debug("REQUEST HEADER", $headerSent);
+        debug("REQUEST HEADER 5", $headerSent);
 // Check if any error occurred
         if (!$ch)
         {
@@ -986,7 +1004,7 @@ die(curl_error($ch));
         if (empty($result) or !$result)
         {
 // some kind of an error happened
-            adderrors($url, 'Curl error: ' . curl_error($ch));
+          //  adderrors($url, 'Curl error: ' . curl_error($ch));
 //echo("curl error getting $url <br/>");
             $curl_info = false;
             $errno = curl_errno($ch);
@@ -1001,7 +1019,7 @@ die(curl_error($ch));
                 $error_message = curl_strerror($errno);
 //echo ("CURL error $url ({$errno}): "." {$error_message}"."<br/>");
                 debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
-                adderrors($url, 'Curl error: ' . $error_message);
+            //    adderrors($url, 'Curl error: ' . $error_message);
             }
             else
             {
@@ -2254,7 +2272,8 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
 
     function extract_headersandbody($filename, $fn, $headers)
     {
-        global $loadContentFromHAR, $body, $OS,$curlresponseheaders,$headers;
+        global $loadContentFromHAR, $body, $OS,$curlresponseheaders,$headers,$encodingoptions;
+        $bBRused = strpos($encodingoptions,"br");
         if($loadContentFromHAR == true)
         {
             $headers = implode($curlresponseheaders);
@@ -2316,37 +2335,40 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                         {
                             case "content-encoding" :
                                 $contentencoding = $pieces[1];
-                                if ($contentencoding == 'br')
+                                if ($contentencoding == 'br' and $bBRused != false)
                                 {
                                     debug('Brotli content encoding detected', "brotli");
 //echo ("Brotli content encoding detected<br/>");
                                     $brotli = true;
-// decompress for brotl
+                                    // decompress for brotl
+                                    @$fni = tempnam("/tmp", "bri");;
+                                    @$fno = tempnam("/tmp", "bro");;
                                     $res = array();
                                     if ($OS == "Windows")
                                     {
-                                        $fni = 'c:\\Temp\\bri';
-                                        $fno = 'c:\\Temp\\bro';
+                                        
 //$tempi = tempnam("c:\\temp\\", "bri");
 //$tempo = tempnam("c:\\temp\\", "bro");
                                         file_put_contents($fni, $body);
                                         exec('win_tools\bro64 -d -i ' . $fni . " -o " . escapeshellarg($fno), $res);
-                                        $body = file_get_contents($fno);
-                                        unlink($fni);
-                                        unlink($fno);
+                                        $bodyDecodedBrotli = file_get_contents($fno);
+                                        if($bodyDecodedBrotli != '')
+                                            $body = $bodyDecodedBrotli;
                                     }
                                     else
                                     {
                                         // brotli linux decoder
-                                        $fni = '/tmp/bri';
-                                        $fno = '/tmp/bro';
                                         file_put_contents($fni, $body);
                                         exec('./lnx_tools/brotli -d '  . " -o " . escapeshellarg($fno) ." " . $fni, $res);
-                                        $body = file_get_contents($fno);
-                                        unlink($fni);
-                                        unlink($fno);
+                                        $bodyDecodedBrotli = file_get_contents($fno);
+                                        if($bodyDecodedBrotli != '')
+                                            $body = $bodyDecodedBrotli;
+
                                     }
+                                    unlink($fni);
+                                    unlink($fno);
                                 }
+
                                 break;
                         }
                     }
@@ -2775,7 +2797,7 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
     function processRootRedir()
     {
         debug(__FUNCTION__ . ' ' . __LINE__, '');
-        global $url, $html, $debug, $fullpagepath, $roothost, $arrayroothost, $filepath_basesavedir, $body, $boolHTTPCompressRoot, $cms, $totbytesdownloaded, $rootbytesdownloaded, $filepath_domainsaverootdir, $localfilename, $uastr;
+        global $url, $html, $debug, $fullpagepath, $roothost, $arrayroothost, $filepath_basesavedir, $body, $boolHTTPCompressRoot, $cms, $totbytesdownloaded, $rootbytesdownloaded, $filepath_domainsaverootdir, $localfilename, $uastr,$wptHAR,$chhHAR;
 //echo "processRootRedir: New Absolute URL = $url<br/>";
         session_start();
         $_SESSION['status'] = 'Processing Root Redirection';
@@ -2959,7 +2981,12 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                         "cacheSeconds" => '',);
         addUpdatePageObject($arr);
 //echo ("Main: saving the headers against the root object: no redirs<br/>");
-        addPageHeaders($url, $hdrs);
+    if($wptHAR == false and $chhHAR == false)
+    {
+//echo ("(psfunc 1: bypass saving the root headers against the object due to HAR processed: $url<br/>");
+        addPageHeaders($url, $hdrs);;
+    }
+        
 //update page's domain data
         UpdateDomainLocationFromHeader($url, $xservedby, $xpx, $xedgelocation, $server, $cfray, $xcdngeo, $xcdn, $xcache, 'processrootdir');
 //update page stats
@@ -4363,10 +4390,11 @@ $jsasync = "ASYNC";
         $result = curl_exec($chc);
         $headerSent = curl_getinfo($chc, CURLINFO_HEADER_OUT);
 //echo "REQUEST HEADER<br/>".$headerSent."<br/>";
+        debug("REQUEST HEADER 6", $headerSent);
         if (empty($result) or !$result)
         {
 // some kind of an error happened
-            adderrors($sourcefile, 'Curl error: ' . curl_error($chc));
+         //   adderrors($sourcefile, 'Curl error: ' . curl_error($chc));
 //echo("curl error getting $sourcefile <br/>");
             $curl_info = false;
 //die(curl_error($ch));
@@ -4376,7 +4404,7 @@ $jsasync = "ASYNC";
             {
                 $error_message = curl_strerror($errno);
 //echo ("cURL error $sourcefile ({$errno}): "." {$error_message}"."<br/>");
-                adderrors($sourcefile, 'Curl error: ' . $error_message);
+             //   adderrors($sourcefile, 'Curl error: ' . $error_message);
 //die("DIED 1- CSS curl error".curl_error($chc));
             }
 //if (empty($result) or !$result) {
@@ -5474,7 +5502,7 @@ addUpdatePageObject($arr);
     function extract_redirects($redirect_count, $headers, $firsturl, $boolIsRoot)
     {
 //echo ("Extract Redirects<br/>");
-        global $debug, $roothost, $arrayroothost, $host_domain, $host_domain_path, $fullurlpath, $boolRootRedirect, $rootredirchain, $page_redir_total, $arrayRootRedirs, $arrayOtherRedirs,$basescheme;
+        global $debug, $roothost, $arrayroothost, $host_domain, $host_domain_path, $fullurlpath, $boolRootRedirect, $rootredirchain, $page_redir_total, $arrayRootRedirs, $arrayOtherRedirs,$basescheme,$wptHAR,$chhHAR;
         $redirecturls = array();
         $TimeOfResponse = get_Datetime_Now();
         $chainlimit = 10;
@@ -5898,7 +5926,12 @@ addUpdatePageObject($arr);
                 $shstring = implode($setofheaders);
 //echo ("Redirection ".$ukey.": Adding headers to header array for ". $lasturl."<br/>");
                 $thissetofheaders = explode('\r\n', $shstring); // leave as single quotes '\r\n' to remove commas when displayed
+                if($wptHAR == false and $chhHAR == false)
+                {
+//echo ("(psfunc 2: bypass saving the object headers against the object due to HAR processed: $sourcefile<br/>");
                 addPageHeaders($lasturl, $thissetofheaders);
+                }
+                
 //update page's domain data = don't update domain or redir
 //UpdateDomainLocationFromHeader($host_domain,$xservedby,$xpx,$xedgelocation,$server,$cfray,"extractredir");
             }

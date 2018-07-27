@@ -1,7 +1,6 @@
 <?php
 session_start();
-if(isset($_SESSION['status']))
-{
+if(isset($_SESSION['status'])) {
   $sdata = $_SESSION['status'];
   $mdata = $_SESSION['mimetype'];
   $mdata = str_replace('/','_',$mdata);

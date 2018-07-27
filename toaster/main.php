@@ -1,5 +1,6 @@
 <?php
 session_start();
+session_destroy();
 $serverName = 'http://'.$_SERVER['SERVER_NAME'];
 $hostname = gethostname();
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -23,6 +24,7 @@ ini_set("auto_detect_line_endings", true);
 ini_set('display_errors', 0); // change to 1 for displaying errors on main scree // 0 to disable
 error_reporting(E_ALL | E_STRICT);
 ini_set('exif.encode_unicode', 'UTF-8');
+require 'xhr_getstatus.php';
 include 'ps_functions.php';
 include 'downloadObject.php';
 include 'extract_urls.php';
@@ -37,7 +39,8 @@ include 'class.Minify.php';
 include 'class.GifDecoder.php';
 include 'ttfInfo.class.php';
 include 'wpt_functions.php';
-include '3ptags_nccgroup_db.php';
+
+// include '3ptags_nccgroup_db.php';
 include 'getiploc.php';
 $toasterid=generateRandomString();
 if($OS == "Windows")
@@ -97,8 +100,7 @@ ob_start();
 //print_r($_REQUEST);
 addInitialRules();
 //echo 'This web server runs on '. $OS .'<br/>';
-$wptHAR = false;
-$chhHAR = false;
+
 $loadContentFromHAR = false;
 if(!empty($_FILES))
 {
@@ -136,7 +138,7 @@ if (isset($_REQUEST["harex"]))
 $basescheme = 'http';
 if (isset($_REQUEST["url"]))
 {
-	$url = trim($_REQUEST["url"]);
+	$url = trim($_REQUEST["url"]);	$url = trim($_REQUEST["url"]);
 	// detect if url is secure of not and set basescheme
 	if(strpos($url,'https') !== false)
 		$basescheme = "https";
@@ -489,7 +491,7 @@ if(isset($_REQUEST["chremoteurlandport"]))
         // check for error and return fail if not an IP address
         if($rootip == "error_ip") {
             session_start();
-            $_SESSION['status'] = 'Ready to Toast';
+            $_SESSION['status'] = 'Looking up Server Domain IP';
             $_SESSION['object'] = '';
             $_SESSION['mimetype'] = '';
             $_SESSION['imagepath'] = '';
@@ -871,7 +873,7 @@ debug ("toasted webname: " .$toastedwebname ,1);
     {
       session_start();
       $_SESSION['imagepath'] = '';
-      $_SESSION['status']  = 'Ready to Toast';
+      $_SESSION['status']  = 'Aborting toasting - Page failed';
       session_write_close();
       // Get the content that is in the buffer and put it in your file //
       //file_put_contents('', ob_get_contents());
@@ -880,8 +882,8 @@ debug ("toasted webname: " .$toastedwebname ,1);
 	// override content length if = -1
 	//if($contentlength = -1)
 	//	$contentlength = $contentsizedownloaded;
-	debug("Main: Root Extract Redirects fron Headers" ,"");
-	//echo("Main: Root Extract Redirects fron Headers<br/>");
+	debug("Main: Root Extract Redirects from Headers" ,"");
+	//echo("Main: Root Extract Redirects from Headers<br/>");
 	// extract redirects
 	if($redirect_count > 0)
 	{
@@ -1029,8 +1031,12 @@ error_log("MAIN redirs: new localfile: " .$localfilename);
 		addUpdatePageObject($arr);
 		$retbodylen = strlen($body);
             //error_log("4 returned body lengh = ". $retbodylen);
-		//echo ("Main: saving the headers against the root object: no redirs<br/>");
-		addPageHeaders(html_entity_decode(htmlentities($url)),$hdrs);
+//echo ("Main: saving the headers against the root object: no redirs<br/>");
+		if($wptHAR == false and $chhHAR == false)
+		{
+//echo ("(main): bypass saving the root headers against the object due to HAR processed: $url<br/>");
+			addPageHeaders(html_entity_decode(htmlentities($url)),$hdrs);
+			}
 		//echo("<pre>");
 		//print_r($hdrs);
 		//echo("</pre>");
@@ -1602,10 +1608,10 @@ if($har != '')
 								$statname = "Render Start Time";
 								break;
 							case 7: //headless chrome
-								$rst = $value['pageTimings']['FirstMeaningfulPaint'];
+								$rst = $value['pageTimings']['_firstMeaningfulPaint'];
 								$domLoadStart = $value['pageTimings']['onContentLoad'];
 								$onLoad = $value['pageTimings']['onLoad'];
-								$doct = $value['pageTimings']['TotalTime'];
+								$doct = $value['pageTimings']['_totalTime'];
 								$statname = "First Meaningful Paint";
 								break;
 							default:
@@ -1647,6 +1653,7 @@ if($har != '')
 						$httpstatus = $response['status'];
 						$pageref = $value['pageref'];
 						$requestheaders = $request['headers'];
+						$responseheaders = $response['headers'];
 						$timings = $value['timings'];
 						// get WPT values for timings
 						switch($browserengine)
@@ -1681,7 +1688,7 @@ if($har != '')
 								$cacheTime = 0;
 						} // end switch $browserengine
 						foreach ($requestheaders as $reqhdrkey => $reqhdrvalue) {
-							//echo ("req hdr key ". $reqhdrkey. " ".$reqhdrvalue."<br/>");
+//echo ("req hdr key ". $reqhdrkey. " ".implode($reqhdrvalue)."<br/>");
 							if($reqhdrvalue['name'] == 'Referer')
 							{
 								$referer = $reqhdrvalue['value'];
@@ -1692,6 +1699,18 @@ if($har != '')
 							if($reqhdrvalue['name'] == 'Content-Type')
 								$mimetype = $reqhdrvalue['value'];
 						}
+						$rsphdrset = '';						
+//echo "adding object headers from har file for: " . $ObjURL . "<br/>";
+						foreach ($responseheaders as $rsphdrkey => $rsphdrvalue) {
+//echo ("rsp hdr key ". $rsphdrkey. " ".$rsphdrvalue['name'] . ": " . $rsphdrvalue['value']."<br/>");
+							//$hdrsplit = str_split($rsphdrvalue,":");
+						
+							$rsphdrset = $rsphdrset . $rsphdrvalue['name'] . ": " . $rsphdrvalue['value'] . PHP_EOL;
+						}
+
+						addPageHeaders($ObjURL,$rsphdrset);
+
+
 						//echo("<pre>Response");
 						//print_r($response);
 						//echo("</pre><br/>");
@@ -2916,7 +2935,7 @@ var cookietext = '<?php echo utf8_converter($cookiedata); ?>';
 		renderHAR(hardata);
 	else
 	{
-		console.log("bypassing HAR processing - no file to process");
+//console.log("bypassing HAR processing - no file to process");
 	}
     document.title = 'Toasted - ' + url;
 </script>

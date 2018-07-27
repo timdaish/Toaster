@@ -495,13 +495,20 @@ function url_to_absolute( $baseUrl, $relativeUrl )
     // If relative URL path doesn't start with /, merge with base path
     if ( $r['path'][0] != '/')
     {
-		//echo "converting url - rel does not start with /: $relativeUrl <br/>";
-		if(isset($b['path']))
+//echo "converting url - rel does not start with /: $relativeUrl <br/>";
+		$dynamicpage = false;
+		if(strpos($b['path'],".php" != false) || strpos($b['path'],".ashx" != false) || strpos($b['path'],".aspx" != false) || strpos($b['path'],".asmxc" != false) || strpos($b['path'],".asvc" != false) || strpos($b['path'],".jsp" != false))
+			$dynamicpage = true;
+		if(isset($b['path']) and $dynamicpage == false)
+		{
 			$base = @mb_strrchr( $b['path'], '/', TRUE, 'UTF-8' );
+			$r['path'] = $base . '/' . $r['path'];
+		}
 		else
-			$base = @mb_strrchr('/', TRUE, 'UTF-8' );
-        if ( $base === FALSE ) $base = '';
-        	$r['path'][0] = $base . '/' . $r['path'];
+		{
+			$base = @mb_strrchr( $r['path'],'/', TRUE, 'UTF-8' );
+			//leave $r['path'] as is;
+		}       	
     }
 	else
 	{
@@ -2117,7 +2124,10 @@ function lookup3PDescriptionDirect($domain)
     $domainprovider = '';
     $domaincat = '';
     $domainproduct = '';
-    $domaingroup = '';
+	$domaingroup = '';
+	$party = '';
+	$author = '';
+	$datetime = '';
 
 	// strip query string
 	if (strpos($domain, "?") > 0)
