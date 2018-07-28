@@ -118,21 +118,21 @@ function renderHAR(harfile){
 			pages.RenderStartTime = SanitiseTimings(pagesdata.pageTimings._renderStart);
 		}
 		if ("_firstMeaningfulPaint" in pagesdata.pageTimings){ // Headless Chrome - Chrome Har Capturer
-			pages.FirstMeaningfulPaint = SanitiseTimings(pagesdata.pageTimings.FirstMeaningfulPaint);
+			pages._firstMeaningfulPaint = SanitiseTimings(pagesdata.pageTimings._firstMeaningfulPaint);
 		}
 
 		if ("_fullyLoaded" in pagesdata){
 			pages.FullyLoadedTime = SanitiseTimings(pagesdata._fullyLoaded);
 		}
 		if ("_totalTime" in pagesdata.pageTimings){
-			pages.FullyLoadedTime = SanitiseTimings(pagesdata.pageTimings.TotalTime);
+			pages._totalTime = SanitiseTimings(pagesdata.pageTimings._totalTime);
 		}
 
 		if ("_domContentLoadedEventStart" in pagesdata){
 			pages.DomContentStartTime = SanitiseTimings(pagesdata._domContentLoadedEventStart);
 		}
-		if ("DomContentLoaded" in pagesdata.pageTimings){
-			pages.DomContentStartTime = SanitiseTimings(pagesdata.pageTimings.DomContentLoaded);
+		if ("_domContentLoaded" in pagesdata.pageTimings){
+			pages._domContentStartTime = SanitiseTimings(pagesdata.pageTimings._domContentLoaded);
 		}
 		if ("onContentLoad" in pagesdata && pagesdata.id){
 			pages.onContentLoad = SanitiseTimings(pagesdata.onContentLoad);
@@ -494,14 +494,14 @@ var group = '';
 		//renderstart (WPT)
 		options.yAxis.plotLines[1].value = val.RenderStartTime;
 		options.yAxis.plotLines[1].label.text = "Render Start (" + val.RenderStartTime + ")";
-		if(val.FirstMeaningfulPaint > 0)
+		if(val._firstMeaningfulPaint > 0)
 		{
-			options.yAxis.plotLines[1].value = val.FirstMeaningfulPaint;
-			options.yAxis.plotLines[1].label.text = "First Meaningful Paint (" + val.FirstMeaningfulPaint + ")";
+			options.yAxis.plotLines[1].value = val._firstMeaningfulPaint;
+			options.yAxis.plotLines[1].label.text = "First Meaningful Paint (" + val._firstMeaningfulPaint + ")";
 			rstitle = "First Meaningful Paint";
 		}
-		options.yAxis.plotLines[2].value = val.DomContentStartTime;
-		options.yAxis.plotLines[2].label.text = "DOM ContentLoaded Start (" + val.DomContentStartTime + ")";
+		options.yAxis.plotLines[2].value = val._domContentStartTime;
+		options.yAxis.plotLines[2].label.text = "DOM ContentLoaded Start (" + val._domContentStartTime + ")";
 
 
 		$.each(val.objects, function(j,objects) {
@@ -621,10 +621,10 @@ console.log(val);
 		}
 		else
 		{
-			renderstarttime = val.FirstMeaningfulPaint;
+			renderstarttime = val._firstMeaningfulPaint;
 			domloadtime = val.onContentLoad;
 			onloadtime = val.onLoadTime;
-			fullyloadedtime = val.FullyLoadedTime;
+			fullyloadedtime = val._totalTime;
 		}
 
 		x++;

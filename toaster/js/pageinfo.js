@@ -1753,7 +1753,7 @@ function mainDisplay(browserenginever) {
                     { // local
                         local = local.substr(11); // strip the /usr/share from the front
                     }
-                    if(local.indexOf("//toast") !== -1)
+                    if(local.indexOf("//toast") == 0)
                     { // local
                         local = local.substr(1); // strip the first / from the front
                     }

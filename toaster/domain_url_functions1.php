@@ -2970,7 +2970,7 @@ function NSlookup($DomainOrIP)
 		{
 			$nslresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnslookup&nsname=" . $DomainOrIP);
 			$jsonnsl = json_decode($nslresult);
-			if(sizeof($jsonnsl) > 0)
+			if(sizeof($jsonnad) > 0)
 			{
 				foreach($jsonnsl as $ipdata)
 				{
@@ -2981,9 +2981,9 @@ function NSlookup($DomainOrIP)
 		}
 			if(filter_var($edgeaddress, FILTER_VALIDATE_IP))
 			{
-//echo("$edgeaddress is a valid IP address");
+				echo("$edgeaddress is a valid IP address");
 			} else {
-//echo("$edgeaddress is not a valid IP address");
+				echo("$edgeaddress is not a valid IP address");
 			}
 		if($edgeaddress != '')
 		{

@@ -53,10 +53,10 @@ else
     //set path for webpagetoaster server and others
 	if( strpos($hostname,"gridhost.co.uk") != false)
     {
-		$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/" . $toasterid . "_debug.txt";
+		$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/logs/" . $toasterid . "_debug.txt";
 	}
 	else{
-		$debuglog = "/usr/share/toast/" . $toasterid . "_debug.txt";
+		$debuglog = "/usr/share/toast/logs/" . $toasterid . "_debug.txt";
 	}
 }
 file_put_contents($debuglog, "DEBUG LOG started" . PHP_EOL);
@@ -232,6 +232,7 @@ else
 	if (isset($_REQUEST["chkdebug"]) and $_REQUEST["chkdebug"] == true)
 	{
 		$debug = true;
+		echo "header('Content-Type: text/html')";
 		//echo "debug status true<br/>";
 	}
 	else
@@ -485,6 +486,7 @@ if(isset($_REQUEST["chremoteurlandport"]))
 	$network = '';
 	$method = '';
 	$service = '';
+	$loc = '';
 //echo ('getting rootip<br/>');
 	if($getipgeo != 'none')
 	{
@@ -2698,7 +2700,7 @@ if($har != '')
     	<div style="clear: both;"></div>
         <?php
         if($uploadedHAR == True)
-          $harsource="HAR file as uploaded";
+          $harsource="HAR file from ". $browserEngineVer;
         else
           {
             $harsource="HAR file from ". $browserEngineVer;

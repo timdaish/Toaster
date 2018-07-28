@@ -998,7 +998,8 @@ function downloadObject($key,$valuearray)
 					// a file to be downloaded
 					debug("<br><br>DOWNLOADING FILE",$sourcefile);
 					list($hd, $hp) = getDomainHostFromURL($sourcefile,true,"DownloadFile");
-
+					debug("from getDomainHostFromURL hd",$hd);
+					debug("from getDomainHostFromURL hp",$hp);
                     // check if file has already been downloaded, i.e. for a redirected file
                     $thisstatuscode = $arrayPageObjects[$key]['HTTP status'];
                     if($thisstatuscode != '')
