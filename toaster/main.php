@@ -21,6 +21,7 @@ session_write_close();
 date_default_timezone_set('UTC');
 set_time_limit(0);
 ini_set("auto_detect_line_endings", true);
+ini_set('max_execution_time', '600');
 ini_set('display_errors', 0); // change to 1 for displaying errors on main scree // 0 to disable
 error_reporting(E_ALL | E_STRICT);
 ini_set('exif.encode_unicode', 'UTF-8');
@@ -238,6 +239,7 @@ else
 		$debug = false;
 		//echo "debug status false<br/>";
 	}
+	
 	if (isset($_REQUEST["akdebug"]) and $_REQUEST["akdebug"] == true)
 	{
 		$boolakamaiDebug = true;
@@ -394,9 +396,9 @@ if(isset($_REQUEST["chremoteurlandport"]))
             break;
         default:
         	list($externalloc,$city,$stateprov,$country,$lat,$long) = lookupLocationforIP($externalIp);
-            $geoExtLocStaticMarker = "&markers=color:red%7Clabel:U%7CUser".$city.",".$stateprov.",".$country;
+            $geoExtLocStaticMarker = "&markers=color:red%7Clabel:T%7CUser".$city.",".$stateprov.",".$country;
             $geoExtLoc = $city.", ".$stateprov.", ".$country;
-			$geoMarkerLetter = "S";
+			$geoMarkerLetter = "T";
 			
 			// $lat = "51.6667";
             // $long = "-0.8333";
@@ -405,9 +407,7 @@ if(isset($_REQUEST["chremoteurlandport"]))
             // $country = "England";
             // $geoExtLoc = "Slough, Berkshire, England";
 			// $externalloc = "Slough, Berkshire, England";
-			$geoMarkerLetter = "S";
 			$b3pdbPublic = true;
-			$geoExtLocStaticMarker = "&markers=color:red%7Clabel:U%7CUser".$city.",".$stateprov.",".$country;
 
 //echo ("toaster server location: ".$externalloc. '; lat='.$lat. '; long='.$long."<br/>");
     }
@@ -466,13 +466,14 @@ if(isset($_REQUEST["chremoteurlandport"]))
 	list($host_domain,$host_domain_path) = getDomainHostFromURL($url,false,"main geo");
 	$roothost = $host_domain;
 //echo ('roothost '.$roothost.'<br/>');
-//echo("host domain: ".$host_domain."<br/>");
-//echo("host domain path: ".$host_domain_path."<br/>");
+
+// echo("host domain: ".$host_domain."<br/>");
+// echo("host domain path: ".$host_domain_path."<br/>");
     debug ('roothost ',$roothost);
 	$arrayroothost = array($host_domain);
-	getRootDomainAndSubDomains($arrayroothost);
+	//getRootDomainAndSubDomains($arrayroothost);
 	error_log("Toasting " . $url .  PHP_EOL);
-    //echo ('roothost '.$roothost.'<br/>');
+//echo ('roothost after subdomains '.$roothost.'<br/>');
 	// root geo IP lookup
 	$rootloc  = '';
 	$edgeloc = '';
@@ -484,6 +485,7 @@ if(isset($_REQUEST["chremoteurlandport"]))
 	$network = '';
 	$method = '';
 	$service = '';
+//echo ('getting rootip<br/>');
 	if($getipgeo != 'none')
 	{
 		$rootip = lookupIPforDomain($host_domain.".");
@@ -1898,11 +1900,11 @@ if($har != '')
 										break;
 									case 'Shard':
 									case 'shard':
-										debug("Shard External File", "'".$ObjURL."'");
+										debug("Shard External File d", "'".$ObjURL."'");
 										$domref = 'Shard';
 										break;
 									default:
-										debug("3rd party External File", "'".$ObjURL."'");
+										debug("3rd party External File d", "'".$ObjURL."'");
 										$domref = '3P';
 								}
 							}

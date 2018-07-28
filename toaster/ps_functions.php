@@ -262,7 +262,7 @@ function getStyleIDandClasess($initurl)
     {
         debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $testArray);
         global $initdomain, $initsubdomain;
-//error_log(__FUNCTION__ . ' ' .__LINE__ . " testarray: ". $testArray);
+error_log(__FUNCTION__ . ' ' .__LINE__ . " testarray: ". $testArray);
         if (isset($testArray))
         {
 //echo ("getting subdomains for '".$testArray. "'<br/>");
@@ -274,6 +274,9 @@ function getStyleIDandClasess($initurl)
             debug("Sub-Domain", $initsubdomain);
             debug("Domain", $initdomain);
         }
+        else
+        echo ("no array for getting subdomains for '".$testArray. "'<br/>");
+        return false;
     }
 
 
@@ -2272,7 +2275,7 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
 
     function extract_headersandbody($filename, $fn, $headers)
     {
-        global $loadContentFromHAR, $body, $OS,$curlresponseheaders,$headers,$encodingoptions;
+        global $loadContentFromHAR, $body, $OS,$curlresponseheaders,$headers,$encodingoptions,$filepath_domainsavedir;
         $bBRused = strpos($encodingoptions,"br");
         if($loadContentFromHAR == true)
         {
@@ -2340,29 +2343,38 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                                     debug('Brotli content encoding detected', "brotli");
 //echo ("Brotli content encoding detected<br/>");
                                     $brotli = true;
-                                    // decompress for brotl
-                                    @$fni = tempnam("/tmp", "bri");;
-                                    @$fno = tempnam("/tmp", "bro");;
+                                    // decompress brotli - windows
+                                    
                                     $res = array();
                                     if ($OS == "Windows")
                                     {
-                                        
-//$tempi = tempnam("c:\\temp\\", "bri");
-//$tempo = tempnam("c:\\temp\\", "bro");
+                                        @$fni = tempnam("/tmp", "bri");
+                                        @$fno = tempnam("/tmp", "bro");
                                         file_put_contents($fni, $body);
-                                        exec('win_tools\bro64 -d -i ' . $fni . " -o " . escapeshellarg($fno), $res);
+                                         exec('win_tools\bro64 -d -i ' . $fni . " -o " . escapeshellarg($fno), $res);
                                         $bodyDecodedBrotli = file_get_contents($fno);
                                         if($bodyDecodedBrotli != '')
                                             $body = $bodyDecodedBrotli;
                                     }
                                     else
                                     {
-                                        // brotli linux decoder
+                                        $fni = $filepath_domainsavedir. "a.input.br";
+                                        //echo ("brotli input file input name: " . $fni. "<br/>");
+                                        $fno = $filepath_domainsavedir . "a.output.txt";
+                                        //echo ("brotli output file input name: " . $fno. "<br/>");
+                                        //brotli linux decoder
                                         file_put_contents($fni, $body);
-                                        exec('./lnx_tools/brotli -d '  . " -o " . escapeshellarg($fno) ." " . $fni, $res);
+                                        //echo "brotli body before " . $body."<br/>";
+                                        $cmd = './lnx_tools/brotli -d ' . $fni . " -o " . $fno;
+                                        exec($cmd, $res);
+                                        //echo "exec cmd: " . $cmd;
                                         $bodyDecodedBrotli = file_get_contents($fno);
+                                        //echo "brotli body after " . strlen($bodyDecodedBrotli)." bytes<br/>";
                                         if($bodyDecodedBrotli != '')
+                                        {
                                             $body = $bodyDecodedBrotli;
+                                        //echo "brotli body after " . $bodyDecodedBrotli."<br/>";
+                                        }
 
                                     }
                                     unlink($fni);
@@ -2375,7 +2387,7 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                 }
             }
         } // end for
-//echo 'BODY<pre>';
+//echo 'after potential Brotli decoding, BODY =<pre>';
 //print_r($body);
 //echo '</pre>';
         $l = strlen($body);
@@ -4436,7 +4448,7 @@ $jsasync = "ASYNC";
                 //echo 'HTTP Success retrieving referenced CSS file: ' . $sourcefile . "; HTTP Status: " . $http_status . "; Hdr size: " . $hdrsize . "<br/>";
                 //echo ('saving temporary CSS file for Extracting CSS URLs as ' . $csstempname . '<br/>');
                 $cssfile = file_get_contents($csstempname);
-                unlink($csstempname); // delete the temp css file;
+                
 //echo($cssfile);
                 debug("cheking css imports for downloaded file in processStyleLinks", "");
                 checkForImportsCSS($cssfile, 'processStyleLinks import css', false, $sourcefile);
@@ -4584,6 +4596,7 @@ $jsasync = "ASYNC";
                         }
                     } // end inner loop
                 } // end outer loop
+                unlink($csstempname); // delete the temp css file;
         } // end for a found CSS file
 //echo 'CSS styles<pre>';
 //print_r($rootStyles);
@@ -5446,11 +5459,11 @@ addUpdatePageObject($arr);
                                     break;
                                 case 'Shard' :
                                 case 'shard' :
-                                    debug("Shard External File", "'" . $ObjURL . "'");
+                                    debug("Shard External File a", "'" . $ObjURL . "'");
                                     $domref = 'Shard';
                                     break;
                                 default :
-                                    debug("3rd party External File", "'" . $ObjURL . "'");
+                                    debug("3rd party External File a", "'" . $ObjURL . "'");
                                     $domref = '3P';
                             }
                         }
@@ -5637,11 +5650,11 @@ addUpdatePageObject($arr);
                                     break;
                                 case 'Shard' :
                                 case 'shard' :
-                                    debug("Shard External File", "'" . $lasturl . "'");
+                                    debug("Shard External File b", "'" . $lasturl . "'");
                                     $domref = 'Shard';
                                     break;
                                 default :
-                                    debug("3rd party External File", "'" . $lasturl . "'");
+                                    debug("3rd party External File b", "'" . $lasturl . "'");
                                     $domref = '3P';
                             }
                         }

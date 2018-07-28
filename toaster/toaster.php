@@ -304,13 +304,13 @@ function startRefresh()
       url: "xhr_getstatus.php",
       //data: '',
       beforeSend: function () {
-        console.log("getting status");;
+//console.log("getting status");;
             },
       dataType: 'json',
       success: function (obj) {
         //$('#status').html(msg);
   
-console.log(JSON.stringify(obj));
+//console.log(JSON.stringify(obj));
 
         if (obj.status == 'Ready to Toast') {
 //console.log("status is now ready to toast")
@@ -355,7 +355,7 @@ console.log(JSON.stringify(obj));
 
           if (obj.toastedfile != '') {
             toastedfilename = obj.toastedfile;
-console.log('status toastedfilename: ' + toastedfilename);
+//console.log('status toastedfilename: ' + toastedfilename);
           }
         }
       }, // end success
@@ -363,13 +363,13 @@ console.log('status toastedfilename: ' + toastedfilename);
               console.log(jqXhr.responseText);
               if(jqXhr.responseText === undefined)
               {
-                console.log("Toasting failed getting status undefined:");
+console.log("Toasting failed getting status undefined:");
                 console.log(textStatus);
               }
               else{
                 var x = jqXhr.responseText;
                 var aError = x.split(',');
-                console.log("Toasting failed getting status:: " + aError);
+//console.log("Toasting failed getting status:: " + aError);
               
                 if (Array.isArray(aError) == true)
                 {
@@ -400,7 +400,7 @@ console.log('status toastedfilename: ' + toastedfilename);
  
     });  // end ajax
 
-  }, 200
+  }, 500
   );
 } // end function startRefresh
 
@@ -422,8 +422,11 @@ console.log('status toastedfilename: ' + toastedfilename);
           return false;
         // carry on with the URL
         if(pgcounter <= urlcount)
+        {
+          $('#status').text("Firing up the Toaster");
           $('#toasturl').text("Toasting " + pgcounter + ' of ' + urlcount + ': ' + decodeURI(splitlistofurls[pagecount]));
         //console.log(pagecount + ": "+ splitlistofurls[pagecount]);
+        }
 
         $.ajax(
           {
@@ -431,7 +434,7 @@ console.log('status toastedfilename: ' + toastedfilename);
             beforeSend: function () {
               $('body').addClass('busy');
               startRefresh(); // startRefresh timer
-console.log("starting refresh status timer");
+//console.log("starting refresh status timer");
             },
             dataType: 'text',
             type: 'post',
@@ -440,7 +443,7 @@ console.log("starting refresh status timer");
             processData: false,
             data: new FormData(thisd),
             success: function (data, textStatus, jQxhr) {
-console.log("main.php success - stopping refresh status timer");
+//console.log("main.php success - stopping refresh status timer");
               clearInterval(refreshStatus);
 // console.log("success from main php");
               //$('html').html(data);
@@ -584,7 +587,8 @@ console.log("main.php success - stopping refresh status timer");
          //     clearInterval(refreshStatus);
             }, // end complete
             always: function () {
-
+//console.log("main.php always - stopping refresh status timer");
+              clearInterval(refreshStatus);
             }
           }
         );

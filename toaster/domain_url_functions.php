@@ -295,7 +295,7 @@ function getDomainHostFromURL($url,$boolAddDomain,$debuginfo)
 	//}
 	debug("<br/>Func GetDomainHostFromURL",$url);
 	$parse = parse_url($url);
-	//print_r($parse);
+//print_r($parse);
 	$thispagename = pathinfo($url,PATHINFO_BASENAME);
 	$h = '';
 	if(isset($parse['host']))
@@ -661,8 +661,8 @@ function AddDomainToArray($url,$roothost)
 		return;
 	list($hostdomain, $p) = getDomainHostFromURL($url,false,"AddDomainToArray");
 //echo("domain checking: ".$url."<br/>");
-	//echo("retrieved host domain: ".$hostdomain."<br/>");
-	//echo("retrieved host domain path: ".$p."<br/>");
+	// echo("retrieved host domain: ".$hostdomain."<br/>");
+	// echo("retrieved host domain path: ".$p."<br/>");
 	$ln = strlen($hostdomain);
 	//echo("retrieved host domain path length: ".$ln."<br/>");
 	$domref = 'Primary';
@@ -695,11 +695,11 @@ function AddDomainToArray($url,$roothost)
     						break;
     					case 'Shard':
                         case 'shard':
-    						debug("Shard External File", "'".$url."'");
+    						debug("Shard External File c", "'".$url."'");
     						$domref = 'Shard';
     						break;
     					default:
-    						debug("3rd party External File", "'".$url."'");
+    						debug("3rd party External File c", "'".$url."'");
     						$domref = '3P';
     				}
     		}
@@ -757,7 +757,7 @@ function AddDomainToArray($url,$roothost)
 		{
 			if(($domref != '3P' and $domref != 'CDN' and $domref != "redirection" and $getipgeo == 'domain') or $getipgeo == 'all')
 			{
-//echo("getting" . $getipgeo." new domain geo: ".$hostdomain."<br/>");
+//echo("getting " . $getipgeo." new domain geo: ".$hostdomain."<br/>");
                 $ip = lookupIPforDomain($hostdomain);
                 list($loc, $city,$region,$country,$lat,$long) = lookupLocationforIP($ip);
 //echo ('ip '.$ip.'<br/>');
@@ -2582,18 +2582,25 @@ function dbLookupShard($domain, $shard)
 } // end function dbLookupShard
 function lookupIPforDomain($inDomain)
 {
-    $ipaddress = $inDomain;
-    $ipaddress = gethostbyname($inDomain);
-    if ($ipaddress == $inDomain or $ipaddress == '92.242.132.15') {
-        //echo "No ip address for host, so host "
-        //     . "not currently available in DNS and "
-        //     . "probably offline for some time<BR>";
-        return 'error_ip';
-    }
-    else {
-        //echo "good hostname, ipaddress = $ipaddress<BR>";
-    }
-	//echo("<br>".$inDomain." ;ip = ".$ipaddress."<br/>");
+	// if(strpos(gethostname(),"gridhost.co.uk") == true)
+	// {
+
+	// }
+	// else
+	{
+		$ipaddress = $inDomain;
+		$ipaddress = gethostbyname($inDomain.".");
+		if ($ipaddress == $inDomain or $ipaddress == '92.242.132.15') {
+//echo "No ip address for host, so host "
+				// . "not currently available in DNS and "
+				// . "probably offline for some time<BR>";
+			return 'error_ip';
+		}
+		else {
+//echo "good hostname, ipaddress = $ipaddress<BR>";
+		}
+//echo("<br>".$inDomain." ;ip = ".$ipaddress."<br/>");
+	}
 	return $ipaddress;
 }
 function lookupLocationforIP($inIP)
@@ -2934,6 +2941,24 @@ function NSlookup($DomainOrIP)
 {
 	global $debug;
 	$strNslookup  = 'nslookup -timeout=20 '.$DomainOrIP;
+//echo "hostname = " . gethostname();
+	if(strpos(gethostname(),"gridhost.co.uk") == true)
+	{
+		// $edgeaddress  = gethostbyname($DomainOrIP.".");
+		// //echo $edgeaddress ;
+		// 	if(isset($edgeaddress ))
+		// 		$edgename = gethostbyaddr($DomainOrIP );
+		// 	else	
+		// 		$edgename = '';
+		// echo $edgename;
+
+		// if($debug == true)
+		// {
+		// 	echo ("edge name = '".$edgename."'<br/>");
+		// 	echo ("edge address = '".$edgeaddress."'<br/>");
+		// }
+		return array("","");
+	}
 	exec($strNslookup,$res);
 	if($debug == true)
 	{
@@ -2950,44 +2975,44 @@ function NSlookup($DomainOrIP)
 	if($res)
 	{
 	// extract address from results
-	foreach($res as $k => $v)
-	{	
-		if($v != '' and $k > 1)	
-		{
-			//echo("k = ".$k. "; v = " .$v."<br/>");
-			$splitv = explode(":",$v);
-			//echo("0 = ".$splitv[0]. "; 1 = " .$splitv[1]."<br/>");
-			if($splitv[0] == 'Name')
+		foreach($res as $k => $v)
+		{	
+			if($v != '' and $k > 1)	
 			{
-				$edgename= trim($splitv[1]);
-			}
-			if($splitv[0] == 'Addresses' or $splitv[0] == 'Address')
-			{
-				$edgeaddress = trim($splitv[1]);
-				if (isset($splitv[2]))
+				//echo("k = ".$k. "; v = " .$v."<br/>");
+				$splitv = explode(":",$v);
+				//echo("0 = ".$splitv[0]. "; 1 = " .$splitv[1]."<br/>");
+				if($splitv[0] == 'Name')
 				{
-					// found IPv6 address
-					//echo ("ip6 found<br/>");
-					$edgeaddress = trim($v);
-					$edgeaddress = str_replace('Addresses:','',$edgeaddress);
-					$edgeaddress = str_replace('Address:','',$edgeaddress);
-					$edgeaddress = trim($edgeaddress);
-				}  
-				break;
+					$edgename= trim($splitv[1]);
+				}
+				if($splitv[0] == 'Addresses' or $splitv[0] == 'Address')
+				{
+					$edgeaddress = trim($splitv[1]);
+					if (isset($splitv[2]))
+					{
+						// found IPv6 address
+						//echo ("ip6 found<br/>");
+						$edgeaddress = trim($v);
+						$edgeaddress = str_replace('Addresses:','',$edgeaddress);
+						$edgeaddress = str_replace('Address:','',$edgeaddress);
+						$edgeaddress = trim($edgeaddress);
+					}  
+					break;
+				}
 			}
 		}
 	}
-}
-else
-{
-	$edgeaddress  = gethostbyname($DomainOrIP);
-//echo $edgeaddress ;
-	if(isset($hostip ))
-		$edgename = gethostbyaddr($hostip );
-	else	
-		$edgename = '';
-// echo $edgename;
-}
+	else
+	{
+		$edgeaddress  = gethostbyname($DomainOrIP);
+	//echo $edgeaddress ;
+		if(isset($edgeaddress ))
+			$edgename = gethostbyaddr($DomainOrIP );
+		else	
+			$edgename = '';
+	// echo $edgename;
+	}
 	if($debug == true)
 	{
 		echo ("edge name = '".$edgename."'<br/>");
