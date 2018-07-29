@@ -173,11 +173,12 @@ function debug($info1, $info2 = '')
 //file_put_contents($filepath_domainsavedir."\\debug.htm", $info1.": ".$info2."<br/>", FILE_APPEND);
 }
 function debug_to_console( $data, $info2 = '' ) {
+    global $debug;
     $output = $data;
     if ( is_array( $output ) )
         $output = implode( ',', $output);
-
-    echo "<script>console.log( 'Debug Objects: " . $output . "' );</script>";
+    if($debug)
+        echo "<script>console.log( 'Debug Objects: " . $output . "' );</script>";
 }
 
 function diagnostics($info1, $info2, $info3)

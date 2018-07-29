@@ -397,9 +397,9 @@ if(isset($_REQUEST["chremoteurlandport"]))
             break;
         default:
         	list($externalloc,$city,$stateprov,$country,$lat,$long) = lookupLocationforIP($externalIp);
-            $geoExtLocStaticMarker = "&markers=color:red%7Clabel:T%7CUser".$city.",".$stateprov.",".$country;
+            $geoExtLocStaticMarker = "&markers=color:red%7Clabel:T%7CToaster".$city.",".$stateprov.",".$country;
             $geoExtLoc = $city.", ".$stateprov.", ".$country;
-			$geoMarkerLetter = "T";
+			$geoMarkerLetter = "T"; // T = Toaster Server Location - may be anywher NTS (Node Toaster Server is running)
 			
 			// $lat = "51.6667";
             // $long = "-0.8333";
@@ -516,12 +516,12 @@ if(isset($_REQUEST["chremoteurlandport"]))
         }
         //echo ('ip '.$rootip.'<br/>');
 		list($rootloc,$city,$region,$country,$rootlat,$rootlong) = lookupLocationforIP($rootip);
-//echo ('ip rootloc '.$rootloc.'<br/>');
+//echo ('ip origin location rootloc '.$rootloc.'<br/>');
 //echo ('doing nslookup on '.$host_domain.'<br/>');
 		// check for latlong location
-		//list($ll,$lat,$lon) = isthisAddressLatLong($rootloc);
-		//if($ll)
-			//$rootloc = lookupLocationForLatLong($lat,$lon);
+		list($ll,$lat,$lon) = isthisAddressLatLong($rootloc);
+		if($ll)
+			$rootloc = lookupLocationForLatLong($lat,$lon);
 		list($edgename,$edgeaddress) = nslookup($host_domain);
 		//echo ('edgename '.$edgename.'<br/>');
 		//echo ('edgeaddress '.$edgeaddress.'<br/>');
@@ -538,6 +538,7 @@ if(isset($_REQUEST["chremoteurlandport"]))
 				$edgename = $edgename2;
 				$edgeaddress = $edgeaddress2;
 			}
+			// get location of edge server
 //echo("IP geo:". $edgename. " ".$edgeaddress."; edgeloc ". $edgeloc."<br/>");
             list($edgeloc3,$city3,$region3,$country3,$lat3,$long3,$network3,$method3,$service3) = checkdomainforNamedCDNLocation($edgename,$edgeaddress);
             if($edgeloc3 != '')
@@ -546,8 +547,8 @@ if(isset($_REQUEST["chremoteurlandport"]))
                 $city = $city3;
                 $region = $region3;
                 $country = $country3;
-                $edgelat = $lat3;
-                $edgelong =$long3;
+				$edgelat = $lat3;
+                $edgelong = $long3;
                 if($network3 != '')
                     $network = $network3;
                 if($method3 != '')
@@ -559,15 +560,17 @@ if(isset($_REQUEST["chremoteurlandport"]))
         if($stripped_edgeloc == '')
         {
 //echo("edgeloc is blank, setting to loc: ".$loc."<br/>");
-            $edgeloc = $loc;
+            $edgeloc = $rootloc;
             list($latlong,$edgelat,$edgelong) = lookupLatLongForLocation($loc);
         }
 		// final checks for updating rootloc based on edgeloc after namedcdn lookup
 		list($ll,$lat,$lon) = isthisAddressLatLong($rootloc);
-		if($ll === true)
+		if($ll === true) // replace location of lat and long with the named location
 		{
 			$rootloc = lookupLocationForLatLong($lat,$lon);
-			$rootloc = $edgeloc;
+			
+			if($rootloc = '')
+				$rootloc = $edgeloc;
 //echo ('main named rootloc '.$rootloc.' was latlong, reset to edgeloc<br/>');
 		}
 		// override rootloc for testing

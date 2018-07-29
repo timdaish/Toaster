@@ -732,21 +732,16 @@ function AddDomainToArray($url,$roothost)
 //echo 'New 3P Domain identified, attempting to look up domain meta description: '.$url.'<br/>';
 			if($hostdomain != '')
 			{
-				list($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime) = get3PDescription($url);
+				list($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime,$domain) = get3PDescription($url);
 //echo ($domref.' domain checked, provider: '.$domprovider.'<br/>');
 			// update domref to shard if an entry was found for the domain with party == 1	
-				if($party == '1')
-				{
-					$domref = "Shard";
-//echo ($hostdomain . ' domain upgraded to shard, provider: '.$domprovider.'<br/>');
-				}
 			}
 		}
-		// geo location
-		$loc = '';
-		$edgeloc = '';
-		$edgename = '';
-		$edgeaddress = '';
+		// geo location - origin server
+ 		$loc = ''; //origin server location
+		$edgeloc = ''; // edge server location
+		$edgename = ''; // edge server name
+		$edgeaddress = '';  // edge server address
 		$lat = '';
 		$long = '';
 		$distance = '';
@@ -756,11 +751,19 @@ function AddDomainToArray($url,$roothost)
 		//echo("getipgeo ".$getipgeo."<br/>");
 		if($getipgeo != 'none')
 		{
-			if(($domref != '3P' and $domref != 'CDN' and $domref != "redirection" and $getipgeo == 'domain') or $getipgeo == 'all')
+ 			if(($domref != '3P' and $domref != 'CDN' and $domref != "redirection" and $getipgeo == 'domain') or $getipgeo == 'all')
 			{
-//echo("getting " . $getipgeo." new domain geo: ".$hostdomain."<br/>");
+//echo("getting " . $getipgeo." new domain geo for origin server: ".$hostdomain."<br/>");
+
+				// ORIGIN LOCATION
                 $ip = lookupIPforDomain($hostdomain);
-                list($loc, $city,$region,$country,$lat,$long) = lookupLocationforIP($ip);
+				list($loc, $city,$region,$country,$lat,$long) = lookupLocationforIP($ip);
+				// check origin location $loc for lat long and replace with lookup if required
+				$locparts = explode(',',$loc);
+				if(count($locparts) == 2 and (is_numeric(abs($locparts[0])) or is_float(abs($locparts[0]))) and (is_numeric(abs($locparts[1])) or is_float(abs($locparts[0]))))
+					$loc = lookupLocationForLatLong($locparts[0],$locparts[1]);
+
+				// EDGE SERVER
 //echo ('ip '.$ip.'<br/>');
 //echo ('doing nslookup on domain IP '.$hostdomain.'<br/>');
                 list($edgename,$edgeaddress) = nslookup($hostdomain);
@@ -773,7 +776,7 @@ function AddDomainToArray($url,$roothost)
                 	list($edgename2,$edgeaddress2) = nslookup($edgeaddress);
 //echo ('reverse NS: edgename '.$edgename2.'<br/>');
 //echo ('reverse NS: edgeaddress '.$edgeaddress2.'<br/>');
-                    if($edgename2 != '')
+                    if($edgename2 == '')
                 	{
                 		$edgeloc = $loc;
                 		$edgename = $edgename2;
@@ -808,35 +811,24 @@ function AddDomainToArray($url,$roothost)
                 }
 				$edgelocnospaces = preg_replace('/\s+/', '', $edgeloc);
 				$locnospaces = preg_replace('/\s+/', '', $loc);
-				//if($edgelocnospaces == $locnospaces)
-				//	$edgeloc = '';
-                //echo($hostdomain. ': lat='.$lat. '; long='.$long."<br/>");
 				//get distance to user's location
 				$distance = round(distance($userlat, $userlong ,$lat,$long,"M"),0);
-				// check $loc for lat long and replace with blank
-				$locparts = explode(',',$loc);
-				if(count($locparts) == 2 and (is_numeric(abs($locparts[0])) or is_float(abs($locparts[0]))) and (is_numeric(abs($locparts[1])) or is_float(abs($locparts[0]))))
-					$loc = '';
 			}
 		}
 		else
 		{
 			//echo("new domain non-geo: ".$hostdomain."<br/>");
 		}
-        // update domeref if shard is on a network
-        //if($domref == "Shard" and $network != '')
-       // {
-       //   $domref = "CDN";
-       // }
-        // check for missing edgeloc and set to loc if possible
+
+        // check for missing edge location and set to loc if possible
         $stripped_edgeloc = preg_replace('/[ ,]+/', '', $edgeloc);
         if($stripped_edgeloc == '')
         {
 //echo("edgeloc is blank, setting to loc: ".$loc."<br/>");
             $edgeloc = $loc;
-            list($latlong,$lat,$long) = lookupLatLongForLocation($loc);
-            $distance = round(distance($userlat, $userlong ,$lat,$long,"M"),0);
-        }
+         //   list($latlong,$lat,$long) = lookupLatLongForLocation($loc);
+		}
+		$distance = round(distance($userlat, $userlong, $lat, $long,"M"),0);
 		//echo("Adding new subdomain ".$hostdomain.";  domref=".$domref.";  nw=".$network."<br/>");
 		debug("Adding new domain to subdomain array",$hostdomain);
 		$arr = array(
@@ -894,7 +886,6 @@ function AddDomainToArray($url,$roothost)
     		$arr = array(
     		"Domain Name" => $hostdomain,
     		"Count" => 1,
-    		"Domain Type" => $domref,
     		"Network" => $network,
     		"Service" => $service,
     		"Site Description" => $sitedesc,
@@ -2063,12 +2054,12 @@ function get3PDescription($indomain)
 
 //echo('start func get3PDescription<br/>'.'arg indomain: '.$indomain.'<br/>');
 	// try subdomain first
-	list($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime) = lookup3PDescriptionDirect($indomain);
+	list($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime,$domain) = lookup3PDescriptionDirect($indomain);
 	if ($domprovider == '')
 	{
 		//if subdomain not defined, try the actual domain
 		$newdomain = get3PDomain($indomain);
-		list($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime) = lookup3PDescriptionDirect($newdomain);
+		list($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime,$domain) = lookup3PDescriptionDirect($newdomain);
 		//echo('domain return value: '.$sitedesc.'<br/>');
 	}
 	else
@@ -2078,7 +2069,7 @@ function get3PDescription($indomain)
 	//echo('return value: '.$sitedesc.'<br/>');
 	//echo('end func get3PDescription<br/>');
 	$sitedesc = preg_replace( '/[^[:print:]]/', '',$sitedesc);
-	return array($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime);
+	return array($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime,$domain);
 }
 function read3PDescriptionsFromFile()
 {
@@ -2197,7 +2188,7 @@ function lookup3PDescriptionDirect($domain)
     //        $domainRegex = html_entity_decode($arr[6]);
 //echo $domainprovider . "; cat: " . $domaincat . "; product: " . $domainproduct . "; group: ". $domaingroup . "; desc: " . $domaindesc . "<br/>";
     }
-    return array($domaindesc,$domainprovider,$domaincat,$domainproduct,$domaingroup,$party,$author,$datetime);
+    return array($domaindesc,$domainprovider,$domaincat,$domainproduct,$domaingroup,$party,$author,$datetime,$domain3P);
 }
 function lookup3PDescription($domain)
 {
@@ -2496,12 +2487,17 @@ function IsThisDomainaCDNofTheRootDomain($rootDomain,$testDomain)
 //    else
 //    {
       //echo("Is this a defined shard? : "."checking file for '". $testDomain."' for record of '". $rootDomain."'<br/>");
-        if(FileLookupDomainShard($rootDomain,$testDomain) == true)
-        {
-          // file lookup
-          //echo("Found a defined shard : "."checking shard file for '". $testDomain."' for record of '". $rootDomain."'<br/>");
-  	      return 'Shard';
-        }
+        // if(FileLookupDomainShard($rootDomain,$testDomain) == true)
+        // {
+        //   // file lookup
+        //   //echo("Found a defined shard : "."checking shard file for '". $testDomain."' for record of '". $rootDomain."'<br/>");
+  	    //   return 'Shard';
+		// }
+		list($sitedesc,$domprovider,$category,$product,$group,$party,$author,$datetime,$domain) = get3PDescription("http://".$testDomain);
+		if($party == "1")
+			return 'Shard';
+
+
  //   }
 	//echo("checking for main domain on: ".$maindomain."<br/>");
 	debug("Is this a shard or cdn","comparing ". $testdomain." against ". $maindomain);
@@ -2619,11 +2615,8 @@ function lookupIPforDomain($inDomain)
 }
 function lookupLocationforIP($inIP)
 {
-	global $geoIPLookupMethod,$OS,$apikey_dbip;
-	$addr = 'addr='.$inIP;
-	$api_key= 'api_key=' . $apikey_dbip;
-	$parameters = '?'.$addr . '&' . $api_key;
-	$response = '';
+	global $geoIPLookupMethod;
+	// only uses local geoip database - MaxMind
 	$tc = '';
 	$city= '';
 	$stateprovName= '';
@@ -2636,8 +2629,25 @@ function lookupLocationforIP($inIP)
 		if (filter_var($inIP, FILTER_VALIDATE_IP) and $inIP != "127.0.0.1") {
 //echo("$inIP is a valid IP address");
 			// use inbuilt service via MaxMind GeoLite2
-			list($inIP,$countryName,$countryisoCode,$stateprovName,$stateprovCode,$city,$citycode,$lat,$long) = getIPLoc($inIP);
+			try{
+				list($inIP,$countryName,$countryisoCode,$stateprovName,$stateprovCode,$city,$citycode,$lat,$long) = getIPLoc($inIP);
+			} catch (Exception $e) {
+//echo 'Caught exception: ',  $e->getMessage(), "\n";
+			}
 	//echo ($inIP . " " . $countryName. " " .$countryisoCode. " " . $stateprovName. " " . $stateprovCode. " " .  $city. " " .$citycode. " " .  $lat. " " .$long. "'<br/>");
+
+	    // add randomness to lat and long to prevent positioning all markers overlaying each other
+		$random1 = ((rand()*(0.04/getrandmax()))-0.02);
+		$random2 = ((rand()*(0.04/getrandmax()))-0.02);
+		if($lat != 0 and $long != 0)
+		{
+			$lat += $random1;
+			$long += $random2;
+		}
+		$addrparts = array($city,$stateprovName,$countryName);
+		$result = array_filter($addrparts, 'strlen'); 
+		$tc = join(", ",$result);
+		if($tc == ',,')
 			$tc = $lat.",".$long;	
 		} else {
 //echo("$inIP is not a valid IP4 address");
@@ -2646,209 +2656,203 @@ function lookupLocationforIP($inIP)
 		return array($tc,$city,$stateprovName,$countryName,$lat,$long);
 	}
 
-	// METHOD 1 - DBIP - uses API KEY
-	if($geoIPLookupMethod == 1)
-	{
-//		echo ("Using Geo API1 - ".$inIP."<br/>");
-		//echo("calling geo api with parms: ".$parameters."<br/>");
-		$response = '';
-		$response = file_get_contents('http://api.db-ip.com/addrinfo'.$parameters);
-		$response = json_decode($response);
-		//echo ("response<br/>");
-		$addr = $response->address;
-		$country = $response->country;
-		$stateprov = $response->stateprov;
-		$city = $response->city;
-		$af = array($city, $stateprov, $country);
-        $tc = implode(", ", array_filter($af));
-		//echo("1) API response:<pre>");
-		//print_r($response);
-		//echo("</pre>");
-		$lat = '';
-		$long = '';
-        // switch to next provider if number of queries per day exceeded
-        if(isset($response->error))
-        {
-            if($response->error == "maximum number of queries per day exceeded")
-                $geoIPLookupMethod = 2;
-        }
-	}
-	// METHOD 2 - TELIZE
-	if( $geoIPLookupMethod == 2)
-	//if that fails try 2nd method
-	{
-//		echo ("Using Geo API2 - ".$inIP."<br/>");
-		$parameters = $inIP;
-		$response = file_get_contents('http://www.telize.com/geoip/'.$parameters);
-		$response = json_decode($response);
-//echo("2) API response:<pre>");
-//print_r($response);
-//echo("</pre>");
-		$lat = $response->latitude;
-		$long = $response->longitude;
-		$country_code = $response->country_code;
-		if(isset($response->region))
-			$stateprov = $response->region;
-		else
-			$stateprov = '';
-		if(isset($response->city))
-			$city = $response->city;
-		else
-			$city = '';
-		if(isset($response->country))
-			$country = $response->country;
-		else
-			$country= '';
-        $af = array($city, $stateprov, $country);
-        $tc = implode(", ", array_filter($af));
-        if($tc = "")
-            $tc = $lat.",".$long;
-	}
-	// METHOD 3 - FreeGeoIP
-	if($geoIPLookupMethod == 3)
-	//if that fails try 3rd method
-	{
-		//echo ("Using Geo API3 - ".$inIP."<br/>");
-        $apiurl = 'http://freegeoip.net/json/185.119.173.18'; // . $inIP;
-        $result = file_get_contents($apiurl);
-        //echo("3) API response:<pre>");
-        //print_r($result);
-        //debug("FreeGeoIP lookup for " . $parameters,implode($response));
-        //echo("</pre>");
-        $response = json_decode($result);
-        //if($response === NULL)
-        //    debug("FreeGeoIP lookup", "failed NULL response");
-     //else
-            debug("FreeGeoIP lookup", $response->latitude . " " . $response->longitude );
-		//echo("3) API response:<pre>");
-		//print_r($response);
-        //debug("FreeGeoIP lookup for " . $inIP,var_dump($response));
-		//echo("</pre>");
-		$lat = $response->latitude;
-		$long = $response->longitude;
-		$country_code = $response->country_code;
-		$country = $response->country_name;
-		if(isset($response->region_name))
-			$stateprov = $response->region_name;
-		else
-			$stateprov = '';
-		if(isset($response->city))
-			$city = $response->city;
-		else
-			$city = '';
-        $af = array($city, $stateprov, $country);
-        $tc = implode(", ", array_filter($af));
-        if($tc = "")
-            $tc = $lat.",".$long;
-	}
-// METHOD 4 - HackerTarget
-	if($geoIPLookupMethod == 4)
-	//try 4th method
-	{
-//		echo ("Using Geo API4 - ".$inIP."<br/>");
-		$parameters = $inIP;
+	// other methods - could be re-enabled if required
+// 	// METHOD 1 - DBIP - uses API KEY
+// 	if($geoIPLookupMethod == 1)
+// 	{
+// //		echo ("Using Geo API1 - ".$inIP."<br/>");
+// 		//echo("calling geo api with parms: ".$parameters."<br/>");
+// 		$response = '';
+// 		$response = file_get_contents('http://api.db-ip.com/addrinfo'.$parameters);
+// 		$response = json_decode($response);
+// 		//echo ("response<br/>");
+// 		$addr = $response->address;
+// 		$country = $response->country;
+// 		$stateprov = $response->stateprov;
+// 		$city = $response->city;
+// 		$af = array($city, $stateprov, $country);
+//         $tc = implode(", ", array_filter($af));
+// 		//echo("1) API response:<pre>");
+// 		//print_r($response);
+// 		//echo("</pre>");
+// 		$lat = '';
+// 		$long = '';
+//         // switch to next provider if number of queries per day exceeded
+//         if(isset($response->error))
+//         {
+//             if($response->error == "maximum number of queries per day exceeded")
+//                 $geoIPLookupMethod = 2;
+//         }
+// 	}
+// 	// METHOD 2 - TELIZE
+// 	if( $geoIPLookupMethod == 2)
+// 	//if that fails try 2nd method
+// 	{
+// //		echo ("Using Geo API2 - ".$inIP."<br/>");
+// 		$parameters = $inIP;
+// 		$response = file_get_contents('http://www.telize.com/geoip/'.$parameters);
+// 		$response = json_decode($response);
+// //echo("2) API response:<pre>");
+// //print_r($response);
+// //echo("</pre>");
+// 		$lat = $response->latitude;
+// 		$long = $response->longitude;
+// 		$country_code = $response->country_code;
+// 		if(isset($response->region))
+// 			$stateprov = $response->region;
+// 		else
+// 			$stateprov = '';
+// 		if(isset($response->city))
+// 			$city = $response->city;
+// 		else
+// 			$city = '';
+// 		if(isset($response->country))
+// 			$country = $response->country;
+// 		else
+// 			$country= '';
+//         $af = array($city, $stateprov, $country);
+//         $tc = implode(", ", array_filter($af));
+//         if($tc = "")
+//             $tc = $lat.",".$long;
+// 	}
+// 	// METHOD 3 - FreeGeoIP
+// 	if($geoIPLookupMethod == 3)
+// 	//if that fails try 3rd method
+// 	{
+// 		//echo ("Using Geo API3 - ".$inIP."<br/>");
+//         $apiurl = 'http://freegeoip.net/json/185.119.173.18'; // . $inIP;
+//         $result = file_get_contents($apiurl);
+//         //echo("3) API response:<pre>");
+//         //print_r($result);
+//         //debug("FreeGeoIP lookup for " . $parameters,implode($response));
+//         //echo("</pre>");
+//         $response = json_decode($result);
+//         //if($response === NULL)
+//         //    debug("FreeGeoIP lookup", "failed NULL response");
+//      //else
+//             debug("FreeGeoIP lookup", $response->latitude . " " . $response->longitude );
+// 		//echo("3) API response:<pre>");
+// 		//print_r($response);
+//         //debug("FreeGeoIP lookup for " . $inIP,var_dump($response));
+// 		//echo("</pre>");
+// 		$lat = $response->latitude;
+// 		$long = $response->longitude;
+// 		$country_code = $response->country_code;
+// 		$country = $response->country_name;
+// 		if(isset($response->region_name))
+// 			$stateprov = $response->region_name;
+// 		else
+// 			$stateprov = '';
+// 		if(isset($response->city))
+// 			$city = $response->city;
+// 		else
+// 			$city = '';
+//         $af = array($city, $stateprov, $country);
+//         $tc = implode(", ", array_filter($af));
+//         if($tc = "")
+//             $tc = $lat.",".$long;
+// 	}
+// // METHOD 4 - HackerTarget
+// 	if($geoIPLookupMethod == 4)
+// 	//try 4th method
+// 	{
+// //		echo ("Using Geo API4 - ".$inIP."<br/>");
+// 		$parameters = $inIP;
 
-		if (filter_var($inIP, FILTER_FLAG_IPV4)) {
-//echo("$ip is a valid IP address");
-		} else {
-//	echo("$ip is not a valid IP address");
-	return array("","","","","","");
-		}
+// 		if (filter_var($inIP, FILTER_FLAG_IPV4)) {
+// //echo("$ip is a valid IP address");
+// 		} else {
+// //	echo("$ip is not a valid IP address");
+// 	return array("","","","","","");
+// 		}
 
-		$response = file_get_contents('http://api.hackertarget.com/geoip/?q='.$parameters);
-		//echo("4) API response:<pre>");
-		//print_r($response)."<br/>";
-        //hex_dump($response);
-		//echo("</pre>");
-        //echo "count: ". count($response)."<br/>";
-        $lines = explode(chr(10),$response);
-        //echo "line count: ". count($lines)."<br/>";
-//IP Address: 54.148.121.63
-//Country: US
-//State: Oregon
-//City: Boardman
-//Latitude: 45.778801
-//Longitude: -119.528999
-        if($OS == "Windows")
-            $names = json_decode(file_get_contents("toaster_tools/countrynames.json"), true);
-        else
-            $names = json_decode(file_get_contents("toaster_tools/countrynames.json"), true);
-        //echo "names ". $names;
-        $lat = '';
-        $long = '';
-        $city = '';
-        $country = '';
-        $country_code = '';
-        $stateprov = '';
-        foreach($lines as $line)
-        {
-          # do something with $line
-          //echo("line = ".$line."<br/>");
-          $lineparts = explode(':',$line);
-          $v = '';
-         //echo($lineparts[0]." === ".$lineparts[1]."<br/>");
-          @$v = trim($lineparts[1]);
-          switch ($lineparts[0])
-          {
-            case 'IP Address':
-                break;
-            case "Country":
-                $country_code = $v;
-                $country = $names[$country_code];
-                //echo("country: ".$country."<br/>");
-                break;
-            case "State":
-                $stateprov = $v;
-                //echo($stateprov."<br/>");
-                if( $stateprov  == 'N/A')
-                     $stateprov  = '';
-                break;
-            case "City":
-                $city = $v;
-                //echo($city."<br/>");
-                if($city == 'N/A')
-                    $city = '';
-                break;
-            case "Latitude":
-                $lat = $v;
-                //echo($lat."<br/>");
-                break;
-            case "Longitude":
-                $long = $v;
-                //echo($long."<br/>");
-                break;
-          }
-        }
-        $af = array($city, $stateprov, $country);
-        $tc = implode(", ", array_filter($af));
-		//if($country == 'N/A' or $country == '')
-		//{
-		//	$tc = $lat.",".$long;
-		//}
-        //echo($tc."<br/>");
-	}
-	//generic latlong lookup for location
-	$tc_nospaces = str_replace(" ","+",$tc);
-	if(!is_numeric(substr($tc_nospaces,0,1)) and $tc_nospaces != '') // location is not lat long
-		list($latlong,$lat,$long) = lookupLatLongForLocation($tc_nospaces);
-	else // location is already lat long
-		$latlong = $tc;
-    // add randomness to lat and long to prevent positioning all markers overlaying each other
-    $random1 = ((rand()*(0.04/getrandmax()))-0.02);
-    $random2 = ((rand()*(0.04/getrandmax()))-0.02);
-    if($lat != 0 and $long != 0)
-    {
-        $lat += $random1;
-        $long += $random2;
-    }
-/*echo ('IP: '.$inIP.'<br/>');
-echo ('lookupLocationforIP loc: '.$tc.'<br/>');
-echo ('lookupLocationforIP city: '.$city.'<br/>');
-echo ('lookupLocationforIP region: '.$stateprov .'<br/>');
-echo ('lookupLocationforIP country: '.$country.'<br/>');
-echo ('lookupLocationforIP lat & long: '.$lat.' '.$long.'<br/><br/>');
-*/
-	return array($tc,$city,$stateprov,$country,$lat,$long);
+// 		$response = file_get_contents('http://api.hackertarget.com/geoip/?q='.$parameters);
+// 		//echo("4) API response:<pre>");
+// 		//print_r($response)."<br/>";
+//         //hex_dump($response);
+// 		//echo("</pre>");
+//         //echo "count: ". count($response)."<br/>";
+//         $lines = explode(chr(10),$response);
+//         //echo "line count: ". count($lines)."<br/>";
+// //IP Address: 54.148.121.63
+// //Country: US
+// //State: Oregon
+// //City: Boardman
+// //Latitude: 45.778801
+// //Longitude: -119.528999
+//         if($OS == "Windows")
+//             $names = json_decode(file_get_contents("toaster_tools/countrynames.json"), true);
+//         else
+//             $names = json_decode(file_get_contents("toaster_tools/countrynames.json"), true);
+//         //echo "names ". $names;
+//         $lat = '';
+//         $long = '';
+//         $city = '';
+//         $country = '';
+//         $country_code = '';
+//         $stateprov = '';
+//         foreach($lines as $line)
+//         {
+//           # do something with $line
+//           //echo("line = ".$line."<br/>");
+//           $lineparts = explode(':',$line);
+//           $v = '';
+//          //echo($lineparts[0]." === ".$lineparts[1]."<br/>");
+//           @$v = trim($lineparts[1]);
+//           switch ($lineparts[0])
+//           {
+//             case 'IP Address':
+//                 break;
+//             case "Country":
+//                 $country_code = $v;
+//                 $country = $names[$country_code];
+//                 //echo("country: ".$country."<br/>");
+//                 break;
+//             case "State":
+//                 $stateprov = $v;
+//                 //echo($stateprov."<br/>");
+//                 if( $stateprov  == 'N/A')
+//                      $stateprov  = '';
+//                 break;
+//             case "City":
+//                 $city = $v;
+//                 //echo($city."<br/>");
+//                 if($city == 'N/A')
+//                     $city = '';
+//                 break;
+//             case "Latitude":
+//                 $lat = $v;
+//                 //echo($lat."<br/>");
+//                 break;
+//             case "Longitude":
+//                 $long = $v;
+//                 //echo($long."<br/>");
+//                 break;
+//           }
+//         }
+//         $af = array($city, $stateprov, $country);
+//         $tc = implode(", ", array_filter($af));
+// 		//if($country == 'N/A' or $country == '')
+// 		//{
+// 		//	$tc = $lat.",".$long;
+// 		//}
+//         //echo($tc."<br/>");
+// 	}
+// 	//generic latlong lookup for location
+// 	$tc_nospaces = str_replace(" ","+",$tc);
+// 	if(!is_numeric(substr($tc_nospaces,0,1)) and $tc_nospaces != '') // location is not lat long
+// 		list($latlong,$lat,$long) = lookupLatLongForLocation($tc_nospaces);
+// 	else // location is already lat long
+// 		$latlong = $tc;
+
+// /*echo ('IP: '.$inIP.'<br/>');
+// echo ('lookupLocationforIP loc: '.$tc.'<br/>');
+// echo ('lookupLocationforIP city: '.$city.'<br/>');
+// echo ('lookupLocationforIP region: '.$stateprov .'<br/>');
+// echo ('lookupLocationforIP country: '.$country.'<br/>');
+// echo ('lookupLocationforIP lat & long: '.$lat.' '.$long.'<br/><br/>');
+// */
+// 	return array($tc,$city,$stateprov,$country,$lat,$long);
 }
 function lookupLatLongForLocation($inAddr)
 {
@@ -2865,7 +2869,7 @@ function lookupLatLongForLocation($inAddr)
 	$parameters = "address=".$inAddr . "&key=" . $apikey_googlemaps;
 	$response = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?'.$parameters);
 	$response = json_decode($response);
-	$status = $response->{'status'}[0];
+	$status = $response->{'status'};
 	if($status == "OVER_QUERY_LIMIT")
 	{
 		echo("GOOGLE API Location Lookup - daily quota exceeded!");
