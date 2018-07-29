@@ -32,7 +32,7 @@ function downloadObject($key,$valuearray)
         $finalurl = $rawurl; // will get updated via redirection
 		$pageobjectno = $key + 1; // starts at zero
     	debug("<br/>Downloading: $pageobjectno of $nooffiles;  file",$value);
-
+		
 
         // begin downloading a file
 		$filepathtosaveobject = '';
@@ -1466,7 +1466,8 @@ function downloadObject($key,$valuearray)
 					$minifiedLen = 0;
 
 					// extract redirects
-					if($redir_count > 0 or ($sc >= 300 and $sc < 400))
+					$arrRedirectResponseCodes = array(301,302,307,308);
+					if($redir_count > 0 or (in_array($sc,$arrRedirectResponseCodes)))
 					{
 //echo ("(download): REDIRS TO PROCESS - headers saved by redirs for: $sourcefile<br/>");
 						list($redirs,$newurlpath,$hdrs) = extract_redirects($redir_count,$curlresponseheaders, $sourcefile,false);
@@ -3055,17 +3056,21 @@ function downloadObject($key,$valuearray)
 
 
 							// get exif data
-
-
 							$exifstr = '';
-							$exif = @exif_read_data($filepathnameofsaveobject, 0, true);
-							if($exif!==false)
+							$exif = false;
+							if(file_exists($filepathnameofsaveobject))
+								try{
+									$exif = exif_read_data($filepathnameofsaveobject, 0, true);
+								}
+								catch (Exception $e) {
+									//echo 'Caught exception: ',  $e->getMessage(), "\n";
+								}
+							if($exif != false)
 							{
 								//echo "EXIF<pre>";
 								//var_dump($exif);
 								//echo "</pre>";
 								//echo implode($exif);
-
 
 								foreach ($exif as $key => $section) {
 									foreach ($section as $name => $val) {
@@ -3098,7 +3103,16 @@ function downloadObject($key,$valuearray)
 
 							// Thumbnail extraction
 							$image = $lfn;
-							$thumbnail = @exif_thumbnail($image, $width, $height, $type);
+							$thumbnail = false;
+							if(file_exists($lfn))
+							{
+								try{
+									$thumbnail = exif_thumbnail($image, $width, $height, $type);
+								}
+								catch (Exception $e) {
+									//echo 'Caught exception: ',  $e->getMessage(), "\n";
+								}
+							}
 							if($thumbnail != false)
 							{
 								$path_parts = pathinfo($lfn);

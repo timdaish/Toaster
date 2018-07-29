@@ -116,14 +116,19 @@
     var refreshstatuserrorcount = 0;
     $(document).ready(function () {
       $storedurl = localStorage.getItem('urlfield');
-
+      $storedwbengine = localStorage.getItem('wbengine');
+      $storedchhserver = localStorage.getItem('chhserver');
+      $('#chremoteurlandport').val($storedchhserver);
 //console.log("storedurl",$storedurl);
       if($storedurl != '')
       {
         $("#urlfield").val($storedurl);
       }
       $("#urlfield").focus('focus', function() { $(this).select(); });
-
+      if($storedwbengine != '')
+      {
+        $("#"+$storedwbengine).prop("checked", true);
+      }
       // determine server name
       var svrname = location.hostname;
 //console.log("hostname",svrname);
@@ -557,13 +562,15 @@ function startRefresh()
               $('#harfile').val('');
               $('div#toastingnow > img').remove();
 
-// console.log("main.php error - stopping refresh status timer");
-         //     clearInterval(refreshStatus);
-
               if(pgcounter < urlcount)
               {
                 pagecount = pagecount + 1;
                 sendURL(thisd);
+              }
+              else
+              {
+                // console.log("main.php error - stopping refresh status timer");
+               // clearInterval(refreshStatus);
               }
             },
             complete: function () {
@@ -584,7 +591,7 @@ function startRefresh()
             }, // end complete
             always: function () {
 //console.log("main.php always - stopping refresh status timer");
-clearInterval(refreshStatus);
+//clearInterval(refreshStatus);
             }
           }
         );
@@ -608,6 +615,8 @@ clearInterval(refreshStatus);
           var rchhsvr = $('#chremoteurlandport').val();
           if(rchhsvr != '')
             localStorage.setItem('chhserver', rchhsvr);
+          var wbengoption = $("input[name='optradio']:checked").val();
+          localStorage.setItem('wbengine', wbengoption);
           //console.log(listofurls);
 
           if ($('#comment').val() != '')

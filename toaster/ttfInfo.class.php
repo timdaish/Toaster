@@ -257,7 +257,7 @@ $this->ntOffset = 0;
 //error_log(__FUNCTION__. " TTF Class " . ': table length exceeded<br/>');
                 break;
             }
-            $tag = $this->text[12+$i*16].$this->text[12+$i*16+1].$this->text[12+$i*16+2].$this->text[12+$i*16+3];
+            @$tag = $this->text[12+$i*16].$this->text[12+$i*16+1].$this->text[12+$i*16+2].$this->text[12+$i*16+3];
 
             if ($tag == 'name')
             {

@@ -172,7 +172,13 @@ function debug($info1, $info2 = '')
     }
 //file_put_contents($filepath_domainsavedir."\\debug.htm", $info1.": ".$info2."<br/>", FILE_APPEND);
 }
+function debug_to_console( $data, $info2 = '' ) {
+    $output = $data;
+    if ( is_array( $output ) )
+        $output = implode( ',', $output);
 
+    echo "<script>console.log( 'Debug Objects: " . $output . "' );</script>";
+}
 
 function diagnostics($info1, $info2, $info3)
 {
@@ -526,7 +532,7 @@ error_log(__FUNCTION__ . ' ' .__LINE__ . " testarray: ". $testArray);
 // Check if any error occurred
         if (!$ch)
         {
-            die("Couldn't initialize a CURL handle");
+            //die("Couldn't initialize a CURL handle");
         }
         
         if (empty($result) or !$result)
@@ -551,8 +557,10 @@ error_log(__FUNCTION__ . ' ' .__LINE__ . " testarray: ". $testArray);
             }
             else
             {
-                echo ("CURL error $url ({$errno}): " . " {$error_message}  - " . $url);
-                die(curl_error($ch));
+//echo ("CURL error $url ({$errno}): " . " {$error_message}  - " . $url);
+debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
+                //die(curl_error($ch));
+                return array("","");
             }
         }
         else
@@ -667,7 +675,7 @@ error_log(__FUNCTION__ . ' ' .__LINE__ . " testarray: ". $testArray);
 // Check if any error occurred
         if (!$ch)
         {
-            die("Couldn't initialize a CURL handle");
+            //die("Couldn't initialize a CURL handle");
         }
         if (empty($result) or !$result)
         {
@@ -792,7 +800,7 @@ error_log(__FUNCTION__ . ' ' .__LINE__ . " testarray: ". $testArray);
 // Check if any error occurred
         if (!$ch)
         {
-            die("Couldn't initialize a CURL handle");
+            //die("Couldn't initialize a CURL handle");
         }
         if (empty($result) or !$result)
         {
@@ -894,7 +902,7 @@ error_log(__FUNCTION__ . ' ' .__LINE__ . " testarray: ". $testArray);
 // Check if any error occurred
         if (!$ch)
         {
-            die("Couldn't initialize a CURL handle");
+            //die("Couldn't initialize a CURL handle");
         }
         if (empty($result) or !$result)
         {
@@ -1002,7 +1010,7 @@ error_log(__FUNCTION__ . ' ' .__LINE__ . " testarray: ". $testArray);
 // Check if any error occurred
         if (!$ch)
         {
-            die("Couldn't initialize a CURL handle");
+            //die("Couldn't initialize a CURL handle");
         }
         if (empty($result) or !$result)
         {
@@ -1725,6 +1733,14 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
 
 //error_log( print_R($inarr,TRUE) );
         $remoteurl = $inarr["Object source"];
+
+        if ((filter_var($remoteurl, FILTER_VALIDATE_URL) or strpos($remoteurl,"data:") == 0) and $remoteurl != "https://:0") {
+//echo("$remoteurl is a valid URL");
+        } else {
+//echo("$remoteurl is not a valid URL");
+            return false;
+        }
+
 // strip unwanted entitied coded characters - linefeed = &#xA;
 //    if(strpos("&#xA;",$remoteurl) != false)
 //echo ("linefeed char found in url" . $remoteurl."<br/>" );
@@ -2576,7 +2592,6 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                     }
                     $arr = array("id" => $objcount, "Object type" => $exttype, "Object name" => $iitem, "Header size" => 0);
                     $arrayOfObjects[] = $arr;
-                    $objcount = $objcount + 1;
 // add to array
                     $arr = array("Object type" => $exttype, "Object source" => $iitem, "Object file" => '', "Object parent" => $url, "Mime type" => '', "Domain" => $hd, "Domain ref" => $domref, "HTTP status" => '', "File extension" => '', "CSS ref" => $cssref, "Header size" => '', "Content length transmitted" => 0, "Content size downloaded" => 0, "Compression" => '', "Content size compressed" => 0, "Content size uncompressed" => 0, "Content size minified uncompressed" => 0, "Content size minified compressed" => 0, "Combined files" => '', "JS defer" => '', "JS async" => '', "JS docwrite" => '', "Image type" => '', "Image encoding" => '', "Image responsive" => '', "Image display size" => '', "Image actual size" => '', "Metadata bytes" => 0, "EXIF bytes" => 0, "APP12 bytes" => 0, "IPTC bytes" => 0, "XMP bytes" => 0, "Comment" => '', "Comment bytes" => 0, "ICC colour profile bytes" => 0, "Colour type" => '', "Colour depth" => '', "Interlace" => '', "Est. quality" => '', "Photoshop quality" => '', "Chroma subsampling" => '', "Animation" => '', "Font name" => '', "hdrs_Server" => '', "hdrs_Protocol" => '', "hdrs_responsecode" => '', "hdrs_age" => '', "hdrs_date" => '', "hdrs_lastmodifieddate" => '', "hdrs_cachecontrol" => '', "hdrs_cachecontrolPrivate" => '', "hdrs_cachecontrolPublic" => '', "hdrs_cachecontrolMaxAge" => '', "hdrs_cachecontrolSMaxAge" => '', "hdrs_cachecontrolNoCache" => '', "hdrs_cachecontrolNoStore" => '', "hdrs_cachecontrolNoTransform" => '', "hdrs_cachecontrolMustRevalidate" => '', "hdrs_cachecontrolProxyRevalidate" => '', "hdrs_connection" => '', "hdrs_contentencoding" => '', "hdrs_contentlength" => '', "hdrs_expires" => '', "hdrs_etag" => '', "hdrs_keepalive" => '', "hdrs_pragma" => '', "hdrs_setcookie" => '', "hdrs_upgrade" => '', "hdrs_vary" => '', "hdrs_via" => '', "hdrs_xservedby" => '', "hdrs_xcache" => '', "hdrs_xpx" => '', "hdrs_xedgelocation" => '', "hdrs_cfray" => '', "hdrs_xcdngeo" => '', "hdrs_xcdn" => '', "response_datetime" => '', "file_section" => '', "file_timing" => '',                		"offsetDuration" => '',
                         "ttfbMS" => '',
@@ -2587,8 +2602,9 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                         "cacheSeconds" => '',);
                     if ($mode == "inline" or ($cssimgs = true and $mode = "all"))
                     {
-                        addUpdatePageObject($arr);
-                        $objcount = $objcount + 1;
+                        $addupdateResult = addUpdatePageObject($arr);
+                        if($addupdateResult)
+                            $objcount = $objcount + 1;
                     }
                 }
                 else
@@ -2991,7 +3007,9 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                         "allStartMS" => '',
                         "allEndMS" => '',
                         "cacheSeconds" => '',);
-        addUpdatePageObject($arr);
+        $addupdateResult = addUpdatePageObject($arr);
+        if($addupdateResult)
+            $objcount = $objcount + 1;
 //echo ("Main: saving the headers against the root object: no redirs<br/>");
     if($wptHAR == false and $chhHAR == false)
     {
@@ -3016,6 +3034,16 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
         {
             $str = trim($element->src);
             debug("image string", $str);
+
+            
+            if ((filter_var($str, FILTER_VALIDATE_URL) or strpos($str,"data:") == 0)  and $str != "//:0") {
+//echo("$str is a valid URL");
+            } 
+            else {
+//echo("$str is not a valid URL");
+                break;
+            }
+            // valid url, so continue
             $boolbase64 = false;
             $qspos = strpos($str, '?');
             if ($qspos > 0)
@@ -3132,8 +3160,9 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                         "allStartMS" => '',
                         "allEndMS" => '',
                         "cacheSeconds" => '',);
-                addUpdatePageObject($arr);
-                $objcount = $objcount + 1;
+                $addupdateResult = addUpdatePageObject($arr);
+                if($addupdateResult)
+                    $objcount = $objcount + 1;
             } // end if not empty string
         } // end for
         $arrayOfObjects = array_values(array_unique($arrayOfObjects, SORT_REGULAR));
@@ -3294,8 +3323,9 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                         "cacheSeconds" => '',);
                     if ($cssimgs == true)
                     {
-                        addUpdatePageObject($arr);
-                        $objcount = $objcount + 1;
+                        $addupdateResult = addUpdatePageObject($arr);
+                        if($addupdateResult)
+                            $objcount = $objcount + 1;
                     }
                 } // end if not empty string
             } // end for each img srcset
@@ -3393,8 +3423,9 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                         "allStartMS" => '',
                         "allEndMS" => '',
                         "cacheSeconds" => '',);
-                addUpdatePageObject($arr);
-                $objcount = $objcount + 1;
+                        $addupdateResult = addUpdatePageObject($arr);
+                        if($addupdateResult)
+                            $objcount = $objcount + 1;
             } // end if not empty string
         }
     }
@@ -3551,7 +3582,9 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                         "allStartMS" => '',
                         "allEndMS" => '',
                         "cacheSeconds" => '',);
-                addUpdatePageObject($arr);
+                $addupdateResult = addUpdatePageObject($arr);
+                if($addupdateResult)
+                    $objcount = $objcount + 1;
             }
             else
             {
@@ -3945,13 +3978,15 @@ $jsasync = "ASYNC";
 */
 // add to array
                                         $arr = array("Object type" => 'JavaScript', "Object source" => $rawurl, "Object file" => '', "Object parent" => $currentpage, "Mime type" => '', "Domain" => $hd, "Domain ref" => 'parsed', "HTTP status" => '', "File extension" => '', "CSS ref" => '', "Header size" => '', "Content length transmitted" => 0, "Content size downloaded" => 0, "Compression" => '', "Content size compressed" => 0, "Content size uncompressed" => 0, "Content size minified uncompressed" => 0, "Content size minified compressed" => 0, "Combined files" => '', "JS defer" => $jsdefer, "JS async" => $jsasync, "JS docwrite" => '', "Image type" => '', "Image encoding" => '', "Image responsive" => '', "Image display size" => '', "Image actual size" => '', "Metadata bytes" => '', "EXIF bytes" => '', "APP12 bytes" => '', "IPTC bytes" => '', "XMP bytes" => '', "Comment" => '', "Comment bytes" => '', "ICC colour profile bytes" => '', "Colour type" => '', "Colour depth" => '', "Interlace" => '', "Est. quality" => '', "Photoshop quality" => '', "Chroma subsampling" => '', "Animation" => '', "Font name" => '', "hdrs_Server" => '', "hdrs_Protocol" => '', "hdrs_responsecode" => '', "hdrs_age" => '', "hdrs_date" => '', "hdrs_lastmodifieddate" => '', "hdrs_cachecontrol" => '', "hdrs_cachecontrolPrivate" => '', "hdrs_cachecontrolPublic" => '', "hdrs_cachecontrolMaxAge" => '', "hdrs_cachecontrolSMaxAge" => '', "hdrs_cachecontrolNoCache" => '', "hdrs_cachecontrolNoStore" => '', "hdrs_cachecontrolNoTransform" => '', "hdrs_cachecontrolMustRevalidate" => '', "hdrs_cachecontrolProxyRevalidate" => '', "hdrs_connection" => '', "hdrs_contentencoding" => '', "hdrs_contentlength" => '', "hdrs_expires" => '', "hdrs_etag" => '', "hdrs_keepalive" => '', "hdrs_pragma" => '', "hdrs_setcookie" => '', "hdrs_upgrade" => '', "hdrs_vary" => '', "hdrs_via" => '', "hdrs_xservedby" => '', "hdrs_xcache" => '', "hdrs_xpx" => '', "hdrs_xedgelocation" => '', "hdrs_cfray" => '', "hdrs_xcdngeo" => '', "hdrs_xcdn" => '', "response_datetime" => '', "file_section" => '', "file_timing" => '',                		"offsetDuration" => '',
-                        "ttfbMS" => '',
-                        "downloadDuration" => '',
-                        "allMS" => '',
-                        "allStartMS" => '',
-                        "allEndMS" => '',
-                        "cacheSeconds" => '',);
-                                        addUpdatePageObject($arr);
+                                            "ttfbMS" => '',
+                                            "downloadDuration" => '',
+                                            "allMS" => '',
+                                            "allStartMS" => '',
+                                            "allEndMS" => '',
+                                            "cacheSeconds" => '',);
+                                        $addupdateResult = addUpdatePageObject($arr);
+                                        if($addupdateResult)
+                                            $objcount = $objcount + 1;
                                     } // end for
                                     break;
                                 default :
@@ -3994,13 +4029,15 @@ $jsasync = "ASYNC";
                                         list($hd, $hp) = getDomainHostFromURL($newUrl, false, "parseJS 2");
 // add to array
                                         $arr = array("Object type" => 'Image', "Object source" => $rawurl, "Object file" => '', "Object parent" => $currentpage, "Mime type" => '', "Domain" => $hd, "Domain ref" => 'parsed', "HTTP status" => '', "File extension" => '', "CSS ref" => '', "Header size" => 0, "Content length transmitted" => 0, "Content size downloaded" => 0, "Compression" => '', "Content size compressed" => '', "Content size uncompressed" => '', "Content size minified uncompressed" => '', "Content size minified compressed" => '', "Combined files" => '', "JS defer" => '', "JS async" => '', "JS docwrite" => '', "Image type" => '', "Image encoding" => '', "Image responsive" => '', "Image display size" => '', "Image actual size" => '', "Metadata bytes" => 0, "EXIF bytes" => 0, "APP12 bytes" => 0, "IPTC bytes" => 0, "XMP bytes" => 0, "Comment" => '', "Comment bytes" => 0, "ICC colour profile bytes" => 0, "Colour type" => '', "Colour depth" => '', "Interlace" => '', "Est. quality" => '', "Photoshop quality" => '', "Chroma subsampling" => '', "Animation" => '', "Font name" => '', "hdrs_Server" => '', "hdrs_Protocol" => '', "hdrs_responsecode" => '', "hdrs_age" => '', "hdrs_date" => '', "hdrs_lastmodifieddate" => '', "hdrs_cachecontrol" => '', "hdrs_cachecontrolPrivate" => '', "hdrs_cachecontrolPublic" => '', "hdrs_cachecontrolMaxAge" => '', "hdrs_cachecontrolSMaxAge" => '', "hdrs_cachecontrolNoCache" => '', "hdrs_cachecontrolNoStore" => '', "hdrs_cachecontrolNoTransform" => '', "hdrs_cachecontrolMustRevalidate" => '', "hdrs_cachecontrolProxyRevalidate" => '', "hdrs_connection" => '', "hdrs_contentencoding" => '', "hdrs_contentlength" => '', "hdrs_expires" => '', "hdrs_etag" => '', "hdrs_keepalive" => '', "hdrs_pragma" => '', "hdrs_setcookie" => '', "hdrs_upgrade" => '', "hdrs_vary" => '', "hdrs_via" => '', "hdrs_xservedby" => '', "hdrs_xcache" => '', "hdrs_xpx" => '', "hdrs_xedgelocation" => '', "hdrs_cfray" => '', "hdrs_xcdngeo" => '', "hdrs_xcdn" => '', "response_datetime" => '', "file_section" => '', "file_timing" => '',                		"offsetDuration" => '',
-                        "ttfbMS" => '',
-                        "downloadDuration" => '',
-                        "allMS" => '',
-                        "allStartMS" => '',
-                        "allEndMS" => '',
-                        "cacheSeconds" => '',);
-                                        addUpdatePageObject($arr);
+                                            "ttfbMS" => '',
+                                            "downloadDuration" => '',
+                                            "allMS" => '',
+                                            "allStartMS" => '',
+                                            "allEndMS" => '',
+                                            "cacheSeconds" => '',);
+                                            $addupdateResult = addUpdatePageObject($arr);
+                                            if($addupdateResult)
+                                                $objcount = $objcount + 1;
                                     } // end for
                                     break;
                                 default :
@@ -4288,7 +4325,6 @@ $jsasync = "ASYNC";
             $arrayListOfStylesheets[] = $str;
             $arr = array("id" => $objcount, "Object type" => "Stylesheet", "Object name" => $str, "Header size" => 0);
             $arrayOfObjects[] = $arr;
-            $objcount = $objcount + 1;
 // add to array
             $arr = array("Object type" => 'StyleSheet', "Object source" => $newUrl, "Object file" => '', "Object parent" => $parentfile, "Mime type" => '', "Domain" => $hd, "Domain ref" => $domref, "HTTP status" => '', "File extension" => '', "CSS ref" => $cssref, "Header size" => '', "Content length transmitted" => 0, "Content size downloaded" => 0, "Compression" => '', "Content size compressed" => 0, "Content size uncompressed" => 0, "Content size minified uncompressed" => 0, "Content size minified compressed" => 0, "Combined files" => '', "JS defer" => '', "JS async" => '', "JS docwrite" => '', "Image type" => '', "Image encoding" => '', "Image responsive" => '', "Image display size" => '', "Image actual size" => '', "Metadata bytes" => '', "EXIF bytes" => '', "APP12 bytes" => '', "IPTC bytes" => '', "XMP bytes" => '', "Comment" => '', "Comment bytes" => '', "ICC colour profile bytes" => '', "Colour type" => '', "Colour depth" => '', "Interlace" => '', "Est. quality" => '', "Photoshop quality" => '', "Chroma subsampling" => '', "Animation" => '', "Font name" => '', "hdrs_Server" => '', "hdrs_Protocol" => '', "hdrs_responsecode" => '', "hdrs_age" => '', "hdrs_date" => '', "hdrs_lastmodifieddate" => '', "hdrs_cachecontrol" => '', "hdrs_cachecontrolMaxAge" => '', "hdrs_cachecontrolSMaxAge" => '', "hdrs_cachecontrolPrivate" => '', "hdrs_cachecontrolPublic" => '', "hdrs_cachecontrolNoCache" => '', "hdrs_cachecontrolNoStore" => '', "hdrs_cachecontrolNoTransform" => '', "hdrs_cachecontrolMustRevalidate" => '', "hdrs_cachecontrolProxyRevalidate" => '', "hdrs_connection" => '', "hdrs_contentencoding" => '', "hdrs_contentlength" => '', "hdrs_expires" => '', "hdrs_etag" => '', "hdrs_keepalive" => '', "hdrs_pragma" => '', "hdrs_setcookie" => '', "hdrs_upgrade" => '', "hdrs_vary" => '', "hdrs_via" => '', "hdrs_xservedby" => '', "hdrs_xcache" => '', "hdrs_xpx" => '', "hdrs_xedgelocation" => '', "hdrs_cfray" => '', "hdrs_xcdngeo" => '', "hdrs_xcdn" => '', "response_datetime" => '', "file_section" => '', "file_timing" => '',                		"offsetDuration" => '',
                         "ttfbMS" => '',
@@ -4297,7 +4333,9 @@ $jsasync = "ASYNC";
                         "allStartMS" => '',
                         "allEndMS" => '',
                         "cacheSeconds" => '',);
-            addUpdatePageObject($arr);
+                        $addupdateResult = addUpdatePageObject($arr);
+                        if($addupdateResult)
+                            $objcount = $objcount + 1;
         }
 //echo ("Parsing the CSS file<br/>");
 // PARSE THE CSS FILE
@@ -4579,16 +4617,17 @@ $jsasync = "ASYNC";
                             }
                             $arr = array("id" => $objcount, "Object type" => $exttype, "Object name" => $iitem, "Header size" => 0);
                             $arrayOfObjects[] = $arr;
-                            $objcount = $objcount + 1;
 // add to array
                             $arr = array("Object type" => "extract ext", "Object source" => $iitem, "Object file" => '', "Object parent" => $sourcefile, "Mime type" => '', "Domain" => $hd, "Domain ref" => $domref, "HTTP status" => '', "File extension" => '', "CSS ref" => $cssref, "Header size" => '', "Content length transmitted" => 0, "Content size downloaded" => 0, "Compression" => '', "Content size compressed" => 0, "Content size uncompressed" => 0, "Content size minified uncompressed" => 0, "Content size minified compressed" => 0, "Combined files" => '', "JS defer" => '', "JS async" => '', "JS docwrite" => '', "Image type" => '', "Image encoding" => '', "Image responsive" => '', "Image display size" => '', "Image actual size" => '', "Metadata bytes" => 0, "EXIF bytes" => 0, "APP12 bytes" => 0, "IPTC bytes" => 0, "XMP bytes" => 0, "Comment" => '', "Comment bytes" => 0, "ICC colour profile bytes" => 0, "Colour type" => '', "Colour depth" => '', "Interlace" => '', "Est. quality" => '', "Photoshop quality" => '', "Chroma subsampling" => '', "Animation" => '', "Font name" => '', "hdrs_Server" => '', "hdrs_Protocol" => '', "hdrs_responsecode" => '', "hdrs_age" => '', "hdrs_date" => '', "hdrs_lastmodifieddate" => '', "hdrs_cachecontrol" => '', "hdrs_cachecontrolPrivate" => '', "hdrs_cachecontrolPublic" => '', "hdrs_cachecontrolMaxAge" => '', "hdrs_cachecontrolSMaxAge" => '', "hdrs_cachecontrolNoCache" => '', "hdrs_cachecontrolNoStore" => '', "hdrs_cachecontrolNoTransform" => '', "hdrs_cachecontrolMustRevalidate" => '', "hdrs_cachecontrolProxyRevalidate" => '', "hdrs_connection" => '', "hdrs_contentencoding" => '', "hdrs_contentlength" => '', "hdrs_expires" => '', "hdrs_etag" => '', "hdrs_keepalive" => '', "hdrs_pragma" => '', "hdrs_setcookie" => '', "hdrs_upgrade" => '', "hdrs_vary" => '', "hdrs_via" => '', "hdrs_xservedby" => '', "hdrs_xcache" => '', "hdrs_xpx" => '', "hdrs_xedgelocation" => '', "hdrs_cfray" => '', "hdrs_xcdngeo" => '', "hdrs_xcdn" => '', "response_datetime" => '', "file_section" => '', "file_timing" => '',                		"offsetDuration" => '',
-                        "ttfbMS" => '',
-                        "downloadDuration" => '',
-                        "allMS" => '',
-                        "allStartMS" => '',
-                        "allEndMS" => '',
-                        "cacheSeconds" => '',);
-                            addUpdatePageObject($arr);
+                            "ttfbMS" => '',
+                            "downloadDuration" => '',
+                            "allMS" => '',
+                            "allStartMS" => '',
+                            "allEndMS" => '',
+                            "cacheSeconds" => '',);
+                            $addupdateResult = addUpdatePageObject($arr);
+                            if($addupdateResult)
+                                $objcount = $objcount + 1;
                         }
                         else
                         {
@@ -5515,7 +5554,7 @@ addUpdatePageObject($arr);
     function extract_redirects($redirect_count, $headers, $firsturl, $boolIsRoot)
     {
 //echo ("Extract Redirects<br/>");
-        global $debug, $roothost, $arrayroothost, $host_domain, $host_domain_path, $fullurlpath, $boolRootRedirect, $rootredirchain, $page_redir_total, $arrayRootRedirs, $arrayOtherRedirs,$basescheme,$wptHAR,$chhHAR;
+        global $debug, $roothost, $arrayroothost, $host_domain, $host_domain_path, $fullurlpath, $boolRootRedirect, $rootredirchain, $page_redir_total, $arrayRootRedirs, $arrayOtherRedirs,$basescheme,$wptHAR,$chhHAR,$objcount;
         $redirecturls = array();
         $TimeOfResponse = get_Datetime_Now();
         $chainlimit = 10;
@@ -5929,7 +5968,9 @@ addUpdatePageObject($arr);
                 "allStartMS" => '',
                 "allEndMS" => '',
                 "cacheSeconds" => '',);   
-                addUpdatePageObject($arr);
+                $addupdateResult = addUpdatePageObject($arr);
+                if($addupdateResult)
+                    $objcount = $objcount + 1;
 
 // only add headers for those urls doing a redirection, not the final URL
 //echo ("$ukey: saving the headers against the object: $lasturl<br/>");
@@ -7185,8 +7226,9 @@ debug("Found image to copy", $local);
                 else
                 {
                     // new object
-                    addUpdatePageObject($arr);
-                    $objcount = $objcount + 1;
+                    $addupdateResult = addUpdatePageObject($arr);
+                    if($addupdateResult)
+                        $objcount = $objcount + 1;
                 }
             }
         }

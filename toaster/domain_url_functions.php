@@ -773,29 +773,32 @@ function AddDomainToArray($url,$roothost)
                 	list($edgename2,$edgeaddress2) = nslookup($edgeaddress);
 //echo ('reverse NS: edgename '.$edgename2.'<br/>');
 //echo ('reverse NS: edgeaddress '.$edgeaddress2.'<br/>');
-                	if($edgename2 != '')
+                    if($edgename2 != '')
                 	{
                 		$edgeloc = $loc;
                 		$edgename = $edgename2;
                 		$edgeaddress = $edgeaddress2;
                 	}
 //echo("IP geo:". $edgename. " ".$edgeaddress."; edgeloc ". $edgeloc."<br/>");
-    				list($edgeloc3,$city3,$region3,$country3,$lat3,$long3,$network3,$method3,$service3) = checkdomainforNamedCDNLocation($edgename,$edgeaddress);
-//echo(__FUNCTION__." ".__LINE__." IP geo lookup:". $edgename. " ".$edgeaddress."; edgeloc ". $edgeloc3. "; method: ". $method3. "<br/>");
-                    if($edgeloc3 != '')
-                    {
-                        $edgeloc = $edgeloc3;
-                        $city = $city3;
-                        $region = $region3;
-                        $country = $country3;
-                        $lat = $lat3;
-                        $long =$long3;
-                        if($network3 != '')
-                            $network = $network3;
-                        if($method3 != '')
-                            $method =$method3;
-                        $service = $service3;
-                    }
+					if(!is_null($edgename) and !is_null($edgeaddress))
+					{
+						list($edgeloc3,$city3,$region3,$country3,$lat3,$long3,$network3,$method3,$service3) = checkdomainforNamedCDNLocation($edgename,$edgeaddress);
+	//echo(__FUNCTION__." ".__LINE__." IP geo lookup:". $edgename. " ".$edgeaddress."; edgeloc ". $edgeloc3. "; method: ". $method3. "<br/>");
+						if($edgeloc3 != '')
+						{
+							$edgeloc = $edgeloc3;
+							$city = $city3;
+							$region = $region3;
+							$country = $country3;
+							$lat = $lat3;
+							$long =$long3;
+							if($network3 != '')
+								$network = $network3;
+							if($method3 != '')
+								$method =$method3;
+							$service = $service3;
+						}
+					}
 //echo("name geo: ".$edgename. " ".$edgeaddress."; edgeloc ". $edgeloc."<br/>");
                 }
                 // overrides for known CDNs not using a specific edgename
@@ -2621,13 +2624,25 @@ function lookupLocationforIP($inIP)
 	$api_key= 'api_key=' . $apikey_dbip;
 	$parameters = '?'.$addr . '&' . $api_key;
 	$response = '';
+	$tc = '';
+	$city= '';
+	$stateprovName= '';
+	$countryName= '';
+	$lat= '';
+	$long= '';
 //echo (__FUNCTION__ . " - IP lookup using " . $geoIPLookupMethod . " for ip: '" . $inIP . "'<br/>" );
-	if($geoIPLookupMethod == 0)
+	if($geoIPLookupMethod == 0  ) // must be IP4
 	{
-		// use inbuilt service via MaxMind GeoLite2
-		list($inIP,$countryName,$countryisoCode,$stateprovName,$stateprovCode,$city,$citycode,$lat,$long) = getIPLoc($inIP);
-//echo ($inIP . " " . $countryName. " " .$countryisoCode. " " . $stateprovName. " " . $stateprovCode. " " .  $city. " " .$citycode. " " .  $lat. " " .$long. "'<br/>");
-		$tc = $lat.",".$long;
+		if (filter_var($inIP, FILTER_VALIDATE_IP) and $inIP != "127.0.0.1") {
+//echo("$inIP is a valid IP address");
+			// use inbuilt service via MaxMind GeoLite2
+			list($inIP,$countryName,$countryisoCode,$stateprovName,$stateprovCode,$city,$citycode,$lat,$long) = getIPLoc($inIP);
+	//echo ($inIP . " " . $countryName. " " .$countryisoCode. " " . $stateprovName. " " . $stateprovCode. " " .  $city. " " .$citycode. " " .  $lat. " " .$long. "'<br/>");
+			$tc = $lat.",".$long;	
+		} else {
+//echo("$inIP is not a valid IP4 address");
+		}
+
 		return array($tc,$city,$stateprovName,$countryName,$lat,$long);
 	}
 
@@ -2963,56 +2978,24 @@ function NSlookup($DomainOrIP)
 	$edgename = '';
 	$edgeaddress = '';
 //echo "hostname = " . gethostname();
-	if (1 == 1) //if(strpos(gethostname(),"gridhost.co.uk") == true)
+	if($DomainOrIP == '')
 	{
-		// call out to node server
-		if($DomainOrIP != '')
-		{
-			$nslresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnslookup&nsname=" . $DomainOrIP);
-			$jsonnsl = json_decode($nslresult);
-			if(sizeof($jsonnsl) > 0)
-			{
-				foreach($jsonnsl as $ipdata)
-				{
-	//echo $ipdata . "\n";
-				} 
-				$edgeaddress = $ipdata;
-			}
-		}
-			if(filter_var($edgeaddress, FILTER_VALIDATE_IP))
-			{
-//echo("$edgeaddress is a valid IP address");
-			} else {
-//echo("$edgeaddress is not a valid IP address");
-			}
-		if($edgeaddress != '')
-		{
-			$addrresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnsreverse&nsip=" . $edgeaddress);
-			$jsonnad = json_decode($addrresult);
-			if(sizeof($jsonnad) > 0)
-				{
-				foreach($jsonnad as $hndata)
-				{
-	//echo $hndata . "\n";
-				} 
-				$edgename = trim($hndata);
-			}
-		}
+		return array($edgename,$edgeaddress);
 	}
-	else
-	{
-		exec($strNslookup,$res);
-		if($debug == true)
-			{
-				echo "NS Lookup for ".$DomainOrIP."<br/>";
-				echo "cmd = " . $strNslookup . "<br/>";
-				echo "<pre>";
-				print_r($res);
-				echo("</pre>");
-			}
+
+	// try local nslookup
+	exec($strNslookup,$res);
+	if($debug == true)
+		{
+			echo "NS Lookup for ".$DomainOrIP."<br/>";
+			echo "cmd = " . $strNslookup . "<br/>";
+			echo "<pre>";
+			print_r($res);
+			echo("</pre>");
+		}
 	
 		// use nslookup results if present
-		if($res)
+		if($res and sizeof($res) > 3)
 		{
 		// extract address from results
 			foreach($res as $k => $v)
@@ -3042,19 +3025,50 @@ function NSlookup($DomainOrIP)
 					}
 				}
 			}
-		}
+		} // nslookup exec is valid
 		else
 		{
+			// try local gethostbyname
 			$edgeaddress  = gethostbyname($DomainOrIP);
 
-		//echo $edgeaddress ;
-			if(isset($edgeaddress ))
-				$edgename = gethostbyaddr($DomainOrIP);
-			else	
-				$edgename = '';
-		// echo $edgename;
-		}
-	}
+			if($edgeaddress  == '' or $edgeaddress == $DomainOrIP)
+			{
+				// finally, call out to node server
+				$nslresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnslookup&nsname=" . $DomainOrIP);
+				$jsonnsl = json_decode($nslresult);
+				if(sizeof($jsonnsl) > 0)
+				{
+					foreach($jsonnsl as $ipdata)
+					{
+			//echo $ipdata . "\n";
+					} 
+					$edgeaddress = $ipdata;
+				}
+			}
+
+			// check edgeaddress is valid
+			if(filter_var($edgeaddress,FILTER_FLAG_IPV4, FILTER_VALIDATE_IP))
+			{
+		//echo("$edgeaddress is a valid IP address");
+				//echo $edgeaddress ;
+			//	$edgename = gethostbyaddr($DomainOrIP);
+				
+				if($edgename == '' or ($edgename == $DomainOrIP))
+				{
+					$addrresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnsreverse&nsip=" . $edgeaddress);
+							$jsonnad = json_decode($addrresult);
+							if(sizeof($jsonnad) > 0)
+								{
+								foreach($jsonnad as $hndata)
+								{
+					//echo $hndata . "\n";
+								} 
+								$edgename = trim($hndata);
+							}
+				}
+			}
+// echo $edgename;
+		} // end alternative lookups
 
 	if($debug == true)
 	{
