@@ -312,11 +312,20 @@ var group = '';
 
                 }
 
+				var transsize = 0;
+				if(entries.response.bodySize != -1)
+					transsize = SanitiseSize(entries.response.bodySize);
+				else
+					if(entries.response._transferSize != -1)
+						transsize = SanitiseSize(entries.response._transferSize);
+
+
+
 				//create object array
 				var entryData = {
 					URL: entries.request.url,
                     Domain: domainnm,
-					TransSize: SanitiseSize(entries.response.bodySize),
+					TransSize: transsize,
 					UncompSize: SanitiseSize(entries.response.content.size),
 					ReqHeaderSize: SanitiseSize(entries.request.headersSize),
 					ReqContentSize: SanitiseSize(entries.request.bodySize),

@@ -1138,6 +1138,19 @@ function checkdomainforNamedCDNLocation($edgename,$edgeaddress)
 		{
 			$network = 'Google';
 		}
+		if(strpos($edgename,".googleusercontent.com") !== false)
+		{
+			$network = 'Google';
+			$cdnparts = explode(".",$edgename);
+			//echo("googleusercontent exploding: ".$edgename."<pre>");
+			//print_r($cdnparts);
+			//echo("</pre>");
+			$ip1 = filter_var(substr($cdnparts[0],-3), FILTER_SANITIZE_NUMBER_INT);
+			$ip4 = filter_var(substr($cdnparts[3],0,3), FILTER_SANITIZE_NUMBER_INT);
+			$edgeaddress = $ip1 . '.' . $cdnparts[1] .'.' . $cdnparts[2] . '.' . $ip4;
+		}
+
+
 		// AOL
 		if(strpos($edgename,".aol.com") !== false)
 		{

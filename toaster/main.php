@@ -2937,8 +2937,8 @@ var cookietext = '<?php echo utf8_converter($cookiedata); ?>';
     }
     // add the image for all browser engines
 	$('#pjspageimg').prepend('<img id="theImg" src="'+ PageImage +'" />');
-    console.log("adding screenshot to summary: " + PageImage);
-    console.log("hardata",hardata);
+//    console.log("adding screenshot to summary: " + PageImage);
+//console.log("hardata",hardata);
 	//drawWaterfall(data,"MyChart");
 	if(hardata)
 		renderHAR(hardata);
