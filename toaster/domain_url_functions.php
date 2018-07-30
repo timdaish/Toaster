@@ -3074,32 +3074,36 @@ function NSlookup($DomainOrIP)
 				}
 
 				// echo "follow on: trying toaster server for edge name lookup $edgename<br/>";
-
-				$nslresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnslookup&nsname=" . $edgename);
-				$jsonnsl = json_decode($nslresult);
-				if(sizeof($jsonnsl) > 0)
+				if($edgename != '')
 				{
-					foreach($jsonnsl as $ipdata)
+					$nslresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnslookup&nsname=" . $edgename);
+					$jsonnsl = json_decode($nslresult);
+					if(sizeof($jsonnsl) > 0)
 					{
-			//echo $ipdata . "\n";
-					} 
-					$edgeaddress = $ipdata;
+						foreach($jsonnsl as $ipdata)
+						{
+				//echo $ipdata . "\n";
+						} 
+						$edgeaddress = $ipdata;
+					}
 				}
 
 			}
 			else
 			{
 				// echo "trying toaster server for name lookup $DomainOrIP<br/>";
-
-				$nslresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnslookup&nsname=" . $DomainOrIP);
-				$jsonnsl = json_decode($nslresult);
-				if(sizeof($jsonnsl) > 0)
+				if($DomainOrIP != '' and $DomainOrIP != "localhost")
 				{
-					foreach($jsonnsl as $ipdata)
+					$nslresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnslookup&nsname=" . $DomainOrIP);
+					$jsonnsl = json_decode($nslresult);
+					if(sizeof($jsonnsl) > 0)
 					{
-			//echo $ipdata . "\n";
-					} 
-					$edgeaddress = $ipdata;
+						foreach($jsonnsl as $ipdata)
+						{
+				//echo $ipdata . "\n";
+						} 
+						$edgeaddress = $ipdata;
+					}
 				}
 			}
 
