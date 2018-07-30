@@ -753,10 +753,11 @@ function AddDomainToArray($url,$roothost)
 		{
  			if(($domref != '3P' and $domref != 'CDN' and $domref != "redirection" and $getipgeo == 'domain') or $getipgeo == 'all')
 			{
-//echo("getting " . $getipgeo." new domain geo for origin server: ".$hostdomain."<br/>");
+debug("getting " . $getipgeo." new domain geo for origin server: ",$hostdomain."<br/>");
 
 				// ORIGIN LOCATION
-                $ip = lookupIPforDomain($hostdomain);
+				$ip = lookupIPforDomain($hostdomain);
+				debug ('origin ip '.$ip.'<br/>');				
 				list($loc, $city,$region,$country,$lat,$long) = lookupLocationforIP($ip);
 				// check origin location $loc for lat long and replace with lookup if required
 				$locparts = explode(',',$loc);
@@ -765,24 +766,28 @@ function AddDomainToArray($url,$roothost)
 
 				// EDGE SERVER
 //echo ('ip '.$ip.'<br/>');
-//echo ('doing nslookup on domain IP '.$hostdomain.'<br/>');
-                list($edgename,$edgeaddress) = nslookup($hostdomain);
-//echo ('edgename '.$edgename.'<br/>');
-//echo ('edgeaddress '.$edgeaddress.'<br/>');
+debug ('doing nslookup on domain IP to get edge server  '.$ip.'<br/>');
+                list($edgename,$edgeaddress) = nslookup($ip);
+debug ('edgename '.$edgename.'<br/>');
+debug ('edgeaddress '.$edgeaddress.'<br/>');
                 if($edgeaddress != '')
                 {
                 	// do reverse NS lookup with returned name
-//echo ('doing reverse NS Lookup on edge IP '.$edgeaddress.'<br/>');
-                	list($edgename2,$edgeaddress2) = nslookup($edgeaddress);
-//echo ('reverse NS: edgename '.$edgename2.'<br/>');
-//echo ('reverse NS: edgeaddress '.$edgeaddress2.'<br/>');
-                    if($edgename2 == '')
+// echo ('doing reverse NS Lookup on edge IP '.$edgename.'<br/>');
+                	list($edgename2,$edgeaddress2) = nslookup($edgename);
+// echo ('reverse NS: edgename '.$edgename2.'<br/>');
+// echo ('reverse NS: edgeaddress '.$edgeaddress2.'<br/>');
+                    if($edgename2 != '')
                 	{
-                		$edgeloc = $loc;
+                		//$edgeloc = $loc;
                 		$edgename = $edgename2;
                 		$edgeaddress = $edgeaddress2;
-                	}
-//echo("IP geo:". $edgename. " ".$edgeaddress."; edgeloc ". $edgeloc."<br/>");
+					}
+					else
+					{
+
+					}
+//echo("edge server IP geo:". $edgename. " ".$edgeaddress."; edgeloc ". $edgeloc."<br/>");
 					if(!is_null($edgename) and !is_null($edgeaddress))
 					{
 						list($edgeloc3,$city3,$region3,$country3,$lat3,$long3,$network3,$method3,$service3) = checkdomainforNamedCDNLocation($edgename,$edgeaddress);
@@ -1536,6 +1541,7 @@ Function UpdateDomainLocationFromHeader($inurl,$xservedby,$xpx,$xedgelocation,$s
 	$network = '';
 	$edgeloc = '';
 	$method = '';
+	$prov = '';
 	if($xservedby == '' and $xpx == '' and $xedgelocation == '' and $server == '' and $cfray == '' and $xcdngeo == '' and $xcdn == '' and $via = '' and $xcache = '')
 		return false;
 //echo("<br>UpdateDomainLocationFromHeader called from ".$debuginfo."<br/>");
@@ -2123,6 +2129,7 @@ function lookup3PDescriptionDirect($domain)
 	$party = '';
 	$author = '';
 	$datetime = '';
+	$domain3P = '';
 
 	// strip query string
 	if (strpos($domain, "?") > 0)
@@ -3032,12 +3039,58 @@ function NSlookup($DomainOrIP)
 		} // nslookup exec is valid
 		else
 		{
-			// try local gethostbyname
-			$edgeaddress  = gethostbyname($DomainOrIP);
+//echo "<br/><br/>local nslookup failed, trying toaster server<br/>";
 
-			if($edgeaddress  == '' or $edgeaddress == $DomainOrIP)
+			if(filter_var($edgeaddress,FILTER_VALIDATE_IP))
 			{
-				// finally, call out to node server
+				$mode = "ip";
+				// is an valid ip
+			}
+			else
+			{
+				$mode = "nm";
+				// is a name
+			}
+
+			// finally, call out to node server
+			// echo "trying toaster server<br/>";
+			// check edgeaddress is valid
+			if(filter_var($DomainOrIP,FILTER_VALIDATE_IP))
+			{
+				// echo "trying toaster server for ip lookup $DomainOrIP<br/>";
+				// echo("$DomainOrIP is a valid IP address<br/>");
+				//echo $edgeaddress ;
+				// $edgename = gethostbyaddr($DomainOrIP);
+				
+				$addrresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnsreverse&nsip=" . $DomainOrIP);
+				$jsonnad = json_decode($addrresult);
+				if(sizeof($jsonnad) > 0)
+					{
+					foreach($jsonnad as $hndata)
+					{
+		//echo $hndata . "\n";
+					} 
+					$edgename = trim($hndata);
+				}
+
+				// echo "follow on: trying toaster server for edge name lookup $edgename<br/>";
+
+				$nslresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnslookup&nsname=" . $edgename);
+				$jsonnsl = json_decode($nslresult);
+				if(sizeof($jsonnsl) > 0)
+				{
+					foreach($jsonnsl as $ipdata)
+					{
+			//echo $ipdata . "\n";
+					} 
+					$edgeaddress = $ipdata;
+				}
+
+			}
+			else
+			{
+				// echo "trying toaster server for name lookup $DomainOrIP<br/>";
+
 				$nslresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnslookup&nsname=" . $DomainOrIP);
 				$jsonnsl = json_decode($nslresult);
 				if(sizeof($jsonnsl) > 0)
@@ -3050,27 +3103,7 @@ function NSlookup($DomainOrIP)
 				}
 			}
 
-			// check edgeaddress is valid
-			if(filter_var($edgeaddress,FILTER_FLAG_IPV4, FILTER_VALIDATE_IP))
-			{
-		//echo("$edgeaddress is a valid IP address");
-				//echo $edgeaddress ;
-			//	$edgename = gethostbyaddr($DomainOrIP);
-				
-				if($edgename == '' or ($edgename == $DomainOrIP))
-				{
-					$addrresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnsreverse&nsip=" . $edgeaddress);
-							$jsonnad = json_decode($addrresult);
-							if(sizeof($jsonnad) > 0)
-								{
-								foreach($jsonnad as $hndata)
-								{
-					//echo $hndata . "\n";
-								} 
-								$edgename = trim($hndata);
-							}
-				}
-			}
+
 // echo $edgename;
 		} // end alternative lookups
 
