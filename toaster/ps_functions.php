@@ -2491,8 +2491,12 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
 
     function getcssurlsfromcss($cssfile, $mode)
     {
-        global $roothost, $arrayOfObjects, $objcount, $arrayListOfImages, $cssimgs, $url, $roothost, $testdomain,$arrayPageObjects,$objcountimg;
+        global $roothost, $arrayOfObjects, $objcount, $arrayListOfImages, $cssimgs, $url, $roothost, $testdomain,$arrayPageObjects,$objcountimg,$wptHAR, $chhHAR;
         $boolLoaded = false;
+
+        if($wptHAR or $chhHAR)
+            return; // don't process for a WPT or Chrome Headless HAR file
+
 // normal urls
         $cssurls = extract_css_urls($cssfile);
 //echo 'extracting URLs from inline CSS<pre>';
@@ -3027,8 +3031,12 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
 
     function getListOfImages()
     {
-        global $html, $arrayListOfImages, $arrayListOf3PImages, $roothost, $arrayOfObjects, $arrayOf3PObjects, $objcount, $fullurlpath, $basescheme;
-// Find all images
+        global $html, $arrayListOfImages, $arrayListOf3PImages, $roothost, $arrayOfObjects, $arrayOf3PObjects, $objcount, $fullurlpath, $basescheme, $wptHAR, $chhHAR;
+
+        if($wptHAR or $chhHAR)
+            return; // don't process for a WPT or Chrome Headless HAR file
+
+        // Find all images
         debug("<br/>PROCESSING IMAGES", "");
         debug("Absolute path of parent page", $fullurlpath);
         foreach ($html->find(strtolower('img')) as $element)
@@ -3424,6 +3432,9 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
                         "allStartMS" => '',
                         "allEndMS" => '',
                         "cacheSeconds" => '',);
+
+                        if($wptHAR or $chhHAR)
+                        return; // don't process for a WPT or Chrome Headless HAR file
                         $addupdateResult = addUpdatePageObject($arr);
                         if($addupdateResult)
                             $objcount = $objcount + 1;
@@ -3434,7 +3445,10 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
 
     function getListOfScriptLinks()
     {
-        global $html, $arrayListOfScriptFiles, $arrayListOf3PScriptFiles, $roothost, $arrayOfObjects, $arrayOf3PObjects, $objcount, $fullurlpath, $jsfiles;
+        global $html, $arrayListOfScriptFiles, $arrayListOf3PScriptFiles, $roothost, $arrayOfObjects, $arrayOf3PObjects, $objcount, $fullurlpath, $jsfiles,$wptHAR, $chhHAR;
+        if($wptHAR or $chhHAR)
+            return; // don't process for a WPT or Chrome Headless HAR file
+        
         $jsasync = '-';
         $jsdefer = '-';
         debug("<br/>PROCESSING SCRIPTS", "");

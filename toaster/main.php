@@ -363,6 +363,8 @@ $chheadlessserver = '';
 if(isset($_REQUEST["chremoteurlandport"]))
 {
 	$chheadlessserver = $_REQUEST["chremoteurlandport"];
+	if(strpos($chheadlessserver,"http://") ==false)
+		$chheadlessserver = "http://" . $chheadlessserver;
 //echo ("headless chrome remote server = " . $chheadlessserver. PHP_EOL);
 }
 // get current working dir

@@ -1,0 +1,356 @@
+[
+  {
+    "EdgeLocation": "Atlanta",
+    "StateOrCountry": "GA",
+    "Latitude": 33.748995,
+    "Longitude": -84.387982
+  },
+  {
+    "EdgeLocation": "Ashburn",
+    "StateOrCountry": "VA",
+    "Latitude": 39.043757,
+    "Longitude": -77.487442
+  },
+  {
+    "EdgeLocation": "Boston",
+    "StateOrCountry": "MA",
+    "Latitude": 42.360082,
+    "Longitude": -71.05888
+  },
+  {
+    "EdgeLocation": "Chicago",
+    "StateOrCountry": "IL",
+    "Latitude": 41.878114,
+    "Longitude": -87.629798
+  },
+  {
+    "EdgeLocation": "Dallas/Fort Worth",
+    "StateOrCountry": "TX",
+    "Latitude": 32.776664,
+    "Longitude": -96.796988
+  },
+  {
+    "EdgeLocation": "Denver",
+    "StateOrCountry": "CO",
+    "Latitude": 39.739236,
+    "Longitude": -104.990251
+  },
+  {
+    "EdgeLocation": "Hayward",
+    "StateOrCountry": "CA",
+    "Latitude": 37.668821,
+    "Longitude": -122.080796
+  },
+  {
+    "EdgeLocation": "Jacksonville",
+    "StateOrCountry": "FL",
+    "Latitude": 30.332184,
+    "Longitude": -81.655651
+  },
+  {
+    "EdgeLocation": "Los Angeles",
+    "StateOrCountry": "CA",
+    "Latitude": 34.052234,
+    "Longitude": -118.243685
+  },
+  {
+    "EdgeLocation": "Miami",
+    "StateOrCountry": "FL",
+    "Latitude": 25.76168,
+    "Longitude": -80.19179
+  },
+  {
+    "EdgeLocation": "Minneapolis",
+    "StateOrCountry": "MN",
+    "Latitude": 44.977753,
+    "Longitude": -93.265011
+  },
+  {
+    "EdgeLocation": "New York",
+    "StateOrCountry": "NY",
+    "Latitude": 40.712775,
+    "Longitude": -74.005973
+  },
+  {
+    "EdgeLocation": "Newark",
+    "StateOrCountry": "NJ",
+    "Latitude": 40.735657,
+    "Longitude": -74.172367
+  },
+  {
+    "EdgeLocation": "Palo Alto",
+    "StateOrCountry": "CA",
+    "Latitude": 37.441883,
+    "Longitude": -122.143019
+  },
+  {
+    "EdgeLocation": "Phoenix",
+    "StateOrCountry": "AZ",
+    "Latitude": 33.448377,
+    "Longitude": -112.074037
+  },
+  {
+    "EdgeLocation": "Philadelphia",
+    "StateOrCountry": "PA",
+    "Latitude": 39.952584,
+    "Longitude": -75.165222
+  },
+  {
+    "EdgeLocation": "San Jose",
+    "StateOrCountry": "CA",
+    "Latitude": 37.338208,
+    "Longitude": -121.886329
+  },
+  {
+    "EdgeLocation": "Seattle",
+    "StateOrCountry": "WA",
+    "Latitude": 47.606209,
+    "Longitude": -122.332071
+  },
+  {
+    "EdgeLocation": "South Bend",
+    "StateOrCountry": "IN",
+    "Latitude": 41.676355,
+    "Longitude": -86.25199
+  },
+  {
+    "EdgeLocation": "St. Louis",
+    "StateOrCountry": "MO",
+    "Latitude": 38.627003,
+    "Longitude": -90.199404
+  },
+  {
+    "EdgeLocation": "Montreal",
+    "StateOrCountry": "QC",
+    "Latitude": 45.501689,
+    "Longitude": -73.567256
+  },
+  {
+    "EdgeLocation": "Toronto",
+    "StateOrCountry": "ON",
+    "Latitude": 43.653226,
+    "Longitude": -79.383184
+  },
+  {
+    "EdgeLocation": "Rio de Janeiro",
+    "StateOrCountry": "Brazil",
+    "Latitude": -22.906847,
+    "Longitude": -43.172896
+  },
+  {
+    "EdgeLocation": "São Paulo",
+    "StateOrCountry": "Brazil",
+    "Latitude": -23.55052,
+    "Longitude": -46.633309
+  },
+  {
+    "EdgeLocation": "Amsterdam",
+    "StateOrCountry": "The Netherlands",
+    "Latitude": 52.370216,
+    "Longitude": 4.895168
+  },
+  {
+    "EdgeLocation": "Berlin",
+    "StateOrCountry": "Germany",
+    "Latitude": 52.520007,
+    "Longitude": 13.404954
+  },
+  {
+    "EdgeLocation": "Cape Town",
+    "StateOrCountry": "South Africa",
+    "Latitude": -33.924869,
+    "Longitude": 18.424055
+  },
+  {
+    "EdgeLocation": "Dublin",
+    "StateOrCountry": "Ireland",
+    "Latitude": 53.349805,
+    "Longitude": -6.26031
+  },
+  {
+    "EdgeLocation": "Frankfurt",
+    "StateOrCountry": "Germany",
+    "Latitude": 50.110922,
+    "Longitude": 8.682127
+  },
+  {
+    "EdgeLocation": "Helsinki",
+    "StateOrCountry": "Finland",
+    "Latitude": 60.169856,
+    "Longitude": 24.938379
+  },
+  {
+    "EdgeLocation": "Johannesburg",
+    "StateOrCountry": "South Africa",
+    "Latitude": -26.204103,
+    "Longitude": 28.047305
+  },
+  {
+    "EdgeLocation": "London",
+    "StateOrCountry": "United Kingdom",
+    "Latitude": 51.507351,
+    "Longitude": -0.127758
+  },
+  {
+    "EdgeLocation": "Madrid",
+    "StateOrCountry": "Spain",
+    "Latitude": 40.416775,
+    "Longitude": -3.70379
+  },
+  {
+    "EdgeLocation": "Manchester United Kingdom",
+    "StateOrCountry": 53.480759,
+    "Latitude": -2.242631,
+    "Longitude": ""
+  },
+  {
+    "EdgeLocation": "Marseille",
+    "StateOrCountry": "France",
+    "Latitude": 43.296482,
+    "Longitude": 5.36978
+  },
+  {
+    "EdgeLocation": "Milan",
+    "StateOrCountry": "Italy",
+    "Latitude": 45.464204,
+    "Longitude": 9.189982
+  },
+  {
+    "EdgeLocation": "Munich",
+    "StateOrCountry": "Germany",
+    "Latitude": 48.135125,
+    "Longitude": 11.58198
+  },
+  {
+    "EdgeLocation": "Palermo",
+    "StateOrCountry": "Italy",
+    "Latitude": 38.115688,
+    "Longitude": 13.361267
+  },
+  {
+    "EdgeLocation": "Paris",
+    "StateOrCountry": "France",
+    "Latitude": 48.856614,
+    "Longitude": 2.352222
+  },
+  {
+    "EdgeLocation": "Prague",
+    "StateOrCountry": "Czech Republic",
+    "Latitude": 50.075538,
+    "Longitude": 14.4378
+  },
+  {
+    "EdgeLocation": "Stockholm",
+    "StateOrCountry": "Sweden",
+    "Latitude": 59.329323,
+    "Longitude": 18.068581
+  },
+  {
+    "EdgeLocation": "Vienna",
+    "StateOrCountry": "Austria",
+    "Latitude": 48.208174,
+    "Longitude": 16.373819
+  },
+  {
+    "EdgeLocation": "Warsaw",
+    "StateOrCountry": "Poland",
+    "Latitude": 52.229676,
+    "Longitude": 21.012229
+  },
+  {
+    "EdgeLocation": "Zurich",
+    "StateOrCountry": "Switzerland",
+    "Latitude": 47.376887,
+    "Longitude": 8.541694
+  },
+  {
+    "EdgeLocation": "Bangalore",
+    "StateOrCountry": "India",
+    "Latitude": 12.971599,
+    "Longitude": 77.594563
+  },
+  {
+    "EdgeLocation": "Chennai",
+    "StateOrCountry": "India",
+    "Latitude": 13.08268,
+    "Longitude": 80.270718
+  },
+  {
+    "EdgeLocation": "Hong Kong SAR",
+    "StateOrCountry": "China",
+    "Latitude": 22.396428,
+    "Longitude": 114.109497
+  },
+  {
+    "EdgeLocation": "Kuala Lumpur",
+    "StateOrCountry": "Malaysia",
+    "Latitude": 3.139003,
+    "Longitude": 101.686855
+  },
+  {
+    "EdgeLocation": "Manila",
+    "StateOrCountry": "The Philippines",
+    "Latitude": 14.599512,
+    "Longitude": 120.984219
+  },
+  {
+    "EdgeLocation": "Melbourne",
+    "StateOrCountry": "Australia",
+    "Latitude": -37.813628,
+    "Longitude": 144.963058
+  },
+  {
+    "EdgeLocation": "Mumbai",
+    "StateOrCountry": "India",
+    "Latitude": 19.075984,
+    "Longitude": 72.877656
+  },
+  {
+    "EdgeLocation": "New Delhi",
+    "StateOrCountry": "India",
+    "Latitude": 28.613939,
+    "Longitude": 77.209021
+  },
+  {
+    "EdgeLocation": "Osaka",
+    "StateOrCountry": "Japan",
+    "Latitude": 34.693738,
+    "Longitude": 135.502165
+  },
+  {
+    "EdgeLocation": "Perth",
+    "StateOrCountry": "Australia",
+    "Latitude": -31.950527,
+    "Longitude": 115.860457
+  },
+  {
+    "EdgeLocation": "Seoul",
+    "StateOrCountry": "South Korea",
+    "Latitude": 37.566535,
+    "Longitude": 126.977969
+  },
+  {
+    "EdgeLocation": "Singapore",
+    "StateOrCountry": 1.352083,
+    "Latitude": 103.819836,
+    "Longitude": ""
+  },
+  {
+    "EdgeLocation": "Sydney",
+    "StateOrCountry": "Australia",
+    "Latitude": -33.86882,
+    "Longitude": 151.209296
+  },
+  {
+    "EdgeLocation": "Taipei",
+    "StateOrCountry": "Taiwan",
+    "Latitude": 25.032969,
+    "Longitude": 121.565418
+  },
+  {
+    "EdgeLocation": "Tokyo",
+    "StateOrCountry": "Japan",
+    "Latitude": 35.689487,
+    "Longitude": 139.691706
+  }
+]

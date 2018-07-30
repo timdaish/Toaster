@@ -112,11 +112,18 @@ function addInitialRules(){
 
 
 function secondsToDays($ss) {
-    $d = floor($ss/86400);
+    if(is_numeric($ss))
+    {
+        $d = floor($ss/86400);
 
-    // round up if required
-    if($d * 86400 !=$ss)
-        $d += 1;
+        // round up if required
+        if($d * 86400 !=$ss)
+            $d += 1;
+    }
+    else
+    {
+        $d = $ss;
+    }
     return $d;
 }
 

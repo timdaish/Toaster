@@ -2667,8 +2667,10 @@ function downloadObject($key,$valuearray)
 									}
 								}
 
-								@$get    = getimagesize($lfn);
-								if(isset($get))
+								if(file_exists($lfn))
+									@$get    = getimagesize($lfn);
+
+								if(isset($get) and $get !== false)
 								{
 									$width  = $get[0];
 									$height = $get[1];

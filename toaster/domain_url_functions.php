@@ -749,32 +749,31 @@ function AddDomainToArray($url,$roothost)
 		$method = '';
 		$service = '';
 		//echo("getipgeo ".$getipgeo."<br/>");
-		if($getipgeo != 'none')
+  		if($getipgeo != 'none')
 		{
  			if(($domref != '3P' and $domref != 'CDN' and $domref != "redirection" and $getipgeo == 'domain') or $getipgeo == 'all')
 			{
 debug("getting " . $getipgeo." new domain geo for origin server: ",$hostdomain."<br/>");
-
 				// ORIGIN LOCATION
 				$ip = lookupIPforDomain($hostdomain);
 				debug ('origin ip '.$ip.'<br/>');				
 				list($loc, $city,$region,$country,$lat,$long) = lookupLocationforIP($ip);
 				// check origin location $loc for lat long and replace with lookup if required
 				$locparts = explode(',',$loc);
-				if(count($locparts) == 2 and (is_numeric(abs($locparts[0])) or is_float(abs($locparts[0]))) and (is_numeric(abs($locparts[1])) or is_float(abs($locparts[0]))))
-					$loc = lookupLocationForLatLong($locparts[0],$locparts[1]);
+				if(count($locparts) == 1 and $locparts[0] == $lat and $locparts[1] == $long) // array 0,1,2 = count  of 2 - 1
+					$loc = lookupLocationForLatLong($lat,$long);
 
 				// EDGE SERVER
 //echo ('ip '.$ip.'<br/>');
 debug ('doing nslookup on domain IP to get edge server  '.$ip.'<br/>');
-                list($edgename,$edgeaddress) = nslookup($ip);
+                list($edgename,$edgeaddress) = nslookup($hostdomain);
 debug ('edgename '.$edgename.'<br/>');
 debug ('edgeaddress '.$edgeaddress.'<br/>');
                 if($edgeaddress != '')
                 {
-                	// do reverse NS lookup with returned name
-// echo ('doing reverse NS Lookup on edge IP '.$edgename.'<br/>');
-                	list($edgename2,$edgeaddress2) = nslookup($edgename);
+                	// do reverse NS lookup with returned address
+// echo ('doing reverse NS Lookup on edge IP '.$edgeaddress.'<br/>');
+                	list($edgename2,$edgeaddress2) = nslookup($edgeaddress);
 // echo ('reverse NS: edgename '.$edgename2.'<br/>');
 // echo ('reverse NS: edgeaddress '.$edgeaddress2.'<br/>');
                     if($edgename2 != '')
@@ -817,7 +816,7 @@ debug ('edgeaddress '.$edgeaddress.'<br/>');
 				$edgelocnospaces = preg_replace('/\s+/', '', $edgeloc);
 				$locnospaces = preg_replace('/\s+/', '', $loc);
 				//get distance to user's location
-				$distance = round(distance($userlat, $userlong ,$lat,$long,"M"),0);
+				$distance = round(distance($userlat, $userlong ,$lat,$long,"M"),0); // M = unit = Miles
 			}
 		}
 		else
@@ -830,10 +829,10 @@ debug ('edgeaddress '.$edgeaddress.'<br/>');
         if($stripped_edgeloc == '')
         {
 //echo("edgeloc is blank, setting to loc: ".$loc."<br/>");
-            $edgeloc = $loc;
+            $edgeloc = "";//$loc;
          //   list($latlong,$lat,$long) = lookupLatLongForLocation($loc);
 		}
-		$distance = round(distance($userlat, $userlong, $lat, $long,"M"),0);
+		$distance = round(distance($userlat, $userlong, $lat, $long,"M"),0); // M = unit = Miles
 		//echo("Adding new subdomain ".$hostdomain.";  domref=".$domref.";  nw=".$network."<br/>");
 		debug("Adding new domain to subdomain array",$hostdomain);
 		$arr = array(
@@ -1435,18 +1434,51 @@ function checkdomainforNamedCDNLocation($edgename,$edgeaddress)
 		// amazon cloudfront
 		if(strpos($edgename,".cloudfront.net") !== false)
 		{
-			$boolknownCDN = true;
-			$cloudfrontparts = explode(".",$edgename);
-			//echo("exploding: ".$edgename."<pre>");
-			//print_r($cloudfrontparts);
-			//echo("</pre>");
-			$string = $cloudfrontparts[1];
-			$cloudfrontIATACode = preg_replace("/[^a-zA-Z]/", "", $string);
-			//echo ('cloudfront IATA code '.$cloudfrontIATACode.'<br/>');
-			list($edgeloc,$latlong,$lat,$long) =  lookupIATAAirportCode($cloudfrontIATACode);
+			// see https://docs.aws.amazon.com/general/latest/gr/aws-ip-ranges.html for details on the Cloudfront ranges and to download
+			$json = file_get_contents("toaster_tools/cloudfront_ip-ranges.json");
+			$json_data = json_decode($json,true);
+			$cffound = false;
+			$region = '';
+			$service = '';
+			if (filter_var($edgeaddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))
+				{ // ip6
+					foreach($json_data["ipv6_prefixes"] as $key => $value)
+					{
+						$range = $value["ipv6_prefix"];
+						if(cidr_match($edgeaddress, $range))
+						{
+							$cffound = true;
+							$region = $value["region"];
+							$service = $value["service"];
+							break;
+						}
+					} // end for each ip6 prefix
+				}
+			else
+			{ // IP4
+				foreach($json_data["prefixes"] as $key => $value)
+				{
+					$range = $value["ip_prefix"];
+					if(cidr_match($edgeaddress, $range))
+					{
+						$cffound = true;
+						$region = $value["region"];
+						$service = $value["service"];
+						break;
+					}
+				} // end for each ip4 prefix
+			} // end else
+			
+			if($cffound)
+			{
+				// lookup region name to get location (region name) - cloudfront always returns GLOBAL IP match
+				list($edgeloc,$lat,$long) = amazonRegionLookup(strtolower($region));
+			}
 			$network = 'Amazon Cloudfront';
 			$method = 'Name';
-		}
+			$latlong = $lat.",".$long;
+			}
+
 		//facebook.com
 		// e.g. edge-star6-shv-02-lhr3.facebook.com
 		if(strpos($edgename,".facebook.com") !== false or strpos($edgename,".fbcdn.net") !== false)
@@ -1510,6 +1542,9 @@ function checkdomainforNamedCDNLocation($edgename,$edgeaddress)
 		if(($boolknownCDN == false or $latlong == '') and $edgeloc == '') 
 		{
 			list($edgeloc,$city,$region,$country,$lat,$long) = lookupLocationforIP($edgeaddress);
+			if($edgeloc == '')
+				$edgeloc = lookupLocationForLatLong($lat,$long);
+
 //echo ('other nw: edge loc '.$edgeloc.' from ip: '.$edgeaddress.'<br/>');
 			if(isset($city))
 				$eloc = $city;
@@ -1533,7 +1568,130 @@ function checkdomainforNamedCDNLocation($edgename,$edgeaddress)
 		//echo ('edge loc: '.$edgeloc.'<br/>');
 	return array($edgeloc,$city,$region,$country,$lat,$long,$network,$method,$service);
 }
-Function UpdateDomainLocationFromHeader($inurl,$xservedby,$xpx,$xedgelocation,$server,$cfray,$xcdngeo,$xcdn,$via,$xcache,$debuginfo)
+function cidr_match($ip, $cidr)
+{
+    list($subnet, $mask) = explode('/', $cidr);
+
+    if ((ip2long($ip) & ~((1 << (32 - $mask)) - 1) ) == ip2long($subnet))
+    { 
+        return true;
+    }
+
+    return false;
+}
+function amazonRegionLookup($region)
+{
+	global $userlat, $userlong;
+	switch ($region)
+	{
+		case "us-east-2":
+			$name = "Ohio, USA";
+			break;
+		case "us-east-1":
+			$name = "N. Virginia, USA";
+			break;
+		case "us-west-1":
+			$name = "N. California, USA";
+			break;
+		case "us-west-2":
+			$name = "Oregon, USA";
+			break;
+		case "ap-northeast-1":
+			$name = "Tokyo, Japan";
+			break;
+		case "ap-northeast-2":
+			$name = "Seoul, South Korea";
+			break;
+		case "ap-northeast-3":
+			$name = "Osaka, Japan";
+			break;
+		case "ap-south-1":
+			$name = "Mumbai, India";
+			break;
+		case "ap-southeast-1":
+			$name = "Singapore";
+			break;
+		case "ap-southeast-2":
+			$name = "Sydney, Australia";
+			break;
+		case "ca-central-1":
+			$name = "Canada";
+			break;
+		case "cn-north-1":
+			$name = "Beijing, China";
+			break;
+		case "cn-northwest-1":
+			$name = "Ningxia, China";
+			break;
+		case "eu-central-1":
+			$name = "Frankfurt, Germany";
+			break;
+		case "eu-west-1":
+			$name = "Dublin, Ireland";
+			break;
+		case "eu-west-2":
+			$name = "London, United Kingdom";
+			break;
+		case "eu-west-3":
+			$name = "Paris, France";
+			break;
+		case "sa-east-1":
+			$name = "São Paulo, Brazil";
+			break;
+		case "global":
+			$name = "London, United Kingdom";
+			// to be replaced with function to find closest actual Cloudfront server to the test location
+			//
+			$json = file_get_contents("toaster_tools/cloudfront_edgenodes.json");
+			$json_data = json_decode($json,true);
+			$cffound = false;
+			$loc = '';
+			$lat = '';
+			$long = '';
+			$mindistance = 100000;
+			$closestloc = '';
+			$closestlat = 0;
+			$closestlong = 0;
+
+			// randomise lat and long
+			$random1 = ((rand()*(0.04/getrandmax()))-0.02);
+			$random2 = ((rand()*(0.04/getrandmax()))-0.02);
+			if($lat != 0 and $long != 0)
+			{
+				$lat += $random1;
+				$long += $random2;
+			}
+
+			foreach($json_data as $key => $value)
+			{
+				$loc = $value["EdgeLocation"].", ". $value["StateOrCountry"];
+				$lat = $value["Latitude"];
+				$long = $value["Longitude"];
+
+				// get distance
+				$distance = round(distance($userlat, $userlong ,$lat,$long,"M"),0); // M = unit = Miles
+				if($distance < $mindistance)
+				{
+					$closestloc = $loc;
+					$closestlat = $lat;
+					$closestlong = $long;
+					$mindistance = $distance;
+				}
+			}
+			//
+			//
+			//
+
+		default:
+			$name = "Global";
+	}
+	$arr = array ($closestloc,$closestlat,$closestlong);
+	return ($arr);
+}
+
+
+
+function UpdateDomainLocationFromHeader($inurl,$xservedby,$xpx,$xedgelocation,$server,$cfray,$xcdngeo,$xcdn,$via,$xcache,$debuginfo)
 {
 	global $arrayDomains,$userlat,$userlong;
 	$cdnIATACode = '';
@@ -1566,12 +1724,13 @@ Function UpdateDomainLocationFromHeader($inurl,$xservedby,$xpx,$xedgelocation,$s
 		$edgeloc = implode(",", array_filter([ $city, $region, $country])) ;
 //echo("Akamai edgeloc: ".$edgeloc."<br/>");
 //lookupLocationForLatLong();
-		if ($country == '' || $country == "United Kingdom")
+		if ($country == '' || is_null($country) || $country == "United Kingdom")
 		{
 			// fill in values
 			$edgeloc = "London, United Kingdom";
 			$city = "London";
 			$country = "United Kingdom";
+			list($edgelatlong,$lat,$long) = lookupLatLongForLocation($edgeloc);
 		}
 //echo "akamai x-cache derived ip: '" . $ip . "' = " . $edgeloc . "<br/>";
 //echo ('Akamai server loc: '.$edgeloc.'<br/>');
@@ -2167,9 +2326,13 @@ function lookup3PDescriptionDirect($domain)
 //echo ("The domain '" . $domain  . "' is not recognised");
 //
 //    }
-    // decode json object
+	$x = 0;
+	// decode json object
+	if($result)
+	{
     $objjson = json_decode($result);
-    $x = count(json_decode($result,1));
+	$x = count(json_decode($result,1));
+	}
 //error_log( "3p lookup: " . $domain .  " count:" . $x);
     if($x!=0)
     {
@@ -2982,9 +3145,9 @@ function lookupReverseIP($inDomain)
 	}
 	return true;
 }
-function NSlookup($DomainOrIP)
+function nslookup($DomainOrIP)
 {
-	global $debug;
+	global $debug,$chheadlessserver;
 	$strNslookup  = 'nslookup -timeout=20 '.$DomainOrIP;
 	$edgename = '';
 	$edgeaddress = '';
@@ -3041,17 +3204,6 @@ function NSlookup($DomainOrIP)
 		{
 //echo "<br/><br/>local nslookup failed, trying toaster server<br/>";
 
-			if(filter_var($edgeaddress,FILTER_VALIDATE_IP))
-			{
-				$mode = "ip";
-				// is an valid ip
-			}
-			else
-			{
-				$mode = "nm";
-				// is a name
-			}
-
 			// finally, call out to node server
 			// echo "trying toaster server<br/>";
 			// check edgeaddress is valid
@@ -3061,30 +3213,31 @@ function NSlookup($DomainOrIP)
 				// echo("$DomainOrIP is a valid IP address<br/>");
 				//echo $edgeaddress ;
 				// $edgename = gethostbyaddr($DomainOrIP);
-				
-				$addrresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnsreverse&nsip=" . $DomainOrIP);
+				$addrresult = file_get_contents($chheadlessserver. "/?action=dnsreverse&nsip=" . $DomainOrIP);
 				$jsonnad = json_decode($addrresult);
 				if(sizeof($jsonnad) > 0)
 					{
 					foreach($jsonnad as $hndata)
 					{
-		//echo $hndata . "\n";
+//echo $hndata . "\n";
+						$edgename = trim($hndata);
 					} 
-					$edgename = trim($hndata);
+					
 				}
 
 				// echo "follow on: trying toaster server for edge name lookup $edgename<br/>";
 				if($edgename != '')
 				{
-					$nslresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnslookup&nsname=" . $edgename);
+					$nslresult = file_get_contents($chheadlessserver. "/?action=dnslookup&nsname=" . $edgename);
 					$jsonnsl = json_decode($nslresult);
 					if(sizeof($jsonnsl) > 0)
 					{
 						foreach($jsonnsl as $ipdata)
 						{
-				//echo $ipdata . "\n";
-						} 
+//echo $ipdata . "\n";
 						$edgeaddress = $ipdata;
+						} 
+						
 					}
 				}
 

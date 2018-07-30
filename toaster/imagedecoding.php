@@ -291,7 +291,7 @@ function decodeJPG2000($content,$lf)
 
 function decodeWEBP($content,$lf)
 {
-
+	global $OS;
 	//echo ("Decoding RIFF WEBP:". $lf ."<br/>");
 	
 	$hexstring = unpack("H*", $content);	
@@ -316,12 +316,12 @@ function decodeWEBP($content,$lf)
 		$file_signature = $bytestr2; //ok
 		$webp_encoding = $bytestr3; //ok
 
-		// get basic infi using Googles webpmux
+		// get basic info using Googles webpmux
 		$res = array();
         if($OS == "Windows")
 		    exec('win_tools\webpmux -info '. escapeshellarg($lf),$res);
         else
-            exec('webpmux -info '. escapeshellarg($lf),$res);
+            exec('./lnx_tools/webpmux -info '. escapeshellarg($lf),$res);
 		$resstr = implode($res);
 		$rescnt = count($res);
 		//echo ("RIFF WEBP ($rescnt): $lf<br/><pre>");
