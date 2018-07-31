@@ -345,11 +345,12 @@ function startRefresh()
             //$('#fileupdate img').attr("src",'');
           }
 
-          if (obj.imagepath != '') {
+          if (obj.imagepath && obj.imagepath != '' && obj.imagepath !== undefined)
+          {
             imgpath = obj.imagepath;
             var src = $('#theImg').attr('src');
             if (src != imgpath) {
-              //console.log("image = " + obj.imagepath);
+//console.log("toasting now image = " + imgpath);
               $('div#toastingnow > img').remove();
               $('#toastingnow').prepend('<img id="theImg" src="' + imgpath + '" />');
             }

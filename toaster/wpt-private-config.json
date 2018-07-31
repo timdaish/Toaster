@@ -6,27 +6,32 @@
     "Chrome" : {
         "location" : "Horsham_wptagent:Chrome",
         "speed" : "",
-        "options" : ""
+        "options" : "",
+        "default" : true
         },
     "Firefox" : {
         "location" : "Horsham_wptagent:Firefox",
         "speed" : "",
-        "options" : ""
+        "options" : "",
+        "default" : false
         },
     "Edge" : {
         "location" : "Horsham_wptagent:Edge",
         "speed" : "",
-        "options" : ""
+        "options" : "",
+        "default" : false
         },
     "Safari" : {
         "location" : "Horsham_wptagent:Safari",
         "speed" : "",
-        "options" : ""
+        "options" : "",
+        "default" : false
         },
     "Opera" : {
         "location" : "Horsham_wptagent:Opera",
         "speed" : "",
-        "options" : ""
+        "options" : "",
+        "default" : false
         }
     }
 }

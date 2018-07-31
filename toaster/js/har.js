@@ -314,10 +314,10 @@ var group = '';
 
 				var transsize = 0;
 				if(entries.response.bodySize != -1)
-					transsize = SanitiseSize(entries.response.bodySize);
+					transsize = SanitiseSize(entries.response.bodySize); // wpt
 				else
 					if(entries.response._transferSize != -1)
-						transsize = SanitiseSize(entries.response._transferSize);
+						transsize = SanitiseSize(entries.response._transferSize); // headless chrome
 
 
 

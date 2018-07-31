@@ -1583,13 +1583,25 @@ function checkdomainforNamedCDNLocation($edgename,$edgeaddress)
 }
 function cidr_match($ip, $cidr)
 {
-    list($subnet, $mask) = explode('/', $cidr);
+	list($subnet, $mask) = explode('/', $cidr);
 
-    if ((ip2long($ip) & ~((1 << (32 - $mask)) - 1) ) == ip2long($subnet))
-    { 
-        return true;
-    }
+	// check for bitshift error
+	// if(32 - $mask < 0)
+	// 	return false;
+	// }
 
+	try{
+		if ((ip2long($ip) & ~((1 << (32 - $mask)) - 1) ) == ip2long($subnet))
+		{ 
+			return true;
+		}
+	} catch (ArithmeticError $error) {
+        // Output expected ArithmeticError.
+	//	Logging::Log($error);
+	}
+	 catch (Exception $e) {
+		//echo 'cidr_match - Caught exception: ',  $e->getMessage(), "\n";
+	}
     return false;
 }
 function amazonRegionLookup($region)
@@ -3220,7 +3232,7 @@ function nslookup($DomainOrIP)
 			// finally, call out to node server
 			// echo "trying toaster server<br/>";
 			// check edgeaddress is valid
-			if(filter_var($DomainOrIP,FILTER_VALIDATE_IP))
+			if(filter_var($DomainOrIP,FILTER_VALIDATE_IP) and isset($chheadlessserver) and $chheadlessserver != '')
 			{
 				// echo "trying toaster server for ip lookup $DomainOrIP<br/>";
 				// echo("$DomainOrIP is a valid IP address<br/>");
@@ -3239,7 +3251,7 @@ function nslookup($DomainOrIP)
 				}
 
 				// echo "follow on: trying toaster server for edge name lookup $edgename<br/>";
-				if($edgename != '')
+				if($edgename != '' and isset($chheadlessserver) and $chheadlessserver != '')
 				{
 					$nslresult = file_get_contents($chheadlessserver. "/?action=dnslookup&nsname=" . $edgename);
 					$jsonnsl = json_decode($nslresult);
@@ -3258,9 +3270,9 @@ function nslookup($DomainOrIP)
 			else
 			{
 				// echo "trying toaster server for name lookup $DomainOrIP<br/>";
-				if($DomainOrIP != '' and $DomainOrIP != "localhost")
+				if($DomainOrIP != '' and $DomainOrIP != "localhost" and isset($chheadlessserver) and $chheadlessserver != '')
 				{
-					$nslresult = file_get_contents("http://toaster.dyndns.biz:8082/?action=dnslookup&nsname=" . $DomainOrIP);
+					$nslresult = file_get_contents($chheadlessserver."/?action=dnslookup&nsname=" . $DomainOrIP);
 					$jsonnsl = json_decode($nslresult);
 					if(sizeof($jsonnsl) > 0)
 					{

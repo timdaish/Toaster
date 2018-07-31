@@ -53,7 +53,7 @@ else
     //set path for webpagetoaster server and others
 	if( strpos($hostname,"gridhost.co.uk") != false)
     {
-		$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/logs/" . $toasterid . "_debug.txt";
+		$debuglog = "/var/sites/w/webpagetoaster.com/public_html/logs/" . $toasterid . "_debug.txt";
 	}
 	else{
 		$debuglog = "/usr/share/toast/logs/" . $toasterid . "_debug.txt";
@@ -183,7 +183,7 @@ if (isset($_REQUEST["url"]))
 	}
     if($i == "Googlebot" or $i == "Custom")
 		echo "User agent: " . $ua."</br>";
-if(!$resolution)
+if(!isset($resolution))
 {
 	// set defaults
 	$ua = "Mozilla/5.0 (Windows NT 10.0, WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.2526.73 Safari/537.36";
@@ -625,31 +625,33 @@ if(isset($_REQUEST["chremoteurlandport"]))
 	// define initial filenames
 	$thispagename = pathinfo($url,PATHINFO_BASENAME);
 	$thispageext = pathinfo($url,PATHINFO_EXTENSION);
-    //error_log(__LINE__ .  'thispagename - '.$thispagename);
+	//error_log(__LINE__ .  'thispagename - '.$thispagename);
+	$datedir = date("Y").'/'.date("m").'/'.date("d").'/'.date('H').'/';
 	// define system filepaths, adding a trailing slash
-	$filepath_domainsavedir = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
-	$filepath_domainsavedirlnx1 = joinFilePaths($filepath_basesavedir,$uastr,DIRECTORY_SEPARATOR);
-	$filepath_domainsavedirlnx2 = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
+	$filepath_domainsavedir = joinFilePaths($filepath_basesavedir,$datedir,$uastr,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
+	$filepath_domainsavedirlnx1 = joinFilePaths($filepath_basesavedir,$datedir,$uastr,DIRECTORY_SEPARATOR);
+	$filepath_domainsavedirlnx2 = joinFilePaths($filepath_basesavedir,$datedir,$uastr,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
 	// create the save directory before it is needed by a browser engine
 	debug ("main: creating basefilepath ",$filepath_domainsavedir);
 	createDomainSaveDir($filepath_domainsavedir);
 	// set up the linux path to the save dir.
+
 	if($OS != "Windows")
 	{
 		chmod($filepath_domainsavedirlnx1, 0777);
 		chmod($filepath_domainsavedirlnx2, 0777);
 		chmod($filepath_domainsavedir, 0777);
 		if( strpos($hostname,"gridhost.co.uk") != false)
-			$filepath_domainsavedirLnx = "/var/sites/w/webpagetoaster.com/subdomains/toast/". $uastr. "/".$host_domain;
+			$filepath_domainsavedirLnx = "/var/sites/w/webpagetoaster.com/public_html/toast/".$datedir. "/".$uastr. "/".$host_domain;
 		else
 		{
-			$filepath_domainsavedirLnx = "/usr/share/toast/". $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"];
+			$filepath_domainsavedirLnx = "/usr/share/toast/". $datedir. "/". $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"];
 			$filepath_domainsavedir = $filepath_domainsavedirLnx;
 		}
 	}
-	$jsfilepath_domainsavedir = joinURLPaths('/toast',$uastr,$host_domain,$sourceurlparts["dirs"]);
-	$filepath_domainsaverootdir = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
-	$localvpath = joinFilePaths($filepath_basesavedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
+	$jsfilepath_domainsavedir = joinURLPaths('/toast',$datedir,$uastr,$host_domain,$sourceurlparts["dirs"]);
+	$filepath_domainsaverootdir = joinFilePaths($filepath_basesavedir,$datedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
+	$localvpath = joinFilePaths($filepath_basesavedir,$datedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
 	$lc = substr($jsfilepath_domainsavedir,-1);
 	if($lc == '/')
     {
@@ -699,7 +701,7 @@ if(isset($_REQUEST["chremoteurlandport"]))
 		if(strpos($hostname,"gridhost.co.uk") != false)
 		{
 				$jsimgname = substr($jsimgname,6);
-				$jsimgname = "http://toast.webpagetoaster.com".$jsimgname;
+				$jsimgname = "https://www.webpagetoaster.com/toast".$jsimgname;
 //echo "jsimagename: " . $jsimgname  . "<br/>";
 		}
 	}
@@ -798,7 +800,7 @@ session_start();
 	session_write_close();
 	if( strpos($hostname,"gridhost.co.uk") != false)
 	{
-		$toastedwebname = 'http://toast.webpagetoaster.com/'. $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"] . "/toasted_".$thispagenameext;
+		$toastedwebname = 'https://www.webpagetoaster.com/toast/'. $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"] . "/toasted_".$thispagenameext;
 //echo ($toastedwebname);
 debug ("toasted webname: " .$toastedwebname ,1);
 	}
@@ -1364,10 +1366,10 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
             $testId = "";
             list ($testId,$jsonResult,$summaryCSV,$detailCSV ) = submitWPTTest($wptbrowser,$urlenc,$uar,$width,$height,$username,$password);
 			$statusCode = 0;
-			$timoutcounter = 0;
-            while (intval($statusCode) != 200 and $timoutcounter < 600) {
+			$timeoutcounter = 0;
+            while (intval($statusCode) != 200 and $timeoutcounter < 600) {
 				$statusCode = checkWPTTestStatus($testId);
-				$timoutcounter++;
+				$timeoutcounter++;
                 sleep(1);
              }
             // get testresults as HAR
@@ -1388,10 +1390,10 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
 			$testId = "";
 			list ($testId,$jsonResult,$summaryCSV,$detailCSV ) = submitWPTTest($wptbrowser,$urlenc,$uar,$width,$height,$username,$password);
 			$statusCode = 0;
-			$timoutcounter = 0;
-			while (intval($statusCode) != 200 and $timoutcounter < 600) {
+			$timeoutcounter = 0;
+			while (intval($statusCode) != 200 and $timeoutcounter < 600) {
 				$statusCode = checkWPTTestStatus($testId);
-				$timoutcounter++;
+				$timeoutcounter++;
 				sleep(1);
 			}
 			// get testresults as HAR
@@ -1571,6 +1573,7 @@ if($har != '')
 		$harfilelength = strlen($har);
 	//echo("reading har file of length . " . $harfilelength . "<br/>");
 		session_start();
+		$_SESSION['imagepath'] = $jsimgname;
 		$_SESSION['status'] = 'Reading HAR file';
 		session_write_close();
 		// override the HAR file if not for WPT or headless chrome
@@ -2087,7 +2090,6 @@ if($har != '')
 
     session_start();
     $_SESSION['status'] = 'Processing Objects from '. $browserEngineVer;
-    $_SESSION['imagepath'] = $jsimgname;
     session_write_close();
 	// get css and js order for unmodified HTML source
 //echo (__FUNCTION__.' '. __LINE__." Main: 1st parseRootBodytoDOM being called to check html content: "."html is not empty");
@@ -2277,11 +2279,11 @@ if($har != '')
 //var_dump($valuearray);
 		$value = $valuearray["Object source"];
 		$local = $valuearray["Object file"];
-//echo "checking " . $local . "<br/>";
-		if(strpos($local,"/var/sites/w/webpagetoaster.com/subdomains/toast") !== false )
+//echo "checking local fn " . $local . "<br/>";
+		if(strpos($local,"/var/sites/w/webpagetoaster.com/public_html/toast") !== false )
 		{
-			$toastlocal = str_replace("/var/sites/w/webpagetoaster.com/subdomains/toast/","http://toast.webpagetoaster.com/",$local);
-			// echo ("updating " . $local . " to " . $toastlocal . "<br/>");
+			$toastlocal = str_replace("/var/sites/w/webpagetoaster.com/public_html/toast/","https://www.webpagetoaster.com/toast/",$local);
+//echo ("updating local fn" . $local . " to " . $toastlocal . "<br/>");
 			$arr = array("Object source" => $value, "Object file" => $toastlocal);
              addUpdatePageObject($arr);
 		}
@@ -2955,7 +2957,10 @@ var cookietext = '<?php echo utf8_converter($cookiedata); ?>';
 if(file_exists($cookie_jar))
 	@unlink($cookie_jar);
 session_start();
+$_SESSION['object'] = '';
+$_SESSION['mimetype'] = '';
 $_SESSION['imagepath'] = '';
+$_SESSION['toastedfile'] = '';
 $_SESSION['status']  = 'Ready to Toast';
 session_write_close();
 // Get the content that is in the buffer and put it in your file //

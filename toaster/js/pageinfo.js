@@ -503,7 +503,7 @@ function fnFormatDetails(oTable, nTr) {
                 break;
         }
         sOut += 'Comments Only<br/><pre><code class="sunburst filecode" id="filec' + objID + '">Please wait... loading comments</code></pre>';
-        if(location.host == "toast.webpagetoaster.com")
+        if(location.host == "www.webpagetoaster.com")
             sOut += 'Full File<br/><pre><code class="sunburst filecode" id="file' + objID + '">Please wait... loading the full file</code></pre>';
         else
             sOut += 'Beautified, Full File<br/><pre><code class="sunburst filecode" id="file' + objID + '">Please wait... loading and beautifing the full file</code></pre>';
@@ -4423,7 +4423,7 @@ function initImageOptimisation(container) {
         console.log(d);
         //console.log(location.protocol + '//' + location.host);
         $opturl = "/toaster/optimise_images.php?" + toasterid;
-        // if(location.host == "toast.webpagetoaster.com");
+        // if(location.host == "www.webpagetoaster.com");
         //     $opturl = "https://www.webpagetoaster.com/toaster/optimise_images.php"
         $.ajax({
             url: $opturl ,

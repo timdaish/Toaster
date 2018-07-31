@@ -14,7 +14,7 @@ else {
         //set path for webpagetoaster server and others
 	if( strpos($hostname,"gridhost.co.uk") != false)
     {
-		$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/".$toasterid."_debug_optimg.txt";
+		$debuglog = "/var/sites/w/webpagetoaster.com/public_html/toast/".$toasterid."_debug_optimg.txt";
 	}
 	else{
 		$debuglog = "/usr/share/toast/".$toasterid."_debug_optimg.txt";
@@ -46,10 +46,10 @@ foreach ($djson as $value) {
                 //set path for webpagetoaster server and others
 	if( strpos($hostname,"gridhost.co.uk") != false)
     {
-		$file = str_replace ("http://toast.webpagetoaster.com", "/var/sites/w/webpagetoaster.com/subdomains/toast",$file);
+		$file = str_replace ("https://www.webpagetoaster.com", "/var/sites/w/webpagetoaster.com/public_html/toast",$file);
 	}
 	else{
-        $file = str_replace ("http://toast.webpagetoaster.com", "/usr/share/toast",$file);
+        $file = str_replace ("https://www.webpagetoaster.com", "/usr/share/toast",$file);
 	    }
     }
 
@@ -67,7 +67,7 @@ foreach ($djson as $value) {
   else
     if( strpos($hostname,"gridhost.co.uk") != false)
     {
-		$savepath= "/var/sites/w/webpagetoaster.com/subdomains/toast/";
+		$savepath= "/var/sites/w/webpagetoaster.com/public_html/toast/";
 	}
 	else{
 		$savepath = "/usr/share/toast/";

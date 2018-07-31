@@ -32,7 +32,7 @@ else
     //set path for webpagetoaster server and others
     if( strpos($hostname,"gridhost.co.uk") != false)
     {
-        $fn = '/var/sites/w/webpagetoaster.com/subdomains/toast/toasted.csv';
+        $fn = '/var/sites/w/webpagetoaster.com/public_html/toast/toasted.csv';
     }
     else
     {
@@ -151,7 +151,7 @@ while (($line = fgetcsv($f)) !== false) {
 //                                 // convert and mogrify give errors on www.webpagetoaster.com, so use php instead
 //                                 //$os_cmd = 'mogrify -format gif -path ' . dirname($thumbnail) . ' -thumbnail 100x100 ' . escapeshellarg($file);
 //                                 $tn = "/var/sites/w/webpagetoaster.com/subdomains" . $thumbnail ;
-//                                 $infilename = "http://toast.webpagetoaster.com" .$file;
+//                                 $infilename = "https://www.webpagetoaster.com" .$file;
 // //echo ("converting image from " . $infilename .  " to thumbnail:" .$tn . "<br/>");
 //                                 $inim = @imagecreatefrompng($infilename);
 //                                 $im = @imagescale($inim,100,100,IMG_NEAREST_NEIGHBOUR);
@@ -159,9 +159,9 @@ while (($line = fgetcsv($f)) !== false) {
 //                                 }
 //                                 else
 //                                 {
-//                                     // toast.webpagetoaster.com
+//                                     // www.webpagetoaster.com
 //                                     $tn = "/var/sites/w/webpagetoaster.com/subdomains" . $thumbnail ;
-//                                     $tn = str_replace("http://toast.webpagetoaster.com","/toast",$tn);
+//                                     $tn = str_replace("https://www.webpagetoaster.com","/toast",$tn);
 //                                     $infilename = $file;
 // //echo ("converting image from " . $infilename .  " to thumbnail:" .$tn . "<br/>");
 //                                     $inim = @imagecreatefrompng($infilename);
@@ -257,7 +257,11 @@ for($i=$c-1; $i>=0; $i--)
 		 
 		$link = $line["link"];
 		$page = urldecode($line["page"]);
-		$dt = $line["date"];
+        $dt = $line["date"];
+//echo "before dt " . $dt . "<br/>";
+        $date1 = strtr($dt, '/', '-');
+        $dt = date("Y-m-d H:i:s", strtotime($date1));
+//echo "after dt " . $dt . "<br/>";
         $ua = $line["ua"];
         $pagetitle = urldecode($line["pagetitle"]);
         $harfile = $line["harfile"];
@@ -266,32 +270,35 @@ for($i=$c-1; $i>=0; $i--)
 
 		$l = str_replace('\\','/',$link);
 
-        if(strpos($hostname,"gridhost.co.uk") != false)
-		{
-//echo("linux screenshot path: " . $ss ."<br/>" );
-            if(substr($ss,0,6) == "/toast")
-                $ss = substr($ss,6);
-            if($SERVER["HTTP_HOST"] == "toast.webpagetoaster.com")
-                $ss = "http://toast.webpagetoaster.com" . $ss;
-            else
-                $ss = "http://toast.webpagetoaster.com" . $ss;   
-
-            // harfile
-            $harfile= str_replace("/var/sites/w/webpagetoaster.com/subdomains/toast","",$harfile);
-            if($SERVER["HTTP_HOST"] == "toast.webpagetoaster.com")
-                $harfile = "http://toast.webpagetoaster.com" . $harfile;
-            else
-                $harfile = "http://toast.webpagetoaster.com" . $harfile;   
+        if($OS == "Windows")
+        {
+            $harfile= substr($harfile,2);
         }
-        else
-            $harfile= str_replace("/usr/share","",$harfile);
+        else // linux
+            if(strpos($hostname,"gridhost.co.uk") != false)
+            {
+    //echo("linux screenshot path: " . $ss ."<br/>" );
+                if(substr($ss,0,6) == "/toast")
+                    $ss = substr($ss,6);
+                    $ss = "https://www.webpagetoaster.com" . $ss;
+
+                // harfile
+                $harfile= str_replace("/var/sites/w/webpagetoaster.com/public_html/toast","",$harfile);
+                $harfile = "https://www.webpagetoaster.com" . $harfile;
+
+            }
+            else
+                $harfile= str_replace("/usr/share","",$harfile);
 
 		//echo("Link:".$l."<br/>");
 		//echo("page:".$page."<br/>");
 		echo ("<tr><td><a class=\"history\" href=\"". ''. "\" target=\"_blank\">link</a></td>"); //<img src=\"".$ss."\" height=100 width=100 class=\"thumbnail\" \"></img>
         echo "<td><a class=\"history\" href=\"". $l. "\" target=\"_blank\">" . $page . "</a></td>";
         echo "<td>". $pagetitle. "</td>";
-        echo '<td><a href="'. $harfile . '" download="test.har">Download HAR</a></td>';
+        if($harfile == '' or $harfile == false or !$harfile)
+            echo '<td></td>';
+        else
+            echo '<td><a href="'. $harfile . '" download="test.har">Download HAR</a></td>';
 
 
         $deviceUA = '';

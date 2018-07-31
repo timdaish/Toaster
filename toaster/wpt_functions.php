@@ -32,9 +32,28 @@ function submitWPTTest($wptbrowser,$url,$ua,$vpw,$vph,$un,$pw)
         else
             if($key == "locations")
             {
-
+                $isdefault = false;
+                $cfgfound = false;
+                $defaultbrowseroptions = '';
+                $defaultloc = '';
+                $defaultspeed = '';
                 foreach ($value as $lkey => $lvalue) {
 //echo ($lkey . ": " .$lvalue['location'] . " " . $lvalue["speed"] . " " . $lvalue["options"] . PHP_EOL);
+
+                    // check for default
+                    if($lvalue["options"] == true)
+                    {
+                        // set defaults
+                        $defaultloc = $lvalue['location'];
+                        $defaultspeed = $lvalue["speed"];
+                        if($defaultspeed != '')
+                            $defaultloc = $defaultloc . "." . $lvalue["speed"];
+                        if($lvalue["options"] == "ua")
+                            $defaultbrowseroptions = "&uastring=".$ua;
+                        if($lvalue["options"] == "vp")
+                            $defaultbrowseroptions = "&width=".$vpw."&height=".$vph;
+                    }
+
                     if($wptbrowser == $lkey)
                     {
                         $loc = $lvalue['location'];
@@ -45,8 +64,17 @@ function submitWPTTest($wptbrowser,$url,$ua,$vpw,$vph,$un,$pw)
                             $browseroptions = "&uastring=".$ua;
                         if($lvalue["options"] == "vp")
                             $browseroptions = "&width=".$vpw."&height=".$vph;
+                        $cfgfound = true;
                         break;
                     }
+                } // end for each
+                if (!$cfgfound)
+                {
+                    $loc = $defaultloc;
+                    $speed = $defaultspeed;
+                    if($speed != '')
+                        $loc = $defaultloc . "." . $lvalue["speed"];
+                        $browseroptions = $defaultbrowseroptions;
                 }
             }
     }

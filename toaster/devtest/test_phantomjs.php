@@ -9,7 +9,7 @@
 <body>
 
 <?php
-$debuglog = "/var/sites/w/webpagetoaster.com/subdomains/toast/debug.txt";
+$debuglog = "/var/sites/w/webpagetoaster.com/public_html/toast/debug.txt";
 file_put_contents($debuglog, "DEBUG LOG started" . PHP_EOL);
 ini_set("log_errors", 1);
 ini_set("error_log", $debuglog);
@@ -17,7 +17,7 @@ $urlforbrowserengine = "www.bluebella.com/collections/lingerie";
 $height = "600";
 $width = "800";
 $uastr ="Chrome_Desktop";
-$filepath_domainsavedir = "/var/sites/w/webpagetoaster.com/subdomains/toast/Chrome_Desktop/" . $urlforbrowserengine;
+$filepath_domainsavedir = "/var/sites/w/webpagetoaster.com/public_html/toast/Chrome_Desktop/" . $urlforbrowserengine;
 $imgname = $filepath_domainsavedir."/_screencapture_". $uastr .".png";
 $uar = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
 $browserengineoutput = tempnam($filepath_domainsavedir."/",'out') . ".txt";

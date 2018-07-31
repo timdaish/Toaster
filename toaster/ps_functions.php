@@ -24,8 +24,8 @@ else
     //override for webpagetoaster server
     if( strpos($hostname,"gridhost.co.uk") != false)
     {
-        $cookie_jar = tempnam("/var/sites/w/webpagetoaster.com/subdomains/toast/", "cky");
-        $drv = '/var/sites/w/webpagetoaster.com/subdomains';
+        $cookie_jar = tempnam("/var/sites/w/webpagetoaster.com/public_html/toast/", "cky");
+        $drv = '/var/sites/w/webpagetoaster.com/public_html/';
     }
         else
     {
