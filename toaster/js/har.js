@@ -618,8 +618,8 @@ function display3PTagWaterfall(tagwfmode){
 
 	$.each(HARpages.pages, function(i,val) {
 		
-console.log("HAR page Timings...");
-console.log(val);
+// console.log("HAR page Timings...");
+// console.log(val);
 
 		if(val.id == "page_0" || val.id == "page_1_0" || val.id == "page_1_0_1") // former HTTPWatch iPhone / latter WPT
 		{
@@ -641,8 +641,8 @@ console.log(val);
 
 		$.each(val.objects, function(j,objects) {
 			y++;
- console.log("object...");
- console.log(objects);
+//  console.log("object...");
+//  console.log(objects);
 
 
 
