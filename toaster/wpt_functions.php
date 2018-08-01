@@ -68,7 +68,7 @@ function submitWPTTest($wptbrowser,$url,$ua,$vpw,$vph,$un,$pw)
                         break;
                     }
                 } // end for each
-                if (!$cfgfound)
+                if (!$cfgfound) // set default
                 {
                     $loc = $defaultloc;
                     $speed = $defaultspeed;

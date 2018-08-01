@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <title>THE WEBPAGE TOASTER</title>
   <link rel="stylesheet" type="text/css" href="css/toaster.css">
 </head>
-
 <body>
   <meta charset="UTF-8">
   <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
@@ -73,6 +71,7 @@
       <!-- MAX_FILE_SIZE must precede the file input field -->
       <!--<label for="fileupload">Upload HAR</label>-->
       <input type="hidden" name="MAX_FILE_SIZE" value="26214400" />
+      <input type="hidden" name="tid" id="tid" value="" />
       <!-- Name of input element determines name in $_FILES array -->
       <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="harfile" name="fileupload" type="file" />&nbsp;
 <div class="checkbox">
@@ -114,6 +113,8 @@
     var toastedfilename = '';
     var refreshStatus = '';
     var refreshstatuserrorcount = 0;
+    var statuspos = 0;
+    var lastStatus = '';
     $(document).ready(function () {
       $storedurl = localStorage.getItem('urlfield');
       $storedwbengine = localStorage.getItem('wbengine');
@@ -199,7 +200,6 @@
         if ($('#wpjs2.1').prop('checked') || $('#wpjs2.5').prop('checked')) {
 //console.log('phantomjs is checked!');
           // change url label
-
         }
         if ($('#chromeheadless').prop('checked')) {
 //console.log('chrome headless is checked!');
@@ -218,16 +218,12 @@
           $("#wbengineoptions").append('<label for="wptpublicapikey">API Key<input id="wptpublicapikey" name="wptpublicapikey"></input>');
         }
       });
-
       // populate device user agent list
       let dropdown = $('#ualist');
       dropdown.empty();
-
       dropdown.append('<option selected="true" disabled>Choose Device</option>');
       //dropdown.prop('selectedIndex', 0);
-
       const uaConfigUrl = 'ua-config.json';
-
       // Populate dropdown with list of devices
       $.getJSON(uaConfigUrl, function (data) {
         $.each(data, function (key, entry) {
@@ -238,8 +234,6 @@
         })
       });
       dropdown.prop('selectedIndex', 1);
-
-
       function getTime(formatted) {
         var currentTime = new Date()
         var hours = currentTime.getHours()
@@ -257,9 +251,7 @@
         } else {
           t_str += "AM";
         }
-
         changeQuote(seconds);
-
         if (formatted)
           return t_str;
         else
@@ -271,7 +263,6 @@
         document.getElementById('timeval').innerHTML = t_str;
       }
       setInterval(updateTime, 1000);
-
       function changeQuote(seconds) {
         //console.log(seconds);
         var bartext = '';
@@ -293,73 +284,116 @@
           });
         }
       }
-
     }
     );
-
 function startRefresh()
 {
+  var tid = $('#tid').val();
+
+//console.log("tid = " + tid);
   refreshStatus = setInterval(function () {
   $.ajax(
     {
       type: "GET",
       url: "xhr_getstatus.php",
-      //data: '',
+      data: { "tid": tid, "p": statuspos},
       beforeSend: function () {
-//console.log("getting status");;
+//console.log("getting status from pos " + statuspos.toString());
             },
       dataType: 'json',
       success: function (obj) {
         //$('#status').html(msg);
   
+        if(obj)
+        {
 //console.log(JSON.stringify(obj));
+//console.log("success status data: length = " + obj.length);
+          statuspos = statuspos + parseInt(obj.length);
+//console.log("status lastpos = " + statuspos.toString());
+          var lines = obj.split('\n');
+          // parse each line of status returned
+          for(var i = 0;i < lines.length;i++){
+              //code here using lines[i] which will give you each line
+              //console.log(i,JSON.parse(lines[i]));
+              for (var key in lines[i]) {
+          //      console.log(JSON.parse(lines[i]));
+                  var l = JSON.parse(lines[i])
+                  var dt = l["datetime"];
+                  var event = l["event"];
+                  var data = l["data"];
+//console.log(dt + ", " + event + ", " + data);
+               
+                  switch (event.toLowerCase())
+                  {
+                    case "toasting":
+                      if(data == false)
+                      {
+                        // console.log("final toasting status received - stopping refresh status timer");
+                        clearInterval(refreshStatus);
+                        //console.log("status is now ready to toast")
+                        $('#submit').removeAttr('disabled');
+                        $('#submit').removeClass("grey");
+                        $('#statusdetail').html("&nbsp;");
+                        $('#toasturl').html("&nbsp;");
+                        $('#fileupdate').html("");
+                        $('div#toastingnow > img').remove();
+                      }
+                      break;
+                    case "status":
+                      $('#statusupdate').html(data);
+                      lastStatus = data;
+                      break;
+                    case "object":
+                      if (lastStatus.substr(0, 11) == "Downloading" || lastStatus.substr(0, 9) == "Analysing" || lastStatus.substr(0, 11) == "Identifying" || lastStatus.substr(0, 6) == "iframe")
+                      {
+                        var statusToDisplay = decodeURI(data);
+                        if (statusToDisplay.length > 50) 
+                        {
+                          statusToDisplay = statusToDisplay.substr(1, 25) + ".." + statusToDisplay.slice(-25);
+                          }
+                       $('#fileupdate').html(statusToDisplay);
+                      }
+                      else
+                      {
+                        $('#fileupdate').html("");
+                      }
+                      break;
+                    case "objectmt":
+                      // object mimetype
+
+                      break;
+                    case "imagepath":
+                      var imgpath = data;
+                      var src = $('#theImg').attr('src');
+                      if (src != imgpath) {
+          //console.log("toasting now image = " + imgpath);
+                        $('div#toastingnow > img').remove();
+                        $('#toastingnow').prepend('<img id="theImg" src="' + imgpath + '" />');
+                      }
+                      break;
+                    case "toastedfile":
+                        if (data != '') {
+                          toastedfilename = data;
+//console.log('status toastedfilename: ' + toastedfilename);
+                        }
+                      break;
+                  } // end switch event
+                }
+
+            } // end for var i
+        }
+        else{
+//console.log("status no update"); 
+        }
+
 
         if (obj.status == 'Ready to Toast') {
-//console.log("status is now ready to toast")
-          $('#submit').removeAttr('disabled');
-          $('#submit').removeClass("grey");
-          $('#statusdetail').html("&nbsp;");
-          $('#toasturl').html("&nbsp;");
-          $('#fileupload').html("");
-          $('div#toastingnow > img').remove();
+
+
+
           var imgpath;
-        }
-        else {
-          $('#status').text(decodeURI(obj.status));
-          if (obj.status.substr(0, 11) == "Downloading" || obj.status.substr(0, 9) == "Analysing" || obj.status.substr(0, 11) == "Identifying" || obj.status.substr(0, 6) == "iframe") {
-            var statusToDisplay = decodeURI(obj.object);
-            if (statusToDisplay.length > 50) {
-              statusToDisplay = statusToDisplay.substr(1, 25) + ".." + statusToDisplay.slice(-25);
-            }
-            else
-              $('#statusdetail').html(statusToDisplay);
-            //if (obj.mimetype == '')
-            //  obj.mimetype = 'application_x_mswinurl';
-            //var loc = 'images/mimetypes128x128/' + obj.mimetype + '.png';
-            //console.log("src " + obj.object + "; mt = " + obj.mimetype);
 
-            //$('#fileupdate img').attr("src",loc);
-          }
-          else {
-            $('#statusdetail').html("&nbsp;");
-            //$('#fileupdate img').attr("src",'');
-          }
 
-          if (obj.imagepath && obj.imagepath != '' && obj.imagepath !== undefined)
-          {
-            imgpath = obj.imagepath;
-            var src = $('#theImg').attr('src');
-            if (src != imgpath) {
-//console.log("toasting now image = " + imgpath);
-              $('div#toastingnow > img').remove();
-              $('#toastingnow').prepend('<img id="theImg" src="' + imgpath + '" />');
-            }
-          }
-
-          if (obj.toastedfile != '') {
-            toastedfilename = obj.toastedfile;
-//console.log('status toastedfilename: ' + toastedfilename);
-          }
         }
       }, // end success
         error: function (jqXhr, textStatus, errorThrown) {
@@ -408,16 +442,18 @@ function startRefresh()
 } // end function startRefresh
 
     (function ($) {
-
       var listfurls = '';
       var splitlistofurls = new Array();
       var urlcount = 0;
       var pagecount = 0;
       var pgcounter = 0;
-
-
       function sendURL(thisd) {
+        statuspos = 0;
         pgcounter = pagecount + 1;
+        // generate new toaster id
+        var tid = [...Array(10)].map(i=>(~~(Math.random()*36)).toString(36)).join('');
+//console.log("setting toaster id: " + tid);
+        $('#tid').val(tid);
         // update the form url one url at a time
         if($('#urlfield').val() != '')
           $('#urlfield').val(splitlistofurls[pagecount]);
@@ -445,8 +481,6 @@ function startRefresh()
             processData: false,
             data: new FormData(thisd),
             success: function (data, textStatus, jQxhr) {
-//console.log("main.php success - stopping refresh status timer");
-              clearInterval(refreshStatus);
 // console.log("success from main php");
               //$('html').html(data);
 
@@ -509,8 +543,6 @@ function startRefresh()
                 $('div#toastingnow > img').remove();
                 return (false);
               }
-
-
             },
             error: function (jqXhr, textStatus, errorThrown) {
               //alert("Error: Either PHP code has an error or URL is invalid!");
@@ -523,8 +555,7 @@ function startRefresh()
               else{
                 var x = jqXhr.responseText;
                 var aError = x.split(',');
-                console.log("Toasting failed submitting main: " + aError);
-              
+//console.log("Toasting failed submitting main: " + aError);
                 if (Array.isArray(aError) == true)
                 {
                   var amessage = '';
@@ -533,11 +564,9 @@ function startRefresh()
                   var debug = '';
                   if (typeof aError[1] !== "undefined") {
                     amessage = aError[1].split(':');
-
                     console.log("message = " + amessage[1]);
                     message = amessage[1];
                   }
-
                   if (typeof aError[2] !== "undefined") {
                     adebug = aError[2].split(':');
                     console.log("debug info = " + adebug[1]);
@@ -562,7 +591,6 @@ function startRefresh()
               $('#comment').val('');
               $('#harfile').val('');
               $('div#toastingnow > img').remove();
-
               if(pgcounter < urlcount)
               {
                 pagecount = pagecount + 1;
@@ -604,7 +632,6 @@ function startRefresh()
           alert("Please select a device type");
           return false;
         }
-
         if (pagecount == 0) {
           e.preventDefault();
           $('#submit').attr("disabled", "true");
@@ -632,10 +659,8 @@ function startRefresh()
             $('#comment').val($('#comment').val() + 'Debug mode; ');
           if ($('#akdebug').is(':checked'))
             $('#comment').val($('#comment').val() + 'Akamai debug headers;');
-
           splitlistofurls = listofurls.split(/,\s*/);
           urlcount = splitlistofurls.length;
-
           if (urlcount > 1) {
             $('#toasturl').text("Multi Page");
             //console.log("Multi Page: "+ urlcount);
@@ -644,18 +669,13 @@ function startRefresh()
             $('#toasturl').text("Single Page");
             //console.log("Single Page: " + urlcount);
           }
-
         }
         sendURL(this);
-
-
       } // end function processForm
-
       // MAIN jQUERY
       $('#form').submit(processForm);
     }
     )(jQuery);
   </script>
 </body>
-
 </html>

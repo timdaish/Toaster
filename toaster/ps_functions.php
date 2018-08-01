@@ -157,8 +157,6 @@ $arrayThirdPartyChain = array();
 $arrayPostData = array();
 //rule checks
 $boolCDNused = false;
-
-
 function debug($info1, $info2 = '')
 {
     global $debug, $filepath_domainsavedir;
@@ -180,14 +178,21 @@ function debug_to_console( $data, $info2 = '' ) {
     if($debug)
         echo "<script>console.log( 'Debug Objects: " . $output . "' );</script>";
 }
-
+function logStatus($event, $data) {
+    global $statuslog;
+    $output = $data;
+    if ( is_array( $data ) )
+        $output = implode( ',', $output);
+    $arr = array ("datetime"=>date("Y-m-d H:i:s"), "event"=>$event,"data"=>$data);
+    $logStatusResult = file_put_contents($statuslog, json_encode($arr)."\n",FILE_APPEND); // don't lock_ex to allow reading at same time
+    if($logStatusResult === false)
+        error_log("Failed to write to status log" . ": " . $event . ": " . $output);
+}
 function diagnostics($info1, $info2, $info3)
 {
     global $diagnostics;
     $diagnostics = $diagnostics . $info1 . " - " . $info2 . " - " . $info3 . "<br/>";
 }
-
-
 function generateRandomString($length = 10)
 {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -199,8 +204,6 @@ function generateRandomString($length = 10)
     }
     return $randomString;
 }
-
-
 function get_Datetime_Now()
 {
     $tz_object = new DateTimeZone('UTC');
@@ -208,8 +211,6 @@ function get_Datetime_Now()
     $datetime->setTimezone($tz_object);
     return $datetime->format('Y\-m\-d\ H:i:s');
 }
-
-
 function getStyleIDandClasess($initurl)
 {
     debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $initurl);
@@ -2835,6 +2836,7 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
         session_start();
         $_SESSION['status'] = 'Processing Root Redirection';
         session_write_close();
+        logStatus('Status','Processing Root Redirection');
 //step 1
         $sourceurlparts = get_SourceURL($url);
         if ($debug == true)
@@ -5207,6 +5209,8 @@ addUpdatePageObject($arr);
                         $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
                         $_SESSION['object'] = $value;
                         session_write_close();
+                        logStatus('Status','iframe - Rerunning ' . $browserEngineVer);
+                        logStatus('Object',$value);
                         if ($OS == "Windows")
                             exec('win_tools\phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         else
@@ -5218,6 +5222,8 @@ addUpdatePageObject($arr);
                         $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
                         $_SESSION['object'] = $value;
                         session_write_close();
+                        logStatus('Status','iframe - Rerunning ' . $browserEngineVer);
+                        logStatus('Object',$value);
                         if ($OS == "Windows")
                             exec('win_tools\phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         else
@@ -5229,6 +5235,8 @@ addUpdatePageObject($arr);
                         $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
                         $_SESSION['object'] = $value;
                         session_write_close();
+                        logStatus('Status','iframe - Rerunning ' . $browserEngineVer);
+                        logStatus('Object',$value);
                         if ($OS == "Windows")
                             exec('win_tools\slimerjs.bat js\netsniff_sjs.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         else
@@ -5240,6 +5248,8 @@ addUpdatePageObject($arr);
                         $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
                         $_SESSION['object'] = $value;
                         session_write_close();
+                        logStatus('Status','iframe - Rerunning ' . $browserEngineVer);
+                        logStatus('Object',$value);
                         if ($OS == "Windows")
                             exec('win_tools\slimerjs-0.10.3\slimerjs.bat js\netsniff_sjs.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         else
@@ -5250,6 +5260,8 @@ addUpdatePageObject($arr);
                         session_start();
                         $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
                         session_write_close();
+                        logStatus('Status','iframe - Rerunning ' . $browserEngineVer);
+                        logStatus('Object',$value);
                         if ($OS == "Windows")
                             exec('win_tools\phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js ' . $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar . "\"" . " " . $browserengineoutput . " " . $username . " " . $password, $res); //responses & sniff
                         else
@@ -5801,6 +5813,7 @@ addUpdatePageObject($arr);
                             session_start();
                             $_SESSION['mimetype'] = trim($contenttype);
                             session_write_close();
+                            logStatus('ObjectMT',trim($contenttype));
                             switch (trim($contenttype))
                             {
                                 case "text/html" :
@@ -6684,6 +6697,7 @@ debug ("creating basefilepath ",$path);
                             case "content-type" :
                                 session_start();
                                 $_SESSION['mimetype'] = $pieces[1];
+                                logStatus('ObjectMT',$pieces[1]);
                                 session_write_close();
                                 $ct = explode(";", $pieces[1]);
                                 $contenttype = $ct[0];
@@ -6785,6 +6799,7 @@ debug ("creating basefilepath ",$path);
         $_SESSION['mimetype'] = '';
         $_SESSION['object'] = '';
         session_write_close();
+        logStatus('Status','Downloading Objects');
         if ($debug == true)
         {
             foreach ($arrayPageObjects as $key => $valuearray)
@@ -6815,12 +6830,18 @@ debug ("creating basefilepath ",$path);
                 $nooffiles = $objectDownloadCount;
             session_start();
             if($loadContentFromHAR == false)
+            {
                 $_SESSION['status'] = 'Downloading and Analysing Object ' . $objectDownloadCount . " of " . $nooffiles;
+                logStatus('Status','Downloading and Analysing Object ' . $objectDownloadCount . " of " . $nooffiles);
+            }
             else
-            $_SESSION['status'] = 'Analysing Object ' . $objectDownloadCount . " of " . $nooffiles;
+                $_SESSION['status'] = 'Analysing Object ' . $objectDownloadCount . " of " . $nooffiles;
+
             $_SESSION['object'] = html_entity_decode($fname);
             $_SESSION['mimetype'] = '';
             session_write_close();
+            logStatus('Status','Analysing Object ' . $objectDownloadCount . " of " . $nooffiles);
+            logStatus('Object',html_entity_decode($fname));
 //error_log("Downloading file ".$key." (". $fname."): memory usage = ". memory_get_usage(true));
             downloadObject($key, $valuearray);
 //error_log("Downloaded file ".$key." (". $fname."): memory usage = ". memory_get_usage(true));
@@ -7625,6 +7646,8 @@ debug("Found image to copy", $local);
             $_SESSION['status'] = 'Identifying Third Party Call Chain (' . $key . ' of ' . $objectcount . ')';
             $_SESSION['object'] = $domain;
             session_write_close();
+            logStatus('Status','Identifying Third Party Call Chain (' . $key . ' of ' . $objectcount . ')');
+            logStatus('Object',$domain);
             if (strpos($objurl, "//") != false)
                 $urlwithoutscheme = substr($objurl, strpos($objurl, '//') + 2);
             else

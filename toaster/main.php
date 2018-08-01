@@ -1,6 +1,5 @@
 <?php
 session_start();
-session_destroy();
 $serverName = 'http://'.$_SERVER['SERVER_NAME'];
 $hostname = gethostname();
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -22,7 +21,7 @@ date_default_timezone_set('UTC');
 set_time_limit(0);
 ini_set("auto_detect_line_endings", true);
 ini_set('max_execution_time', '600');
-ini_set('display_errors', 0); // change to 1 for displaying errors on main scree // 0 to disable
+ini_set('display_errors', 0); // change to 1 for displaying errors on main screen // 0 to disable
 error_reporting(E_ALL | E_STRICT);
 ini_set('exif.encode_unicode', 'UTF-8');
 require 'xhr_getstatus.php';
@@ -40,13 +39,17 @@ include 'class.Minify.php';
 include 'class.GifDecoder.php';
 include 'ttfInfo.class.php';
 include 'wpt_functions.php';
-
-// include '3ptags_nccgroup_db.php';
 include 'getiploc.php';
-$toasterid=generateRandomString();
+// set toaster id from parameter if available
+if (isset($_REQUEST["tid"]))
+	$toasterid = $_REQUEST["tid"];
+else
+	$toasterid=generateRandomString(); // generate if calling main.php directly without tid
+echo "toaster id:" . $toasterid .PHP_EOL; 
 if($OS == "Windows")
 {
-    $debuglog = "c:\\temp\\" . $toasterid . "_debug.txt";
+	$debuglog = "f:\\toast\\logs\\" . $toasterid . "_debug.txt";
+	$statuslog = "f:\\toast\\logs\\" . $toasterid . "_status.json";
 }
 else
 {
@@ -54,11 +57,17 @@ else
 	if( strpos($hostname,"gridhost.co.uk") != false)
     {
 		$debuglog = "/var/sites/w/webpagetoaster.com/public_html/logs/" . $toasterid . "_debug.txt";
+		$statuslog = "/var/sites/w/webpagetoaster.com/public_html/logs/" . $toasterid . "_status.txt";
 	}
 	else{
 		$debuglog = "/usr/share/toast/logs/" . $toasterid . "_debug.txt";
+		$statuslog = "/usr/share/toast/logs/" . $toasterid . "_status.txt";
 	}
 }
+if(file_exists($debuglog))
+	unlink($debuglog);
+if(file_exists($statuslog))
+	unlink($statuslog);
 file_put_contents($debuglog, "DEBUG LOG started" . PHP_EOL);
 ini_set("log_errors", 1);
 ini_set("error_log", $debuglog);
@@ -98,10 +107,11 @@ ob_start();
 </a>The Webpage Toaster's Report for <q><span id="pagetitle">page</span></q></h2>
 <div id="activitystatus" class="status"></div>
 <?php
+logStatus("Status","Firing up the Toaster");
+logStatus("Toasting",true);
 //print_r($_REQUEST);
 addInitialRules();
 //echo 'This web server runs on '. $OS .'<br/>';
-
 $loadContentFromHAR = false;
 if(!empty($_FILES))
 {
@@ -209,26 +219,8 @@ else
 		//echo "get links status false<br/>";
 	}
 	// always use 3rd party database
-	//if (isset($_REQUEST["dbusage"])) 
-	{
-        $_SESSION['status'] = 'Reading local shard data';
-        session_write_close();
-		$dbusage = true;
-		//read3PDescriptionsFromDB();
-        //readSelfHosted3PDescriptionsFromFile();
-		//echo "dbusage status true<br/>";
-        readSelfHosted3PDescriptionsFromFile();
-        readShardsFromFile();
-	}
-	// else
-	// {
-	// 	$dbusage = false;
-	// 	read3PDescriptionsFromFile();
-    //     readSelfHosted3PDescriptionsFromFile();
-    //     readShardsFromFile();
-	// 	//echo "dbusage status false<br/>";
-	// }
-	
+	$dbusage = true;
+	//echo "dbusage status true<br/>";
 	if (isset($_REQUEST["chkdebug"]) and $_REQUEST["chkdebug"] == true)
 	{
 		$debug = true;
@@ -496,13 +488,14 @@ if(isset($_REQUEST["chremoteurlandport"]))
 //echo ('returned root ip '.$rootip.' - checking for error<br/>');
         // check for error and return fail if not an IP address
         if($rootip == "error_ip") {
-            session_start();
-            $_SESSION['status'] = 'Looking up Server Domain IP';
-            $_SESSION['object'] = '';
-            $_SESSION['mimetype'] = '';
-            $_SESSION['imagepath'] = '';
-            $_SESSION['toastedfile']  = '';
-            session_write_close();
+            // session_start();
+            // $_SESSION['status'] = 'Looking up Server Domain IP';
+            // $_SESSION['object'] = '';
+            // $_SESSION['mimetype'] = '';
+            // $_SESSION['imagepath'] = '';
+            // $_SESSION['toastedfile']  = '';
+			// session_write_close();
+			logStatus("Status","Looking up Server Domain IP");
             ob_clean();
             //echo 'Error, incorrect host or ip';
             $dbgt=debug_backtrace();
@@ -795,9 +788,10 @@ if(isset($_REQUEST["chremoteurlandport"]))
 debug ("toast filepathname: " .$toastedfilepathname,1);
 // echo ("toast filepathname: " .$toastedfilepathname."<br/>");
 // echo ("toast webname: " .$toastedwebname."<br/>");
-session_start();
-	$_SESSION['status'] = 'Processing hostname';
-	session_write_close();
+// session_start();
+// 	$_SESSION['status'] = 'Processing hostname';
+// 	session_write_close();
+	logStatus("Status","Processing hostname");
 	if( strpos($hostname,"gridhost.co.uk") != false)
 	{
 		$toastedwebname = 'https://www.webpagetoaster.com/toast/'. $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"] . "/toasted_".$thispagenameext;
@@ -814,10 +808,12 @@ debug ("toasted webname: " .$toastedwebname ,1);
 	//echo "Files saved to directory: " .$filepath_domainsavedir."<br>";
 	//echo "Root Page saved as: ".$filepathname_rootobject_headersandbody."<br/>";
 //	createDomainSaveDir($filepath_domainsavedir);
-      session_start();
-      $_SESSION['status'] = 'Retrieving Root Object';
-      $_SESSION['toastedfile'] = $toastedwebname; //$toastedfilepathname;
-      session_write_close();
+    //   session_start();
+    //   $_SESSION['status'] = 'Retrieving Root Object';
+    //   $_SESSION['toastedfile'] = $toastedwebname; //$toastedfilepathname;
+	//   session_write_close();
+	  logStatus("Status","Retrieving Root Object");
+	  logStatus("toastedfile",$toastedwebname);
 	// get some basic information about the root object from a headers lookup
 	list($curl_info,$curlresponseheaders) = readURLandSaveToFilePath($url,$filepathname_rootobject_headersandbody);
 	$TimeOfResponse = get_Datetime_Now();
@@ -882,10 +878,13 @@ debug ("toasted webname: " .$toastedwebname ,1);
 	$bodylen = extract_headersandbody($filepathname_rootobject_headersandbody,$localfilename,$curlresponseheaders);
     if($bodylen == 0)
     {
-      session_start();
-      $_SESSION['imagepath'] = '';
-      $_SESSION['status']  = 'Aborting toasting - Page failed';
-      session_write_close();
+    //   session_start();
+    //   $_SESSION['imagepath'] = '';
+    //   $_SESSION['status']  = 'Aborting toasting - Page failed';
+	//   session_write_close();
+	  logStatus("Status","Aborting toasting - Page could not be reached");
+	  logStatus('imagepath','');
+	  logStatus('Toasting',false);
       // Get the content that is in the buffer and put it in your file //
       //file_put_contents('', ob_get_contents());
     }
@@ -1094,9 +1093,10 @@ error_log("MAIN redirs: new localfile: " .$localfilename);
 ?>
 <script type="text/javascript" language="JavaScript" src="/toaster/js/pageinfo.js"></script>
 <?php
-    session_start();
-    $_SESSION['status'] = 'Parsing the DOM';
-    session_write_close();
+    // session_start();
+    // $_SESSION['status'] = 'Parsing the DOM';
+	// session_write_close();
+	logStatus('Status','Parsing the DOM');
 	$retbodylen = strlen($body);
 // echo("main, source DOM - returned body length = ". $retbodylen."<br>");
 // echo $body; 
@@ -1278,15 +1278,17 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
     {
 		case 0:
 			$browserEngineVer = 'Toaster';
-			session_start();
-			$_SESSION['status'] = 'Running basic test only';
-			session_write_close();
+			// session_start();
+			// $_SESSION['status'] = 'Running basic test only';
+			// session_write_close();
+			logStatus('Status','Running basic test only');
 			break;
         case 1:
             $browserEngineVer = 'Webkit (PhantomJS v1.9.8)';
-            session_start();
-            $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
-            session_write_close();
+            // session_start();
+            // $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
+			// session_write_close();
+			logStatus('Status','Running test on ' . $browserEngineVer);
             if($OS == "Windows")
                 exec('win_tools\phantomjs --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             else
@@ -1294,9 +1296,10 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
             break;
         case 2:
             $browserEngineVer = 'Webkit (PhantomJS v2.0.0)';
-            session_start();
-            $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
-            session_write_close();
+            // session_start();
+            // $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
+			// session_write_close();
+			logStatus('Status','Running test on ' . $browserEngineVer);
             if($OS == "Windows")
                 exec('win_tools\phantomjs2 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             else
@@ -1313,9 +1316,10 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
             //     exec('./lnx_tools/slimerjs.bat js/netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
 			// break;
 			$browserEngineVer = 'Webkit (PhantomJS v2.5)';
-            session_start();
-            $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
-            session_write_close();
+            // session_start();
+            // $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
+			// session_write_close();
+			logStatus('Status','Running test on ' . $browserEngineVer);
             if($OS == "Windows")
                 exec('win_tools\phantomjs2.5 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
 			else
@@ -1331,9 +1335,10 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
 			break;
         case 4:
             $browserEngineVer = 'Gecko (SlimerJS v0.10)';
-            session_start();
-            $_SESSION['status'] = 'Running test on  ' . $browserEngineVer;
-            session_write_close();
+            // session_start();
+            // $_SESSION['status'] = 'Running test on  ' . $browserEngineVer;
+			// session_write_close();
+			logStatus('Status','Running test on ' . $browserEngineVer);
             if($OS == "Windows")
                 exec('win_tools\slimerjs-0.10.3\slimerjs.bat js\netsniff_sjs.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
             else
@@ -1341,9 +1346,10 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
             break;
         case 5:
             $browserEngineVer = 'Webkit (PhantomJS v2.1.1)';
-            session_start();
-            $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
-            session_write_close();
+            // session_start();
+            // $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
+			// session_write_close();
+			logStatus('Status','Running test on ' . $browserEngineVer);
             if($OS == "Windows")
                 exec('win_tools\phantomjs2.1 --ignore-ssl-errors=true --ssl-protocol=tlsv1 js\netsniff.js '. $urlforbrowserengine . " " . $height . " " . $width . " " . $imgname . " \"" . $uar ."\"" . " ". $browserengineoutput." ".$username. " ". $password,$res); //responses & sniff
 			else
@@ -1359,9 +1365,10 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
 			break;
 		case 6: // private instance WPT
             $browserEngineVer = 'WebpageTest Private Instance';
-            session_start();
-            $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
-            session_write_close();
+            // session_start();
+            // $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
+			// session_write_close();
+			logStatus('Status','Running test on ' . $browserEngineVer);
             $urlenc = urlencode($urlforbrowserengine);
             $testId = "";
             list ($testId,$jsonResult,$summaryCSV,$detailCSV ) = submitWPTTest($wptbrowser,$urlenc,$uar,$width,$height,$username,$password);
@@ -1383,9 +1390,10 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
 
 		case 8: // public WPT
 			$browserEngineVer = 'WebpageTest Public';
-			session_start();
-			$_SESSION['status'] = 'Running test on ' . $browserEngineVer;
-			session_write_close();
+			// session_start();
+			// $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
+			// session_write_close();
+			logStatus('Status','Running test on ' . $browserEngineVer);
 			$urlenc = urlencode($urlforbrowserengine);
 			$testId = "";
 			list ($testId,$jsonResult,$summaryCSV,$detailCSV ) = submitWPTTest($wptbrowser,$urlenc,$uar,$width,$height,$username,$password);
@@ -1407,9 +1415,10 @@ debug('MAIN: Running browser engine number: ', "'" . $browserengine . "'<br/>");
 			
 		case 7:
 			$browserEngineVer = 'Headless Chrome';
-			session_start();
-			$_SESSION['status'] = 'Running test on ' . $browserEngineVer;
-			session_write_close();	
+			// session_start();
+			// $_SESSION['status'] = 'Running test on ' . $browserEngineVer;
+			// session_write_close();
+			logStatus('Status','Running test on ' . $browserEngineVer);
             $urlenc = urlencode($urlforbrowserengine);
 			$testId = "";
 //echo ('Running test on ' . $browserEngineVer . " against a Toaster NodeJS server: " . $chheadlessserver."<br/>");
@@ -1572,10 +1581,12 @@ if($har != '')
 		file_put_contents($localfilename.".har",$har,FILE_APPEND);
 		$harfilelength = strlen($har);
 	//echo("reading har file of length . " . $harfilelength . "<br/>");
-		session_start();
-		$_SESSION['imagepath'] = $jsimgname;
-		$_SESSION['status'] = 'Reading HAR file';
-		session_write_close();
+		// session_start();
+		// $_SESSION['imagepath'] = $jsimgname;
+		// $_SESSION['status'] = 'Reading HAR file';
+		// session_write_close();
+		logStatus('imagepath',$jsimgname);
+		logStatus('Status','Reading HAR file');
 		// override the HAR file if not for WPT or headless chrome
 		if($uploadedHAR == True and $wptHAR == false and $chhHAR == false)
 		{
@@ -2088,9 +2099,10 @@ if($har != '')
 
 
 
-    session_start();
-    $_SESSION['status'] = 'Processing Objects from '. $browserEngineVer;
-    session_write_close();
+    // session_start();
+    // $_SESSION['status'] = 'Processing Objects from '. $browserEngineVer;
+	// session_write_close();
+	logStatus('Status','Processing Objects from '. $browserEngineVer);
 	// get css and js order for unmodified HTML source
 //echo (__FUNCTION__.' '. __LINE__." Main: 1st parseRootBodytoDOM being called to check html content: "."html is not empty");
     getCSSJSOrdering('source');
@@ -2127,9 +2139,10 @@ if($har != '')
 			// echo "<xmp>";
 			// echo "modified HTML:".$modrootfilecontent;
 			// echo "</xmp>";
-		session_start();
-		$_SESSION['status'] = 'Parsing the updated DOM';
-		session_write_close();
+		// session_start();
+		// $_SESSION['status'] = 'Parsing the updated DOM';
+		// session_write_close();
+		logStatus('Status','Parsing the updated DOM');
 		$returned = parseRootBodytoDOM($modrootfilecontent,'main, updated DOM');
 			if(!empty($returned))
 				$html = $returned;
@@ -2166,9 +2179,10 @@ if($har != '')
     }
     if($uploadedHAR == false)
     {
-        session_start();
-        $_SESSION['status'] = 'Checking for Responsive Images';
-        session_write_close();
+        // session_start();
+        // $_SESSION['status'] = 'Checking for Responsive Images';
+		// session_write_close();
+		logStatus('Status','Checking for Responsive Images');
         // look for responsive imaages
         getListOfResponsiveImages('img','srcset','sizes');
         getListOfResponsiveImages('img','data-srcset','data-sizes');
@@ -2195,29 +2209,33 @@ if($har != '')
 
 	// update redirections - source - destination	
     setRedirTargets();
-    session_start();
-    $_SESSION['status'] = 'Generating Page Stats.';
-    session_write_close();
+    // session_start();
+    // $_SESSION['status'] = 'Generating Page Stats.';
+	// session_write_close();
+	logStatus('Status','Generating Page Stats.');
 	updateFileStats();
 	detectJSLibs();
     if($thirdpartychain == true)
     {
         session_start();
         $_SESSION['status'] = 'Identifying Third Party Call Chain';
-        session_write_close();
+		session_write_close();
+		logStatus('Status','Identifying Third Party Call Chain');
     	Identify3Pchains();
     }
     //	copyFiles();
-    session_start();
-    $_SESSION['status'] = 'Copying Image Files';
-    session_write_close();
+    // session_start();
+    // $_SESSION['status'] = 'Copying Image Files';
+	// session_write_close();
+	//logStatus('Status','Copying Image Files');
     copyImageFilesToFolders();
 	//
 	//echo("getCompressionFileStats<br/>");
 	// get stats
-    session_start();
-    $_SESSION['status'] = 'Calculating GZIP Savings';
-    session_write_close();
+    // session_start();
+    // $_SESSION['status'] = 'Calculating GZIP Savings';
+	// session_write_close();
+	logStatus('Status','Calculating GZIP Savings');
 	getCompressionFileStats();
 	//echo("Listing Headers<br/>");
 	$ListOfHeaders = getArrayOfHeaders();
@@ -2231,9 +2249,10 @@ if($har != '')
 	//echo("</pre>");
 	//echo("MAIN: End of Listing page objects<br/>");
 }
-    session_start();
-    $_SESSION['status'] = 'Preparing Toasted Page';
-    session_write_close();
+    // session_start();
+    // $_SESSION['status'] = 'Preparing Toasted Page';
+	// session_write_close();
+	logStatus('Status','Preparing Geo Locations');
 	//echo("rootloc: ".$rootloc."<br/>");
 	// geo lookup for root
 	$markerhome = $geoExtLocStaticMarker;
@@ -2293,9 +2312,10 @@ if($har != '')
 	// print_r($arrayPageObjects);
 	// echo("</pre>");
 
-    session_start();
-    $_SESSION['status'] = 'Preparing Toasted Page';
-    session_write_close();
+    // session_start();
+    // $_SESSION['status'] = 'Preparing Toasted Page';
+	// session_write_close();
+	logStatus('Status','Preparing Toasted Page');
 ?>
 <div class="wrap">
 <!-- the tabs -->
@@ -2773,9 +2793,10 @@ else
 		unlink($cookie_jar);
 		}		
 }
-    session_start();
-    $_SESSION['status'] = 'Formatting Page (JavaScript)';
-    session_write_close();
+    // session_start();
+    // $_SESSION['status'] = 'Formatting Page (JavaScript)';
+	// session_write_close();
+	logStatus('Status','Toast is ready; popping up in the Toaster');
 ?>
 var cookietext = '<?php echo utf8_converter($cookiedata); ?>';
 //console.log("Starting JavaScript main");
@@ -2956,13 +2977,15 @@ var cookietext = '<?php echo utf8_converter($cookiedata); ?>';
 <?php
 if(file_exists($cookie_jar))
 	@unlink($cookie_jar);
-session_start();
-$_SESSION['object'] = '';
-$_SESSION['mimetype'] = '';
-$_SESSION['imagepath'] = '';
-$_SESSION['toastedfile'] = '';
-$_SESSION['status']  = 'Ready to Toast';
-session_write_close();
+// session_start();
+// $_SESSION['object'] = '';
+// $_SESSION['mimetype'] = '';
+// $_SESSION['imagepath'] = '';
+// $_SESSION['toastedfile'] = '';
+// $_SESSION['status']  = 'Ready to Toast';
+// session_write_close();
+logStatus('Status','Ready to Toast');
+logStatus('Toasting',false);
 // Get the content that is in the buffer and put it in your file //
 //echo ("writing toast file to " . $toastedfilepathname."<br/>");
 //error_log (ob_get_contents());
