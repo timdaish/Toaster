@@ -794,7 +794,7 @@ debug ("toast filepathname: " .$toastedfilepathname,1);
 	logStatus("Status","Processing hostname");
 	if( strpos($hostname,"gridhost.co.uk") != false)
 	{
-		$toastedwebname = 'https://www.webpagetoaster.com/toast/'. $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"] . "/toasted_".$thispagenameext;
+		$toastedwebname = 'https://www.webpagetoaster.com/toast/'. $datedir . "/" . $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"] . "/toasted_".$thispagenameext;
 //echo ($toastedwebname);
 debug ("toasted webname: " .$toastedwebname ,1);
 	}
@@ -1199,13 +1199,13 @@ error_log("MAIN redirs: new localfile: " .$localfilename);
     debug ("MAIN: updating min and gzip stats","");
 	addUpdatePageObject($arr);
 	// get list of style ids and classes
-    debug ("MAIN: getStyuleIDandClasses",$url);
+    debug ("MAIN: getStyleIDandClasses",$url);
 	getStyleIDandClasess($url);
     //session_start();
     //$_SESSION['status'] = 'Checking for uploaded HAR file';
     //session_write_close();
  debug ("MAIN: checking for uploaded HAR","");
-    if(($uploadedHAR == false or $browserengine == 7 or $loadContentFromHAR == false) and $browserengine != 6 and $browserengine != 8)
+    if(($uploadedHAR == false or $loadContentFromHAR == false) and $browserengine != 6 and $browserengine != 8 and $browserengine != 7)
     {
     	//getCSSJSOrdering();
     	getListOfStyleLinks("before DOM load");
