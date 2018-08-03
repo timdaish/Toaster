@@ -880,3 +880,6 @@ a.shortcut{
 .fonticons{
     letter-spacing: 10px;
 }
+#toastDate{
+    color: navy;
+  }

@@ -50,6 +50,12 @@ if(file_exists($statuslog))
     }
   }
   fclose ($fhandle);
+  if($buffer != '')
+  {
+    echo json_encode($buffer);
+  }
+  else
+    header('Temporary-Header: True', true, 204);
 }
 else
 {
@@ -61,7 +67,7 @@ else
     $idata = $_SESSION['imagepath'];
     $fdata = $_SESSION['toastedfile'];
     $arr = array('status' => $sdata,  'mimetype' => $mdata, 'object' => $odata, 'imagepath' => $idata, 'toastedfile' => $fdata ,'debug' =>$statuslog);
+    echo json_encode($arr);
   }
 }
-echo json_encode($buffer);
 ?>

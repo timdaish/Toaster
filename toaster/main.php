@@ -2950,7 +2950,7 @@ var cookietext = '<?php echo utf8_converter($cookiedata); ?>';
 	google.charts.setOnLoadCallback(drawTPChart);
 	visjs_thirdpartynetwork("D");
     // image in sized div
-    if(BrwsEngine != '6')
+    if(BrwsEngine != '6' && BrwsEngine != '8')
     {
       	$('#pjspage').append(' at Resolution of <?php echo $width;?> x <?php echo $height;?> px (<?php echo str_replace("_"," ",$uastr);?>)');
     }
@@ -3001,4 +3001,15 @@ $toastedlist = $filepath_basesavedir."toasted.csv";
 $handle = fopen($toastedlist, "a");
 fputcsv($handle, $line,',');
 fclose($handle);
+// replacement json file list of toasted pages
+$dt = date("Y-m-d H:i:s");
+$datedir = date("Y").'/'.date("m").'/'.date("d").'/';
+if(substr($filepath_basesavedir,-1) != DIRECTORY_SEPARATOR)
+	$toastedlog = $filepath_basesavedir.DIRECTORY_SEPARATOR.$datedir."toasted.json";
+else
+	$toastedlog = $filepath_basesavedir.$datedir."toasted.json";
+$arr = array ("datetime"=>$dt, "url"=>$url,"toastedwebname"=>$toastedwebname,"browserengine"=>$browserEngineVer,"ua"=>str_replace("_"," ",$uastr),"pagetitle"=>htmlentities(trim($pagetitle)),"harfile"=>trim($uploadedHARFileName),"imgname"=>trim($jsimgname),"notes"=>$runnotes);
+$logToastedResult = file_put_contents($toastedlog, json_encode($arr)."\n",FILE_APPEND); // don't lock_ex to allow reading at same time
+if($logToastedResult === false)
+	error_log("Failed to write to toasted json log: " . $dt . " " . $toastedwebname);
 ?>
