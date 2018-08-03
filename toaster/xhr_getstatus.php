@@ -13,7 +13,11 @@ else {
     $OS = PHP_OS;
 }
 $toasterid = $_REQUEST["tid"];
-$lastpos = intval($_REQUEST["p"]);
+if(isset($_REQUEST["p"]))
+  $lastpos = intval($_REQUEST["p"]);
+else
+  $lastpos = 1;
+
 if($OS == "Windows")
 {
 	$debuglog = "f:\\toast\\logs\\" . $toasterid . "_debug.txt";
@@ -55,7 +59,10 @@ if(file_exists($statuslog))
     echo json_encode($buffer);
   }
   else
+  {
     header('Temporary-Header: True', true, 204);
+    header_remove('Temporary-Header');
+  }
 }
 else
 {

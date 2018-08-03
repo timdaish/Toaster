@@ -6695,10 +6695,10 @@ debug ("creating basefilepath ",$path);
 //echo("content length = ".$contentlength ."<br/>");
                                 break;
                             case "content-type" :
-                                session_start();
-                                $_SESSION['mimetype'] = $pieces[1];
-                                logStatus('ObjectMT',$pieces[1]);
-                                session_write_close();
+                                // session_start();
+                                // $_SESSION['mimetype'] = $pieces[1];
+                                // logStatus('ObjectMT',$pieces[1]);
+                                // session_write_close();
                                 $ct = explode(";", $pieces[1]);
                                 $contenttype = $ct[0];
 //echo ("content type full: ". $pieces[1]."<br/>");

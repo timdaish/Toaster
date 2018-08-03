@@ -443,7 +443,12 @@ if(isset($_REQUEST["chremoteurlandport"]))
 //echo "getting user lon: ".$_SESSION['userlong']."<br/>";
   }
 //echo ("my location: ".$externalloc. ' lat='.$userlat. '; long='.$userlong."<br/>");
- //echo "Current dir is: ".$curdir."<br/>";
+
+//logging of new test
+$logurl = 'http://localhost/toaster/sql/logstats.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
+$f = file_get_contents($logurl);
+
+//echo "Current dir is: ".$curdir."<br/>";
   //echo realpath($curdir.'\getstatus.php')."<br/>";
   //echo realpath( '.' );
 	//step 1
@@ -3012,4 +3017,7 @@ $arr = array ("datetime"=>$dt, "url"=>$url,"toastedwebname"=>$toastedwebname,"br
 $logToastedResult = file_put_contents($toastedlog, json_encode($arr)."\n",FILE_APPEND); // don't lock_ex to allow reading at same time
 if($logToastedResult === false)
 	error_log("Failed to write to toasted json log: " . $dt . " " . $toastedwebname);
+//final logging of new test
+$logurl = 'http://localhost/toaster/sql/logstats.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
+$f = file_get_contents($logurl);
 ?>

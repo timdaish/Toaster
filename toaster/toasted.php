@@ -260,24 +260,31 @@ $('#toastedtab').DataTable().clear();
                         if(item.ua.indexOf('Googlebot') !==false)
                             deviceUA = '<img src="/toaster/images/googlebot.png"></img><br/>'+item.ua;
                     }
-
-                   var $tr = $('<tr>').append(
-                        $('<td>').html('<a class="history" href="' + item.imgname + '" target="_blank">view screenshot</a>'),
-                        $('<td>').html('<a href="'+item.toastedwebname+'" target="_blank">'+item.url+"</a>"),
-                        $('<td>').html(decodeURIComponent(item.pagetitle)),
-                        $('<td>').html('<a href="'+harfile+'" download>Download HAR</a>'),
-                        $('<td>').text(item.browserengine),
-                        $('<td>').html(deviceUA),
-                        $('<td>').text(item.datetime),
-                        $('<td>').text(item.notes),
-                        // $('<td>').text(item.imgname),
-                        // $('<td>').text(item.toastedwebname),
-                    ); 
+                    var pt = '';
+                    console.log(item.toastedwebname);
+                    try{
+                        pt = item.pagetitle;
+                    }
+                    catch(err) {
+                //document.getElementById("demo").innerHTML = err.message;
+                    }
+                //    var $tr = $('<tr>').append(
+                //         $('<td>').html('<a class="history" href="' + item.imgname + '" target="_blank">view screenshot</a>'),
+                //         $('<td>').html('<a href="'+item.toastedwebname+'" target="_blank">'+item.url+"</a>"),
+                //         $('<td>').html(encodeURIComponent(pt)),
+                //         $('<td>').html('<a href="'+harfile+'" download>Download HAR</a>'),
+                //         $('<td>').text(item.browserengine),
+                //         $('<td>').html(deviceUA),
+                //         $('<td>').text(item.datetime),
+                //         $('<td>').text(item.notes),
+                //         // $('<td>').text(item.imgname),
+                //         // $('<td>').text(item.toastedwebname),
+                //     ); 
             }
             $('#toastedtab').dataTable().fnAddData( [
                 '<a class="history" href="' + item.imgname + '" target="_blank">view screenshot</a>',
                 '<a href="'+item.toastedwebname+'" target="_blank">'+item.url+"</a>",
-                decodeURIComponent(item.pagetitle),
+                pt,
                 '<a href="'+harfile+'" download>Download HAR</a>',
                 item.browserengine,
                 deviceUA,

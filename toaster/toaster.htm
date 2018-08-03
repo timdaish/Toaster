@@ -316,8 +316,12 @@ function startRefresh()
               //code here using lines[i] which will give you each line
               //console.log(i,JSON.parse(lines[i]));
               for (var key in lines[i]) {
+                if(!lines[i])
+                {
+                  continue;
+                }
           //      console.log(JSON.parse(lines[i]));
-                  var l = JSON.parse(lines[i])
+                  var l = JSON.parse(lines[i]);
                   var dt = l["datetime"];
                   var event = l["event"];
                   var data = l["data"];
@@ -386,15 +390,6 @@ function startRefresh()
 //console.log("status no update"); 
         }
 
-
-        if (obj.status == 'Ready to Toast') {
-
-
-
-          var imgpath;
-
-
-        }
       }, // end success
         error: function (jqXhr, textStatus, errorThrown) {
               console.log(jqXhr.responseText);
