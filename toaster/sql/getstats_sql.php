@@ -14,6 +14,9 @@ $countRunning = $db->querySingle("SELECT COUNT(*) as count FROM LOG WHERE dt_end
 
 
 
+// SELECT * FROM MyTable WHERE myDate >= date('now', '-1 days')  AND myDate <  date('now') // select today and yesterday only
+
+
 // get all results
 $result = $db->query("SELECT * FROM LOG ORDER by dt_ended desc");
 $stack = array();

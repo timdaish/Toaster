@@ -2540,9 +2540,12 @@ function lookup3PDescription($domain)
 function getSelfHosted3PFiles()
 {
 	global $arraySelfHosted3pDescriptions,$dbusage;
+	if(!$arraySelfHosted3pDescriptions)
+		return false;
 	$desc = '';
 	$domprovider = '';
 	$cat = '';
+	$prod = '';
 	foreach ($arraySelfHosted3pDescriptions as $line_num => $line) {
 		if($dbusage == true)
 		{

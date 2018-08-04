@@ -1,5 +1,6 @@
 <?php
 session_start();
+session_destroy();
 $serverName = 'http://'.$_SERVER['SERVER_NAME'];
 $hostname = gethostname();
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -409,7 +410,7 @@ if(isset($_REQUEST["chremoteurlandport"]))
     $extlatlong = $lat.",".$long;
     $userlat = $lat;
     $userlong = $long;
-    session_start();
+
     $_SESSION['userIP'] = $externalIp;
     $_SESSION['userlat'] = $lat;
     $_SESSION['userlong'] = $long;
@@ -443,10 +444,10 @@ if(isset($_REQUEST["chremoteurlandport"]))
 //echo "getting user lon: ".$_SESSION['userlong']."<br/>";
   }
 //echo ("my location: ".$externalloc. ' lat='.$userlat. '; long='.$userlong."<br/>");
-
+getSelfHosted3PFiles();
 //logging of new test
-$logurl = 'http://localhost/toaster/sql/logstats.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
-$f = file_get_contents($logurl);
+// $logurl = 'https://www/webpagetoaster.com/toaster/sql/logstats.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
+// $f = file_get_contents($logurl);
 
 //echo "Current dir is: ".$curdir."<br/>";
   //echo realpath($curdir.'\getstatus.php')."<br/>";
@@ -3018,6 +3019,6 @@ $logToastedResult = file_put_contents($toastedlog, json_encode($arr)."\n",FILE_A
 if($logToastedResult === false)
 	error_log("Failed to write to toasted json log: " . $dt . " " . $toastedwebname);
 //final logging of new test
-$logurl = 'http://localhost/toaster/sql/logstats.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
-$f = file_get_contents($logurl);
+// $logurl = 'https://www/webpagetoaster.com/toaster/sql/logstats.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
+// $f = file_get_contents($logurl);
 ?>

@@ -183,7 +183,8 @@ function logStatus($event, $data) {
     $output = $data;
     if ( is_array( $data ) )
         $output = implode( ',', $output);
-    $arr = array ("datetime"=>date("Y-m-d H:i:s"), "event"=>$event,"data"=>$data);
+//echo ("log status event: " . $event. " ; data: ".$output);
+    $arr = array ("datetime"=>date("Y-m-d H:i:s"), "event"=>$event,"data"=>$output);
     $logStatusResult = file_put_contents($statuslog, json_encode($arr)."\n",FILE_APPEND); // don't lock_ex to allow reading at same time
     if($logStatusResult === false)
         error_log("Failed to write to status log" . ": " . $event . ": " . $output);
@@ -2833,9 +2834,9 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
         debug(__FUNCTION__ . ' ' . __LINE__, '');
         global $url, $html, $debug, $fullpagepath, $roothost, $arrayroothost, $filepath_basesavedir, $body, $boolHTTPCompressRoot, $cms, $totbytesdownloaded, $rootbytesdownloaded, $filepath_domainsaverootdir, $localfilename, $uastr,$wptHAR,$chhHAR;
 //echo "processRootRedir: New Absolute URL = $url<br/>";
-        session_start();
-        $_SESSION['status'] = 'Processing Root Redirection';
-        session_write_close();
+        // session_start();
+        // $_SESSION['status'] = 'Processing Root Redirection';
+        // session_write_close();
         logStatus('Status','Processing Root Redirection');
 //step 1
         $sourceurlparts = get_SourceURL($url);
@@ -5205,10 +5206,10 @@ addUpdatePageObject($arr);
                 {
                     case 1 :
                         $browserEngineVer = 'Webkit (PhantomJS v1.9.8)';
-                        session_start();
-                        $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
-                        $_SESSION['object'] = $value;
-                        session_write_close();
+                        // session_start();
+                        // $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
+                        // $_SESSION['object'] = $value;
+                        // session_write_close();
                         logStatus('Status','iframe - Rerunning ' . $browserEngineVer);
                         logStatus('Object',$value);
                         if ($OS == "Windows")
@@ -5218,10 +5219,10 @@ addUpdatePageObject($arr);
                         break;
                     case 2 :
                         $browserEngineVer = 'Webkit (PhantomJS v2.0.0)';
-                        session_start();
-                        $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
-                        $_SESSION['object'] = $value;
-                        session_write_close();
+                        // session_start();
+                        // $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
+                        // $_SESSION['object'] = $value;
+                        // session_write_close();
                         logStatus('Status','iframe - Rerunning ' . $browserEngineVer);
                         logStatus('Object',$value);
                         if ($OS == "Windows")
@@ -5231,10 +5232,10 @@ addUpdatePageObject($arr);
                         break;
                     case 3 :
                         $browserEngineVer = 'Gecko (SlimerJS v0.9.5)';
-                        session_start();
-                        $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
-                        $_SESSION['object'] = $value;
-                        session_write_close();
+                        // session_start();
+                        // $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
+                        // $_SESSION['object'] = $value;
+                        // session_write_close();
                         logStatus('Status','iframe - Rerunning ' . $browserEngineVer);
                         logStatus('Object',$value);
                         if ($OS == "Windows")
@@ -5244,10 +5245,10 @@ addUpdatePageObject($arr);
                         break;
                     case 4 :
                         $browserEngineVer = 'Gecko (SlimerJS v0.10)';
-                        session_start();
-                        $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
-                        $_SESSION['object'] = $value;
-                        session_write_close();
+                        // session_start();
+                        // $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
+                        // $_SESSION['object'] = $value;
+                        // session_write_close();
                         logStatus('Status','iframe - Rerunning ' . $browserEngineVer);
                         logStatus('Object',$value);
                         if ($OS == "Windows")
@@ -5257,9 +5258,9 @@ addUpdatePageObject($arr);
                         break;
                     case 5 :
                         $browserEngineVer = 'Webkit (PhantomJS v2.1.1)';
-                        session_start();
-                        $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
-                        session_write_close();
+                        // session_start();
+                        // $_SESSION['status'] = 'iframe - Rerunning ' . $browserEngineVer;
+                        // session_write_close();
                         logStatus('Status','iframe - Rerunning ' . $browserEngineVer);
                         logStatus('Object',$value);
                         if ($OS == "Windows")
@@ -5810,9 +5811,9 @@ addUpdatePageObject($arr);
                             $valsemipos = explode(";", $val);
                             $contenttype = trim($valsemipos[0]);
 //echo ("redirs checking content type: ". $contenttype);
-                            session_start();
-                            $_SESSION['mimetype'] = trim($contenttype);
-                            session_write_close();
+                            // session_start();
+                            // $_SESSION['mimetype'] = trim($contenttype);
+                            // session_write_close();
                             logStatus('ObjectMT',trim($contenttype));
                             switch (trim($contenttype))
                             {
@@ -6794,11 +6795,11 @@ debug ("creating basefilepath ",$path);
 //echo("</pre>");
         $nooffiles = count($arrayPageObjects);
         debug("<br/>DOWNLOADING FILES", 'init count: ' . $nooffiles);
-        session_start();
-        $_SESSION['status'] = 'Downloading Objects';
-        $_SESSION['mimetype'] = '';
-        $_SESSION['object'] = '';
-        session_write_close();
+        // session_start();
+        // $_SESSION['status'] = 'Downloading Objects';
+        // $_SESSION['mimetype'] = '';
+        // $_SESSION['object'] = '';
+        // session_write_close();
         logStatus('Status','Downloading Objects');
         if ($debug == true)
         {
@@ -6827,20 +6828,24 @@ debug ("creating basefilepath ",$path);
             $objectDownloadCount += 1;
             $nooffiles = count($arrayPageObjects);
             if($nooffiles < $objectDownloadCount)
-                $nooffiles = $objectDownloadCount;
-            session_start();
+            //     $nooffiles = $objectDownloadCount;
+            // session_start();
+            $dlstatus = '';
             if($loadContentFromHAR == false)
             {
-                $_SESSION['status'] = 'Downloading and Analysing Object ' . $objectDownloadCount . " of " . $nooffiles;
-                logStatus('Status','Downloading and Analysing Object ' . $objectDownloadCount . " of " . $nooffiles);
+                // $_SESSION['status'] = 'Downloading and Analysing Object ' . $objectDownloadCount . " of " . $nooffiles;
+                $dlstatus = 'Downloading and Analysing Object ' . $objectDownloadCount . ' of ' . $nooffiles;
             }
             else
-                $_SESSION['status'] = 'Analysing Object ' . $objectDownloadCount . " of " . $nooffiles;
-
-            $_SESSION['object'] = html_entity_decode($fname);
-            $_SESSION['mimetype'] = '';
-            session_write_close();
-            logStatus('Status','Analysing Object ' . $objectDownloadCount . " of " . $nooffiles);
+            {
+                // $_SESSION['status'] = 'Analysing Object ' . $objectDownloadCount . " of " . $nooffiles;
+                $dlstatus = 'Analysing Object ' . $objectDownloadCount . ' of  ' . $nooffiles;
+            }
+            // $_SESSION['object'] = html_entity_decode($fname);
+            // $_SESSION['mimetype'] = '';
+            // session_write_close();
+//echo $dlstatus.PHP_EOL;
+            logStatus('Status',$dlstatus);
             logStatus('Object',html_entity_decode($fname));
 //error_log("Downloading file ".$key." (". $fname."): memory usage = ". memory_get_usage(true));
             downloadObject($key, $valuearray);
@@ -7545,7 +7550,11 @@ debug("Found image to copy", $local);
     function detect3PJSFile($lfn, $domain, $srcfile)
     {
         global $host_domain, $arrayHost3PFiles, $arrayDomains, $arraySelfHosted3pDescriptions;
-// 1) extract comments
+
+        if(!$arraySelfHosted3pDescriptions)
+        return false;
+
+        // 1) extract comments
         if(!file_exists($lfn))
             return false;
 
@@ -7642,10 +7651,10 @@ debug("Found image to copy", $local);
             $domref = $valuearray["Domain ref"];
             $domain = $valuearray["Domain"];
             $objtype = $valuearray["Object type"];
-            session_start();
-            $_SESSION['status'] = 'Identifying Third Party Call Chain (' . $key . ' of ' . $objectcount . ')';
-            $_SESSION['object'] = $domain;
-            session_write_close();
+            // session_start();
+            // $_SESSION['status'] = 'Identifying Third Party Call Chain (' . $key . ' of ' . $objectcount . ')';
+            // $_SESSION['object'] = $domain;
+            // session_write_close();
             logStatus('Status','Identifying Third Party Call Chain (' . $key . ' of ' . $objectcount . ')');
             logStatus('Object',$domain);
             if (strpos($objurl, "//") != false)

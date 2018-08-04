@@ -312,15 +312,19 @@ function startRefresh()
 //console.log("status lastpos = " + statuspos.toString());
           var lines = obj.split('\n');
           // parse each line of status returned
+// console.log("noof lines",lines.length);          
           for(var i = 0;i < lines.length;i++){
               //code here using lines[i] which will give you each line
-              //console.log(i,JSON.parse(lines[i]));
-              for (var key in lines[i]) {
+//console.log(i,JSON.parse(lines[i]));
+  var lc = 0;
+           //   for (var key in lines[i]) {
+                lc++;
+//console.log("line processed count " + lc);
                 if(!lines[i])
                 {
                   continue;
                 }
-          //      console.log(JSON.parse(lines[i]));
+//console.log(JSON.parse(lines[i]));
                   var l = JSON.parse(lines[i]);
                   var dt = l["datetime"];
                   var event = l["event"];
@@ -382,7 +386,7 @@ function startRefresh()
                         }
                       break;
                   } // end switch event
-                }
+               // }
 
             } // end for var i
         }
