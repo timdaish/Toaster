@@ -6,7 +6,7 @@ $db = new SQLite3('toasterlog.db');
 $countAll = $db->querySingle("SELECT COUNT(*) as count FROM LOG");
 //echo "Noof log records: " . $count . PHP_EOL;
 
-$countComplete = $db->querySingle("SELECT COUNT(*) as count FROM LOG WHERE dt_ended IS NOT NULL");
+$countCompleteAll = $db->querySingle("SELECT COUNT(*) as count FROM LOG WHERE dt_ended IS NOT NULL");
 //echo "Noof log records: " . $count . PHP_EOL;
 
 $countRunning = $db->querySingle("SELECT COUNT(*) as count FROM LOG WHERE dt_ended IS NULL and dt_started > datetime('now', '-5 minutes')");
@@ -14,11 +14,13 @@ $countRunning = $db->querySingle("SELECT COUNT(*) as count FROM LOG WHERE dt_end
 
 
 
-// SELECT * FROM MyTable WHERE myDate >= date('now', '-1 days')  AND myDate <  date('now') // select today and yesterday only
-
 
 // get all results
-$result = $db->query("SELECT * FROM LOG ORDER by dt_ended desc");
+$sql = "SELECT * FROM LOG ORDER by dt_ended desc";
+// select today and yesterday only
+$sql = "SELECT * FROM LOG WHERE dt_ended >= datetime('now', '-1 days')  AND dt_ended <  datetime('now') ORDER by dt_ended desc"; 
+$result = $db->query($sql);
+
 $stack = array();
 $arrtest = array();
 while ($row = $result->fetchArray())
@@ -35,6 +37,6 @@ while ($row = $result->fetchArray())
 }
 //print_r($stack);
 
-$arr = array ("noofTestsAll"=> $countAll,"noofCompleteAll"=> $countComplete,"noofRunning5mins"=> $countRunning, "tests" => $stack);
+$arr = array ("noofTestsAll"=> $countAll,"noofCompleteAll"=> $countCompleteAll,"noofRunning5mins"=> $countRunning, "tests" => $stack);
 echo json_encode($arr)
 ?>

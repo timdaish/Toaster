@@ -446,8 +446,8 @@ if(isset($_REQUEST["chremoteurlandport"]))
 //echo ("my location: ".$externalloc. ' lat='.$userlat. '; long='.$userlong."<br/>");
 getSelfHosted3PFiles();
 //logging of new test
-// $logurl = 'https://www/webpagetoaster.com/toaster/sql/logstats.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
-// $f = file_get_contents($logurl);
+$logurl = 'https://www.webpagetoaster.com/toaster/sql/logstats.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
+$f = file_get_contents($logurl);
 
 //echo "Current dir is: ".$curdir."<br/>";
   //echo realpath($curdir.'\getstatus.php')."<br/>";
@@ -3019,6 +3019,6 @@ $logToastedResult = file_put_contents($toastedlog, json_encode($arr)."\n",FILE_A
 if($logToastedResult === false)
 	error_log("Failed to write to toasted json log: " . $dt . " " . $toastedwebname);
 //final logging of new test
-// $logurl = 'https://www/webpagetoaster.com/toaster/sql/logstats.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
-// $f = file_get_contents($logurl);
+$logurl = 'https://www.webpagetoaster.com/toaster/sql/logstats.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
+$f = file_get_contents($logurl);
 ?>
