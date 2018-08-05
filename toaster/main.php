@@ -1056,7 +1056,7 @@ error_log("MAIN redirs: new localfile: " .$localfilename);
 		{
 //echo ("(main): bypass saving the root headers against the object due to HAR processed: $url<br/>");
 			addPageHeaders(html_entity_decode(htmlentities($url)),$hdrs);
-			}
+		}
 		//echo("<pre>");
 		//print_r($hdrs);
 		//echo("</pre>");
@@ -1733,7 +1733,7 @@ if($har != '')
 								$mimetype = $reqhdrvalue['value'];
 						}
 						$rsphdrset = '';						
-//echo "adding object headers from har file for: " . $ObjURL . "<br/>";
+//echo "getting object headers from har file for: " . $ObjURL . "<br/>";
 						foreach ($responseheaders as $rsphdrkey => $rsphdrvalue) {
 //echo ("rsp hdr key ". $rsphdrkey. " ".$rsphdrvalue['name'] . ": " . $rsphdrvalue['value']."<br/>");
 							//$hdrsplit = str_split($rsphdrvalue,":");
@@ -1741,7 +1741,7 @@ if($har != '')
 							$rsphdrset = $rsphdrset . $rsphdrvalue['name'] . ": " . $rsphdrvalue['value'] . PHP_EOL;
 						}
 
-						addPageHeaders($ObjURL,$rsphdrset);
+					//	addPageHeaders($ObjURL,$rsphdrset);
 
 
 						//echo("<pre>Response");
@@ -2093,6 +2093,7 @@ if($har != '')
 								addUpdatePageObject($arr);
 							}
 						}
+						addPageHeaders($ObjURL,$rsphdrset);
 					} // end for each entry in the entries array (in switch statement)
 				break;
 				default:
