@@ -360,6 +360,7 @@ if(isset($_REQUEST["chremoteurlandport"]))
 		$chheadlessserver = "http://" . $chheadlessserver;
 //echo ("headless chrome remote server = " . $chheadlessserver. PHP_EOL);
 }
+$userip_address = get_client_ip_server();
 // get current working dir
 //echo "Request uri is: ".$_SERVER['REQUEST_URI']. "<br>";
   $curdir = dirname($_SERVER['REQUEST_URI'])."/";
@@ -446,7 +447,10 @@ if(isset($_REQUEST["chremoteurlandport"]))
 //echo ("my location: ".$externalloc. ' lat='.$userlat. '; long='.$userlong."<br/>");
 getSelfHosted3PFiles();
 //logging of new test
-$logurl = 'https://www.webpagetoaster.com/toaster/sql/logstats.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
+if( strpos($hostname,"gridhost.co.uk") != false)
+	$logurl = 'https://www.webpagetoaster.com/toaster/sql/dblogging.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver.'&uip='.$userip_address;
+else
+	$logurl = 'http://localhost/toaster/sql/dblogging.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
 $f = file_get_contents($logurl);
 
 //echo "Current dir is: ".$curdir."<br/>";
@@ -800,7 +804,7 @@ debug ("toast filepathname: " .$toastedfilepathname,1);
 	logStatus("Status","Processing hostname");
 	if( strpos($hostname,"gridhost.co.uk") != false)
 	{
-		$toastedwebname = 'https://www.webpagetoaster.com/toast/'. $datedir . "/" . $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"] . "/toasted_".$thispagenameext;
+		$toastedwebname = 'https://www.webpagetoaster.com/toast/'. $datedir . $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"] . "/toasted_".$thispagenameext;
 //echo ($toastedwebname);
 debug ("toasted webname: " .$toastedwebname ,1);
 	}
@@ -2233,7 +2237,7 @@ if($har != '')
     // session_start();
     // $_SESSION['status'] = 'Copying Image Files';
 	// session_write_close();
-	//logStatus('Status','Copying Image Files');
+	logStatus('Status','Backing Image Files');
     copyImageFilesToFolders();
 	//
 	//echo("getCompressionFileStats<br/>");
@@ -2998,15 +3002,15 @@ logStatus('Toasting',false);
 $toastfileresult = file_put_contents($toastedfilepathname, ob_get_contents(),LOCK_EX);
 //echo ("toast file put result " . $toastfileresult."<br/>");
 // add generated file to lists of tests
-$dt = date("Y-m-d H:i:s");
-$line = $array = array($url,$toastedwebname,trim($dt),str_replace("_"," ",$uastr),htmlentities(trim($pagetitle)),trim($uploadedHARFileName),trim($jsimgname),$runnotes,);
-if(substr($filepath_basesavedir,-1) != DIRECTORY_SEPARATOR)
-	$toastedlist = $filepath_basesavedir.DIRECTORY_SEPARATOR."toasted.csv";
-else
-$toastedlist = $filepath_basesavedir."toasted.csv";
-$handle = fopen($toastedlist, "a");
-fputcsv($handle, $line,',');
-fclose($handle);
+// $dt = date("Y-m-d H:i:s");
+// $line = $array = array($url,$toastedwebname,trim($dt),str_replace("_"," ",$uastr),htmlentities(trim($pagetitle)),trim($uploadedHARFileName),trim($jsimgname),$runnotes,);
+// if(substr($filepath_basesavedir,-1) != DIRECTORY_SEPARATOR)
+// 	$toastedlist = $filepath_basesavedir.DIRECTORY_SEPARATOR."toasted.csv";
+// else
+// $toastedlist = $filepath_basesavedir."toasted.csv";
+// $handle = fopen($toastedlist, "a");
+// fputcsv($handle, $line,',');
+// fclose($handle);
 // replacement json file list of toasted pages
 $dt = date("Y-m-d H:i:s");
 $datedir = date("Y").'/'.date("m").'/'.date("d").'/';
@@ -3019,6 +3023,9 @@ $logToastedResult = file_put_contents($toastedlog, json_encode($arr)."\n",FILE_A
 if($logToastedResult === false)
 	error_log("Failed to write to toasted json log: " . $dt . " " . $toastedwebname);
 //final logging of new test
-$logurl = 'https://www.webpagetoaster.com/toaster/sql/logstats.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
+if( strpos($hostname,"gridhost.co.uk") != false)
+	$logurl = 'https://www.webpagetoaster.com/toaster/sql/dblogging.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver.'&uip='.$userip_address;
+else
+	$logurl = 'http://localhost/toaster/sql/dblogging.php?tid='. $toasterid.'&ip='.$externalIp.'&url='.urlencode($url).'&eng=' .$_REQUEST["wbengine"] .'&hchloc=' . $chheadlessserver;
 $f = file_get_contents($logurl);
 ?>

@@ -66,7 +66,7 @@ $(document).ready(function() {
     
 
     $( "#rescore" ).click(function() {
-        console.log("rescoring");
+//console.log("rescoring");
         
         table.rows().iterator( 'row', function ( context, index ) {
             // ... do something with data(), or this.node(), etc
@@ -163,7 +163,7 @@ $('#toastedtab').DataTable().clear();
         },
         success: function(data, textStatus, jqXHR) {
             // since we are using jQuery, you don't need to parse response
-            console.log("success");
+//console.log("success");
 //console.log(data);
 
 
@@ -177,7 +177,7 @@ $('#toastedtab').DataTable().clear();
 
                 var x = location.hostname;
                 var svr = fp ;
-                console.log(x);
+//console.log(x);
 //console.log(item.datetime,item.url, item.ua);
                 // $.each(j, function(i, item) {
                 //     console.log(i,item);
@@ -235,7 +235,7 @@ $('#toastedtab').DataTable().clear();
                                 deviceUA = '<img src="/toaster/images/internet_explorer.png"></img><img src="/toaster/images/desktop.png"></img><br/>'+item.ua;
                                 break;
                             default:
-                                deviceUA = $ua;
+                                deviceUA = item.ua;
                                 break;
                         }
                     }
@@ -261,7 +261,7 @@ $('#toastedtab').DataTable().clear();
                             deviceUA = '<img src="/toaster/images/googlebot.png"></img><br/>'+item.ua;
                     }
                     var pt = '';
-                    console.log(item.toastedwebname);
+//console.log(item.toastedwebname);
                     try{
                         pt = item.pagetitle;
                     }
@@ -281,6 +281,7 @@ $('#toastedtab').DataTable().clear();
                 //         // $('<td>').text(item.toastedwebname),
                 //     ); 
             }
+//console.log(item.toastedwebname);
             $('#toastedtab').dataTable().fnAddData( [
                 '<a class="history" href="' + item.imgname + '" target="_blank">view screenshot</a>',
                 '<a href="'+item.toastedwebname+'" target="_blank">'+item.url+"</a>",

@@ -1,0 +1,91 @@
+body{
+    color: white;
+}
+table {
+    font-family: verdana,arial,sans-serif;
+    color:#333;
+    border-width: 1px;
+    border-color: #999999;
+    border-collapse: collapse;
+    text-wrap:unrestricted;
+    word-wrap:break-word;
+}
+ul {
+    list-style-type: none;
+    margin-left: -25px;
+}
+li{
+    width: 300px;
+    height: 200px;
+    background-color: navy;
+    padding: 10px;
+    margin: 20px;
+    float: left;
+}
+li.pass{
+    color: green;
+    background-image: url("/toaster/images/pass.png");
+    background-repeat: no-repeat;
+    background-position: 0px 0px;
+    padding-left: 25px;
+}
+li.fail{
+    color: red;
+    background-image: url("/toaster/images/fail.png");
+    background-repeat: no-repeat;
+    background-position: 0px 0px;
+    padding-left: 25px;
+}
+li.warn{
+    color: #CC471A;
+    background-image: url("/toasterimages/warn.png");
+    background-repeat: no-repeat;
+    background-position: 0px 0px;
+    padding-left: 25px;
+}
+.none{
+    color: white;
+    padding-left: 25px;
+    padding-right: 25px;
+}
+div.dataTables_length {
+    float: left;
+}
+ 
+div.dataTables_filter {
+    float: right;
+}
+ 
+div.dataTables_info {
+    float: left;
+}
+ 
+div.dataTables_paginate {
+    float: right;
+}
+ 
+div.dataTables_length,
+div.dataTables_filter,
+div.dataTables_paginate,
+div.dataTables_info {
+    padding: 6px;
+}
+table.dataTable thead th, table.dataTable thead td
+{
+    color: white;
+}
+.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate{
+    color: white;
+}
+select{
+    color: black;
+}
+.lihdr{
+    font-size: 200%;
+    margin:auto; display:table;
+}
+.lino{
+    font-size: 400%;
+    margin:auto; display:table;
+    padding-top: 30px;
+}

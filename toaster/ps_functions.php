@@ -7643,7 +7643,7 @@ debug("Found image to copy", $local);
 //echo ("Third Party References<br/>");
         foreach ($arrayPageObjects as $key => $valuearray)
         {
-//echo("key:".$key." = value: " .$valuearray["id"]. "<br/>");
+debug("key:".$key." = value: " ,$valuearray["id"]);
 //print_r($valuearray);
 // get domain stats
             $objid = $valuearray["id"];
@@ -7661,7 +7661,7 @@ debug("Found image to copy", $local);
                 $urlwithoutscheme = substr($objurl, strpos($objurl, '//') + 2);
             else
                 $urlwithoutscheme = $objurl;
-//echo($objid.": checking domain for url ". $urlwithoutscheme . "; domref = '".  $domref ."'<br/>");
+debug($objid.": checking domain for url ". $urlwithoutscheme , "; domref = '".  $domref );
 // only lookup for objects on 3P domains, CDNs, redirs and include Adobe analytics on a shard
             if ($domref == '3P' or $domref == 'CDN' or $domref == 'Shard' or ($domref == 'redirection' and $domain != $host_domain) or ($domref == 'Shard') and strpos($domain,'metrics.') != false )
             {
@@ -7710,7 +7710,7 @@ debug("Found image to copy", $local);
 // only look in objects that are JavaScript , CSS, HTML or data
                         if (($lu_objtype != 'JavaScript' and $lu_objtype != 'StyleSheet' and $lu_objtype != 'HTML' and $lu_objtype != 'Data') or $lu_statuscode != "200") //and $lu_objtype != 'CSS'
                             continue;
-//echo("id: ".$objid.": looking in object ". $lu_objid .  ": file: " . $lu_objfile ."<br/>");
+debug("id: ".$objid.": looking in object ". $lu_objid ,  ": file: " . $lu_objfile);
 // retrieve the lookup object and search
 // strip subdomain from domain and try again
                         $subdomain = $domain;

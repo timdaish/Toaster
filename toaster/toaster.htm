@@ -548,8 +548,17 @@ function startRefresh()
               //console.log(jqXhr.responseText);
               if(jqXhr.responseText === undefined)
               {
-                console.log("Toasting failed submitting main: Either PHP code has an error or URL is invalid!");
-                console.log(textStatus);
+                // console.log("Toasting failed submitting main: Either PHP code has an error or URL is invalid!");
+                // console.log(textStatus);
+                $('#status').text('Sorry, that page failed - please review URL and retry');
+                $('#statusdetail').html("&nbsp;");
+                $('body').removeClass('busy');
+                $('#submit').removeAttr('disabled');
+                $('#submit').removeClass("grey");
+                $('#fileupdate img').attr("src", '');
+                $('#comment').val('');
+                $('#harfile').val('');
+                $('div#toastingnow > img').remove();
               }
               else{
                 var x = jqXhr.responseText;
