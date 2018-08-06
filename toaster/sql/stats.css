@@ -70,9 +70,17 @@ div.dataTables_paginate,
 div.dataTables_info {
     padding: 6px;
 }
-table.dataTable thead th, table.dataTable thead td
+table.dataTable thead th, table.dataTable thead td,
 {
     color: white;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button
+{
+    color: white !important;  
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover
+{
+    background: linear-gradient(to bottom, #585858 0%, #111111 100%);
 }
 .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate{
     color: white;

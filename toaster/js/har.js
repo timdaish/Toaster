@@ -436,6 +436,13 @@ var group = '';
 			            'width': 1,
 			            'label':{}
 
+					}
+					,
+		            {
+		            	'color': 'black',
+			            'width': 1,
+			            'label':{}
+
 		            }]
 			},
 			'xAxis':{
@@ -504,13 +511,31 @@ var group = '';
 		options.yAxis.plotLines[1].value = val.RenderStartTime;
 		options.yAxis.plotLines[1].label.text = "Render Start (" + val.RenderStartTime + ")";
 		if(val._firstMeaningfulPaint > 0)
-		{
+		{ // chrome headless
 			options.yAxis.plotLines[1].value = val._firstMeaningfulPaint;
 			options.yAxis.plotLines[1].label.text = "First Meaningful Paint (" + val._firstMeaningfulPaint + ")";
 			rstitle = "First Meaningful Paint";
 		}
-		options.yAxis.plotLines[2].value = val._domContentStartTime;
-		options.yAxis.plotLines[2].label.text = "DOM ContentLoaded Start (" + val._domContentStartTime + ")";
+		if(val.DomContentStartTime > 0)
+		{
+			options.yAxis.plotLines[2].value = val.DomContentStartTime;
+			options.yAxis.plotLines[2].label.text = "DOM ContentLoaded Start (" + val._domContentStartTime + ")";
+		}
+		else{
+			options.yAxis.plotLines[2].value = val.DomContentStartTime;
+			options.yAxis.plotLines[2].label.text = "DOM ContentLoaded Start (" + val._domContentStartTime + ")";
+		}
+
+		if(!val._totalTime)
+		{ // wpt
+			options.yAxis.plotLines[3].value = val.FullyLoadedTime;
+			options.yAxis.plotLines[3].label.text = "Fully Loaded Time (" + val.FullyLoadedTime + ")";
+		}
+		else
+		{ // chrome headless
+			options.yAxis.plotLines[3].value = val._totalTime;
+			options.yAxis.plotLines[3].label.text = "Total Time (" + val._totalTime + ")";
+		}
 
 
 		$.each(val.objects, function(j,objects) {
@@ -989,7 +1014,7 @@ function display3PTagWaterfall(tagwfmode){
 ];
 
 
-console.log("plotting data for mode " + tagwfmode.toString());
+//console.log("plotting data for mode " + tagwfmode.toString());
 	var tagtext = '';
 	// select series data for mode being displayed
 	if(tagwfmode == 1)
@@ -1008,7 +1033,7 @@ console.log("plotting data for mode " + tagwfmode.toString());
 		tagtext = 'Tags by Content Type and Total Size (incl. response header) against page load duration';
 	}
 
-console.log("render start time/First Meaningful Paint: " + renderstarttime + " = " + rstitle);
+//console.log("render start time/First Meaningful Paint: " + renderstarttime + " = " + rstitle);
 // blitz all nav timings if render not present
 // if(typeof renderstarttime === "undefined" )
 // {
@@ -1019,10 +1044,11 @@ console.log("render start time/First Meaningful Paint: " + renderstarttime + " =
 // }
 //console.log("timing dataseries",dataSeries);
 if(fullyloadedtime === undefined)
-	var xaxismaxvalue = Math.max(onloadtime, maxtiming ) + 1;
+	var xaxismaxvalue = Math.ceil(Math.max(onloadtime, maxtiming ));
 else
-	var xaxismaxvalue = Math.max(onloadtime, fullyloadedtime, maxtiming ) + 1;
-console.log(rstitle + " ; max x value", onloadtime,fullyloadedtime, maxtiming);
+	var xaxismaxvalue = Math.ceil(Math.max(onloadtime, fullyloadedtime, maxtiming ));
+	
+console.log(rstitle + ": max x value: ", xaxismaxvalue , "from :", onloadtime,fullyloadedtime, maxtiming);
     $(function () {
         $('#container_3Ptagwaterfall').highcharts({
 
