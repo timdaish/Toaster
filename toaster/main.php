@@ -2531,8 +2531,8 @@ if($har != '')
         <table id="fonts_table" class="dataTable table-striped" border="1"><thead></thead><tbody></tbody></table>
         <div style="clear: both;"></div>
         <form>
-        <button class="btn btn-default" id="ViewFonts" class="button" type="button" value="View Fonts"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>View Fonts</button>
-        <button class="btn btn-default" id="HideFonts" class="button" type="button" value="Hide Fonts"><span class="glyphicon glyphicon-zoom-out" aria-hidden="true"></span>Hide Fonts</button>
+        <button class="btn btn-default" id="ViewFonts" class="button" type="button" value="View Text Fonts"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>View Fonts</button>
+        <button class="btn btn-default" id="HideFonts" class="button" type="button" value="Hide Text Fonts"><span class="glyphicon glyphicon-zoom-out" aria-hidden="true"></span>Hide Fonts</button>
         </form>
         <div id="fontdefs"></div>
         <div id="fontdisplay"></div>

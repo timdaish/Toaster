@@ -687,7 +687,7 @@ function fnFormatDetails(oTable, nTr) {
             if(((filename.indexOf("icon") != -1 || filename.indexOf("fontawesome") != -1  || lcfontname.indexOf("icon") != -1) && filename.indexOf("woff2") == -1 ) )
             {
 
-                var jsondata = (getWoffFontDetails(objLocFileCnv));
+                var jsondata = getWoffFontDetails(objLocFileCnv);
 //console.log(jsondata);
                 $.each(jsondata, function (index, data) {
 //console.log(index, data)
@@ -695,6 +695,7 @@ function fnFormatDetails(oTable, nTr) {
                     {
                         case "fontname":
 //console.log("fontname = " + data);
+                            fontname = data;
                             break;
                         case "cmap":
                         $.each(data, function (idx,cmapsubtable) {
@@ -2348,6 +2349,7 @@ function displayTableNewObj(tbltype) {
     var id = '';
     var httpstatus = '';
     var objsource = '';
+    var objlocal = '';
     var bytesize = 0;
     var respsonsedatetime = '';
     var domref = '';
@@ -2361,6 +2363,7 @@ function displayTableNewObj(tbltype) {
     var isCompressed = '';
     var filesection = '';
     var filetiming = '';
+    var filename = '';
     // build the column headings
     $.each(NewObj, function () {
         var tbl_row = "";
@@ -2373,6 +2376,7 @@ function displayTableNewObj(tbltype) {
                 respsonsedatetime = NewObj[Number(v)]['response_datetime'];
                 id = NewObj[Number(v)]['id'];
                 objsource = NewObj[Number(v)]['Object source'];
+                objlocal = NewObj[Number(v)]['Object file'];
                 objtype = NewObj[Number(v)]['Object type'];
                 domref = NewObj[Number(v)]['Domain ref'];
                 domain = NewObj[Number(v)]['Domain'];
@@ -2386,6 +2390,8 @@ function displayTableNewObj(tbltype) {
                     minifiedSize = NewObj[Number(v)]['Content size minified uncompressed'];
                 filesection = NewObj[Number(v)]['file_section'];
                 filetiming = NewObj[Number(v)]['file_timing'];
+                var escapedFilepath = objlocal.replace(/\\/g, "/");
+                filename = escapedFilepath.substring(escapedFilepath.lastIndexOf("/") + 1, escapedFilepath.lastIndexOf("."));
                 //console.log("dt found: " + objsource + ': ' + respsonsedatetime);
             }
             //console.log('id: "' + id + '"');
@@ -2781,6 +2787,10 @@ function displayTableNewObj(tbltype) {
                         case 'Content size compressed':
                         case 'Content size uncompressed':
                         case 'Font name':
+                        if(v == '' && filename.indexOf("fontawesome") != -1)
+                        {  
+                            v = "Font Awesome";
+                         }
                             tbl_row += "<td title=\"" + k + "\">" + v + "</td>";
                             break;
                         case 'Object source':
@@ -8202,20 +8212,41 @@ function displayFonts() {
                     var name_with_ext = objfile.split('\\').pop().split('/').pop();
                     var name_without_ext = name_with_ext.substring(name_with_ext.lastIndexOf("/") + 1, name_with_ext.lastIndexOf("."));
                     var lc = jssavedir.slice(-1);
-                    var objLocFileurl = objfile.substr(2); // strip the c:\ from the front#
-                    //console.log("objLocFileurl = " +objLocFileurl);
-                    var objLocFileCnv = objLocFileurl.replace(/\\/g, "/")
+                    var objLocFileurl = objfile;
+                    var windir = objLocFileurl.substr(1, 1);
+                    if (windir == ':') {
+                        objLocFileurl = objLocFileurl.substr(2); // strip the windows drive from the beginning
+                        objLocFileCnv = objLocFileurl.replace(/[/\\*]/g, '\/');
+                        //console.log("WIN objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv);
+                    }
+                    else { // linux
+                        if(objLocFile.indexOf("/usr/share") !== -1)
+                        { // local
+                        objLocFileurl = objLocFile.substr(10); // strip the /usr/share from the front
+                        objLocFileCnv = objLocFileurl.replace(/[/\\*]/g, '\/');
+                        }
+                        else // webpagetoaster.com
+                            objLocFileCnv = objLocFile;
+                    }
+
                     //console.log("objLocFileconv= " +objLocFileCnv);
                     objLocFileCnv.trim();
                     if (lc != "/")
                         jssavedir = jssavedir + '/';
 
-                    // don't add known iconfonts
+                    // don't add known iconfonts to the view fonts list
                     if(filename.indexOf("icon") != -1 || filename.indexOf("fontawesome") != -1)
                     {  
-//                         var jsondata = $.parseJSON(getWoffFontDetails(objLocFileCnv));
-// //console.log(jsondata);
-
+                        var ext = filename.substr(filename.lastIndexOf('.') + 1);
+                        switch (ext)
+                        {
+                            case "woff":
+                                var jsondata = getWoffFontDetails(objLocFileCnv);
+//console.log(jsondata);
+                                fontname = jsondata.fontname;
+                                NewObj[Number(v)]['Font name'] = fontname;
+                                break;
+                        }
                      }
                      else
                      {
