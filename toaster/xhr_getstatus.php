@@ -66,15 +66,7 @@ if(file_exists($statuslog))
 }
 else
 {
-  if(isset($_SESSION['status'])) {
-    $sdata = $_SESSION['status'];
-    $mdata = $_SESSION['mimetype'];
-    $mdata = str_replace('/','_',$mdata);
-    $odata = $_SESSION['object'];
-    $idata = $_SESSION['imagepath'];
-    $fdata = $_SESSION['toastedfile'];
-    $arr = array('status' => $sdata,  'mimetype' => $mdata, 'object' => $odata, 'imagepath' => $idata, 'toastedfile' => $fdata ,'debug' =>$statuslog);
+    $arr = array('status' => "File not available",'file' =>$statuslog);
     echo json_encode($arr);
-  }
 }
 ?>

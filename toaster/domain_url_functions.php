@@ -4,6 +4,25 @@ function convertAbsoluteURLtoLocalFileName($sourcefile)
 {
 	global $filepath_domainsavedir, $filepath_domainsaverootdir,$host_domain,$debug;
 	$localfile = '';
+
+        // check for URL with semi colons in place of querystring ? and &
+        if(strpos($sourcefile,";") !== false)
+        {
+            // alternative querystring format found - not good for file saving so replace for purpose of generating filename
+//echo "semicolons found in url";
+            $noofsc = substr_count($sourcefile, ';');
+            if(strpos($sourcefile,"?") === false)
+            {
+                // replace first semi colons with ?
+                $firstscpos = strpos($sourcefile,";");
+                $sourcefile = substr($sourcefile,0,$firstscpos ) . "?" . substr($sourcefile,$firstscpos + 1);
+                // replace all remaining semi colons with &
+                $sourcefile = str_replace(";","&",$sourcefile);
+            }
+
+        }
+
+
     //if(strpos($sourcefile,"FileMerge") > 0 or strpos($sourcefile,"WebResource") > 0)
 	//    $funcdebug = true;
     //else
@@ -128,6 +147,14 @@ function convertAbsoluteURLtoLocalFileName($sourcefile)
 	// remove invalid characters from filename, startung with colon :
 	$thisfilename = str_replace(":","",$thisfilename);
 	$thisfilename = str_replace("%3A","",$thisfilename);
+
+	// check for querystring using semi-colons instead
+	if(strpos($originalsourcefile,";") !== false)
+	{
+		// semi colons found - replace these in local filename
+
+	}
+
 
 //echo ($thisfilename . "<br/>");
     
@@ -1555,7 +1582,7 @@ function checkdomainforNamedCDNLocation($edgename,$edgeaddress)
 		if(($boolknownCDN == false or $latlong == '') and $edgeloc == '') 
 		{
 			list($edgeloc,$city,$region,$country,$lat,$long) = lookupLocationforIP($edgeaddress);
-			if($edgeloc == '')
+			if($edgeloc == '' and $lat != '' and $long != '')
 				$edgeloc = lookupLocationForLatLong($lat,$long);
 
 //echo ('other nw: edge loc '.$edgeloc.' from ip: '.$edgeaddress.'<br/>');
@@ -1584,14 +1611,16 @@ function checkdomainforNamedCDNLocation($edgename,$edgeaddress)
 function cidr_match($ip, $cidr)
 {
 	list($subnet, $mask) = explode('/', $cidr);
-
+	$chkmask = 32;
 	// check for bitshift error
-	// if(32 - $mask < 0)
-	// 	return false;
-	// }
+	if(32 - $mask < 0)
+	{
+		$chkmask = 64;
+		//return false;
+	}
 
 	try{
-		if ((ip2long($ip) & ~((1 << (32 - $mask)) - 1) ) == ip2long($subnet))
+		if ((ip2long($ip) & ~((1 << ($chkmask - $mask)) - 1) ) == ip2long($subnet))
 		{ 
 			return true;
 		}
@@ -1607,6 +1636,7 @@ function cidr_match($ip, $cidr)
 function amazonRegionLookup($region)
 {
 	global $userlat, $userlong;
+	$distance = -1;
 	switch ($region)
 	{
 		case "us-east-2":
@@ -1675,9 +1705,8 @@ function amazonRegionLookup($region)
 			$long = '';
 			$mindistance = 100000;
 			$closestloc = '';
-			$closestlat = 0;
-			$closestlong = 0;
-
+			$closestlat = '';
+			$closestlong = '';
 			// randomise lat and long
 			$random1 = ((rand()*(0.04/getrandmax()))-0.02);
 			$random2 = ((rand()*(0.04/getrandmax()))-0.02);
@@ -1702,14 +1731,34 @@ function amazonRegionLookup($region)
 					$closestlong = $long;
 					$mindistance = $distance;
 				}
-			}
+			}	
 			//
 			//
 			//
 
 		default:
 			$name = "Global";
-	}
+	} // end switch
+
+	if($distance == -1)
+	{
+		list($edgelatlong,$lat,$long) = lookupLatLongForLocation($name);
+
+		// randomise lat and long
+		$random1 = ((rand()*(0.04/getrandmax()))-0.02);
+		$random2 = ((rand()*(0.04/getrandmax()))-0.02);
+		if($lat != 0 and $long != 0)
+		{
+			$lat += $random1;
+			$long += $random2;
+		}
+			// get distance
+			$distance = round(distance($userlat, $userlong ,$lat,$long,"M"),0); // M = unit = Miles
+			$closestloc = $name;
+			$closestlat = $lat;
+			$closestlong = $long;
+		}
+
 	$arr = array ($closestloc,$closestlat,$closestlong);
 	return ($arr);
 }
@@ -3122,8 +3171,12 @@ function isthisAddressLatLong($inaddr)
 function lookupLocationForLatLong($lat,$long)
 {
 	global $apikey_googlemaps;
-	//echo("Geocode API  lookuplocation call for: ".$lat. ", ".$long."<br/>");
-	$latlng = $lat.",".$long;	
+	if(!$lat or !$long)
+	{
+		return "";
+	}
+	//echo("Geocode API lookuplocation call for: ".$lat. ", ".$long."<br/>");
+	$latlng = $lat.",".$long;
 	$parameters = "latlng=".$latlng . "&key=" .$apikey_googlemaps;
 	$response = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?'.$parameters);
 	$response = json_decode($response);

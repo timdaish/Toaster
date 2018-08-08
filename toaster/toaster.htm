@@ -399,14 +399,12 @@ function startRefresh()
               console.log(jqXhr.responseText);
               if(jqXhr.responseText === undefined)
               {
-                console.log("Toasting failed getting status undefined:");
+                console.log("Toasting failed getting status - undefined error:");
                 console.log(textStatus);
               }
               else{
                 var x = jqXhr.responseText;
                 var aError = x.split(',');
-                console.log("Toasting failed getting status:: " + aError);
-              
                 if (Array.isArray(aError) == true)
                 {
                   var amessage = '';
@@ -425,13 +423,18 @@ function startRefresh()
                     console.log("debug info = " + adebug[1]);
                     debug = adebug[1];
                   }
-                  else {
+                  else
+                  {
 //console.log("Status = " + textStatus);
+                    console.log("Toasting failed getting status:: " + aError);
+                    //alert($('#urlfield').val() + ": " + textStatus + ": " + message);
+                    $('#statusupdate').empty();
+                    $('#fileupdate').empty();
+                    $('#toasturl').html("An error has occurred - toast burned. Please try another slice.");
+                    console.log(errorThrown + ": " + $('#urlfield').val() + ": " + " " + message + ": " + debug);
                   }
-                }
-                //alert($('#urlfield').val() + ": " + textStatus + ": " + message);
-                console.log(errorThrown + ": " + $('#urlfield').val() + ": " + " " + message + ": " + debug);
-              }
+                } // have an error message
+              } // end defined error
       }, // end error
  
     });  // end ajax

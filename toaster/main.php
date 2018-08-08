@@ -21,7 +21,7 @@ session_write_close();
 date_default_timezone_set('UTC');
 set_time_limit(0);
 ini_set("auto_detect_line_endings", true);
-ini_set('max_execution_time', '600');
+ini_set('max_execution_time', '1200');
 ini_set('display_errors', 0); // change to 1 for displaying errors on main screen // 0 to disable
 error_reporting(E_ALL | E_STRICT);
 ini_set('exif.encode_unicode', 'UTF-8');
@@ -46,7 +46,7 @@ if (isset($_REQUEST["tid"]))
 	$toasterid = $_REQUEST["tid"];
 else
 	$toasterid=generateRandomString(); // generate if calling main.php directly without tid
-echo "toaster id:" . $toasterid .PHP_EOL; 
+// echo "toaster id:" . $toasterid .PHP_EOL; 
 if($OS == "Windows")
 {
 	$debuglog = "f:\\toast\\logs\\" . $toasterid . "_debug.txt";
@@ -631,9 +631,9 @@ $f = file_get_contents($logurl);
 	//error_log(__LINE__ .  'thispagename - '.$thispagename);
 	$datedir = date("Y").'/'.date("m").'/'.date("d").'/'.date('H').'/';
 	// define system filepaths, adding a trailing slash
-	$filepath_domainsavedir = joinFilePaths($filepath_basesavedir,$datedir,$uastr,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
-	$filepath_domainsavedirlnx1 = joinFilePaths($filepath_basesavedir,$datedir,$uastr,DIRECTORY_SEPARATOR);
-	$filepath_domainsavedirlnx2 = joinFilePaths($filepath_basesavedir,$datedir,$uastr,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
+	$filepath_domainsavedir = joinFilePaths($filepath_basesavedir,$datedir,$toasterid,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
+	$filepath_domainsavedirlnx1 = joinFilePaths($filepath_basesavedir,$datedir,$toasterid,DIRECTORY_SEPARATOR);
+	$filepath_domainsavedirlnx2 = joinFilePaths($filepath_basesavedir,$datedir,$toasterid,$host_domain,$sourceurlparts["dirs"],DIRECTORY_SEPARATOR);
 	// create the save directory before it is needed by a browser engine
 	debug ("main: creating basefilepath ",$filepath_domainsavedir);
 	createDomainSaveDir($filepath_domainsavedir);
@@ -645,16 +645,16 @@ $f = file_get_contents($logurl);
 		chmod($filepath_domainsavedirlnx2, 0777);
 		chmod($filepath_domainsavedir, 0777);
 		if( strpos($hostname,"gridhost.co.uk") != false)
-			$filepath_domainsavedirLnx = "/var/sites/w/webpagetoaster.com/public_html/toast/".$datedir. "/".$uastr. "/".$host_domain;
+			$filepath_domainsavedirLnx = "/var/sites/w/webpagetoaster.com/public_html/toast/".$datedir. "/".$toasterid. "/".$host_domain;
 		else
 		{
-			$filepath_domainsavedirLnx = "/usr/share/toast/". $datedir. "/". $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"];
+			$filepath_domainsavedirLnx = "/usr/share/toast/". $datedir. "/". $toasterid. "/".$host_domain . "/" . $sourceurlparts["dirs"];
 			$filepath_domainsavedir = $filepath_domainsavedirLnx;
 		}
 	}
-	$jsfilepath_domainsavedir = joinURLPaths('/toast',$datedir,$uastr,$host_domain,$sourceurlparts["dirs"]);
-	$filepath_domainsaverootdir = joinFilePaths($filepath_basesavedir,$datedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
-	$localvpath = joinFilePaths($filepath_basesavedir,$datedir,$uastr,$host_domain,DIRECTORY_SEPARATOR);
+	$jsfilepath_domainsavedir = joinURLPaths('/toast',$datedir,$toasterid,$host_domain,$sourceurlparts["dirs"]);
+	$filepath_domainsaverootdir = joinFilePaths($filepath_basesavedir,$datedir,$toasterid,$host_domain,DIRECTORY_SEPARATOR);
+	$localvpath = joinFilePaths($filepath_basesavedir,$datedir,$toasterid,$host_domain,DIRECTORY_SEPARATOR);
 	$lc = substr($jsfilepath_domainsavedir,-1);
 	if($lc == '/')
     {
@@ -787,12 +787,12 @@ $f = file_get_contents($logurl);
     $lastchar = substr($jsfilepath_domainsavedir, -1);
 	if($lastchar == "/")
 	{
-		$toastedwebname = $jsfilepath_domainsavedir."toasted_".$thispagenameext;
+		$toastedwebname = $jsfilepath_domainsavedir."toasted_".urlencode($thispagenameext);
 		$toastedfilepathname = $filepath_domainsavedir."toasted_".$thispagenameext;
 	}
 	else
 		{
-		$toastedwebname = $jsfilepath_domainsavedir."/toasted_".$thispagenameext;
+		$toastedwebname = $jsfilepath_domainsavedir."/toasted_".urlencode($thispagenameext);
 		$toastedfilepathname = $filepath_domainsavedir."/toasted_".$thispagenameext;
 		}
 debug ("toast filepathname: " .$toastedfilepathname,1);
@@ -804,7 +804,7 @@ debug ("toast filepathname: " .$toastedfilepathname,1);
 	logStatus("Status","Processing hostname");
 	if( strpos($hostname,"gridhost.co.uk") != false)
 	{
-		$toastedwebname = 'https://www.webpagetoaster.com/toast/'. $datedir . $uastr. "/".$host_domain . "/" . $sourceurlparts["dirs"] . "/toasted_".$thispagenameext;
+		$toastedwebname = 'https://www.webpagetoaster.com/toast/'. $datedir . $toasterid. "/".$host_domain . "/" . $sourceurlparts["dirs"] . "/toasted_".urlencode($thispagenameext);
 //echo ($toastedwebname);
 debug ("toasted webname: " .$toastedwebname ,1);
 	}
@@ -1596,7 +1596,7 @@ if($har != '')
 		// $_SESSION['status'] = 'Reading HAR file';
 		// session_write_close();
 		logStatus('imagepath',$jsimgname);
-		logStatus('Status','Reading HAR file');
+		logStatus('Status','Processing HAR from ' . $browserEngineVer);
 		// override the HAR file if not for WPT or headless chrome
 		if($uploadedHAR == True and $wptHAR == false and $chhHAR == false)
 		{
@@ -2238,7 +2238,7 @@ if($har != '')
     // session_start();
     // $_SESSION['status'] = 'Copying Image Files';
 	// session_write_close();
-	logStatus('Status','Backing Image Files');
+	logStatus('Status','Saving Image Files For Optimisation Comparison');
     copyImageFilesToFolders();
 	//
 	//echo("getCompressionFileStats<br/>");

@@ -467,11 +467,12 @@ error_log(__FUNCTION__ . ' ' .__LINE__ . " testarray: ". $testArray);
     }
 
 
-    function readURLandSaveToFilePath($url, $sfn)
+    function readURLandSaveToFilePath($url, $sfn,$curlcount=0)
     {
+        $curlcount++;
         debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $url . "; " . $sfn);
         global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath,$encodingoptions;
-        debug('<br/>function readURLandSaveToFilePath called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br />');
+        debug('function readURLandSaveToFilePath called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br />');
 //echo('<br/>function readURLandSaveToFilePath called for '.$url. '<br/> saving file to '.$sfn.'<br />');
 //echo ("opening file $url: $sfn<br/>");
 // replace misconfigured paramters ?& with ?
@@ -549,14 +550,14 @@ error_log(__FUNCTION__ . ' ' .__LINE__ . " testarray: ". $testArray);
             debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
             //echo "ch: " . $ch . PHP_EOL;
             
-            if($errno == 61 or $errno == 23)
+            if(($errno == 61 or $errno == 23) and $curlcount < 2) // count calls made to prevent recursion errors
             {
               // echo ("Brotli decoding was not supported CURL error $url ({$errno}): " . " {$error_message}  - " . $url);
                echo ("Brotli was available from the host but decoding was not supported by the version of CURL on this server.");
                     // can't decode brotli in the current version of curl, so remove it
                     $encodingoptions = "gzip,deflate";
                     // and retry request again without brotli
-                    list($curl_info, $curlheader) = readURLandSaveToFilePath($url, $sfn);
+                    list($curl_info, $curlheader) = readURLandSaveToFilePath($url, $sfn, $curlcount);
             }
             else
             {
@@ -610,7 +611,7 @@ debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
             }
             readURLWithExtraCookieandSaveToFilePath($url, $sfn, $extracookies);
         }
-        debug('<br/>END function readURLandSaveToFilePath called for ', $url . '; <br/> saved file to ' . $sfn . '<br />');
+        debug('END function readURLandSaveToFilePath called for ', $url . '; <br/> saved file to ' . $sfn . '<br />');
         return array($curl_info, $curlheader);
     }
 
@@ -619,7 +620,7 @@ debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
     {
         debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $url . "; " . $sfn);
         global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath,$encodingoptions;
-        debug('<br/>function readURLandSaveToFilePathNoFollow called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br />');
+        debug('function readURLandSaveToFilePathNoFollow called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br />');
 //echo('<br/>function readURLandSaveToFilePath called for '.$url. '<br/> saving file to '.$sfn.'<br />');
 //echo ("opening file $url: $sfn<br/>");
         $url = htmlspecialchars_decode($url);
@@ -736,7 +737,7 @@ debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
             }
 //readURLWithExtraCookieandSaveToFilePathNoFollow($url,$sfn,$extracookies);
         }
-        debug('<br/>END function readURLandSaveToFilePathNoFollow called for ', $url . '; <br/> saved file to ' . $sfn . '<br />');
+        debug('END function readURLandSaveToFilePathNoFollow called for ', $url . '; <br/> saved file to ' . $sfn . '<br />');
         return array($curl_info, $curlheader);
     }
 
@@ -745,7 +746,7 @@ debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
     {
         debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $url . "; " . $sfn);
         global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath,$encodingoptions;
-        debug('<br/>readURLWithExtraCookieandSaveToFilePath called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br/>');
+        debug('readURLWithExtraCookieandSaveToFilePath called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br/>');
 //echo('<br/>function readURLWithExtraCookieandSaveToFilePath '.$url. '<br/> saving file to '.$sfn.'<br />');
 //echo ('extra cookies set: ' . $extracookies.'<br>');
 //echo ("opening file $url: $sfn<br/>");
@@ -837,7 +838,7 @@ debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
 //echo("Response headers for file retry<pre>");
 //print_r ($curlheader);
 //echo ("</pre>");
-        debug('<br/>END function readURLandSaveToFilePath called for ', $url . '; <br/> saved file to ' . $sfn . '<br />');
+        debug('END function readURLandSaveToFilePath called for ', $url . '; <br/> saved file to ' . $sfn . '<br />');
         return array($curl_info, $curlheader);
     }
 
@@ -846,7 +847,7 @@ debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
     {
         debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $url . "; " . $sfn);
         global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath,$encodingoptions;
-        debug('<br/>readURLWithExtraCookieandSaveToFilePathNoFollow called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br/>');
+        debug('readURLWithExtraCookieandSaveToFilePathNoFollow called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br/>');
 //echo('<br/>function readURLWithExtraCookieandSaveToFilePath '.$url. '<br/> saving file to '.$sfn.'<br />');
 //echo ('extra cookies set: ' . $extracookies.'<br>');
 //echo ("opening file $url: $sfn<br/>");
@@ -939,7 +940,7 @@ debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
 //echo("Response headers for file<pre>");
 //print_r ($curlheader);
 //echo ("</pre>");
-        debug('<br/>END function readURLandSaveToFilePathNoFollow called for ', $url . '; <br/> saved file to ' . $sfn . '<br />');
+        debug('END function readURLandSaveToFilePathNoFollow called for ', $url . '; <br/> saved file to ' . $sfn . '<br />');
 //echo('<br/>END function readURLandSaveToFilePathNoFollow called for ' . $url. '; <br/>status code=' . $dlstatuscode . ' filesize=' . $dlfilesize. '; saved file to '.$sfn.'<br />');
         return array($curl_info, $curlheader);
     }
@@ -949,7 +950,7 @@ debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
     {
         debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $url . "; " . $sfn);
         global $result, $ua, $curlheader, $cookie_jar, $username, $password, $boolakamaiDebug, $boolNewCookieSessionSet,$fullurlpath,$encodingoptions;
-        debug('<br/>function readURLandSaveToFilePath called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br />');
+        debug('function readURLandSaveToFilePath called for ', $url . '<br/> the returned headers and body will be saved to ' . $sfn . '<br />');
 //echo('<br/>function readURLandSaveToFilePath called for '.$url. '<br/> saving file to '.$sfn.'<br />');
 //echo ("opening file $url: $sfn<br/>");
 // replace misconfigured paramters ?& with ?
@@ -1071,7 +1072,7 @@ debug("CURL error $url ({$errno}): " . " {$error_message}  - ", $url);
             }
             readURLWithExtraCookieandSaveToFilePath($url, $sfn, $extracookies);
         }
-        debug('<br/>END function readURLandSaveToFilePath called for ', $url . '; <br/> saved file to ' . $sfn . '<br />');
+        debug('END function readURLandSaveToFilePath called for ', $url . '; <br/> saved file to ' . $sfn . '<br />');
         return array($curl_info, $curlheader);
     }
 
@@ -1869,7 +1870,7 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
             if (!isset($inarr["HTTP status"]))
                 return false;
 //echo ("Adding source url to object array: ". $remoteurl.": $objCNT: $localfile<br/>");
-            debug("<br/>ADDING NEW OBJECT - object id", $objCNT);
+            debug("ADDING NEW OBJECT - object id", $objCNT);
             debug("new source url", $newsourceurl);
             debug("new local url", $localfile);
 // new add to array
@@ -6794,7 +6795,7 @@ debug ("creating basefilepath ",$path);
 //print_r($ListOfFiles);
 //echo("</pre>");
         $nooffiles = count($arrayPageObjects);
-        debug("<br/>DOWNLOADING FILES", 'init count: ' . $nooffiles);
+        debug("DOWNLOADING FILES", 'init count: ' . $nooffiles);
         // session_start();
         // $_SESSION['status'] = 'Downloading Objects';
         // $_SESSION['mimetype'] = '';
@@ -6912,7 +6913,16 @@ debug ("creating basefilepath ",$path);
 //echo ("Found $ftype Image to copy: $local<br/>");
                 $path_parts = pathinfo($local);
                 $filename = $path_parts['filename'];
-                $ext = $path_parts['extension'];
+                if(isset($path_parts['extension']))
+                    $ext = $path_parts['extension'];
+                else
+                {
+                    $imgext = substr($ftype,(strpos($ftype,'/')));
+                    if($imgext != '')
+                        $ext = $imgext;
+                    else
+                        $ext = 'img';
+                }
 debug("Found image to copy", $local);
                 $folder = '_Extracted_Images';
                 $baseImgfolder = $filepath_domainsavedir . $folder;

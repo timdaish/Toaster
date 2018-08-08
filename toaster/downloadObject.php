@@ -2667,9 +2667,16 @@ function downloadObject($key,$valuearray)
 									}
 								}
 
-								if(file_exists($lfn))
+								if(file_exists($lfn) and $truemimetype != '')
+								{
+									try{
 									@$get    = getimagesize($lfn);
-
+									}
+								catch (Exception $e) {
+									echo 'Caught exception: ',  $e->getMessage(), "\n";
+									$get = false;
+									}
+								}
 								if(isset($get) and $get !== false)
 								{
 									$width  = $get[0];

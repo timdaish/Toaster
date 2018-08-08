@@ -177,6 +177,7 @@ $('#toastedtab').DataTable().clear();
 
                 var x = location.hostname;
                 var svr = fp ;
+             //   item.url = str_replace('%','%25',item.url);
 //console.log(x);
 //console.log(item.datetime,item.url, item.ua);
                 // $.each(j, function(i, item) {

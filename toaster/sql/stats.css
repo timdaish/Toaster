@@ -69,10 +69,20 @@ div.dataTables_filter,
 div.dataTables_paginate,
 div.dataTables_info {
     padding: 6px;
+    color: white;
+}
+thead{
+    color: white;
+}
+.wrap{
+    word-wrap: break-word;
+    word-break: break-all;
+    width: 400px;
 }
 table.dataTable thead th, table.dataTable thead td,
 {
     color: white;
+
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button
 {
