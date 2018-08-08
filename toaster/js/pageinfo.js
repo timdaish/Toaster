@@ -342,7 +342,7 @@ $.ajax({
     url: '/toaster/get_fontinfo_woff.php',
     beforeSend: function () {
         //$('#tab_imageoptimisation').addClass('wait');
-        console.log("AJAX request WOFF Fontinfo for: " + lf);
+//console.log("AJAX request WOFF Fontinfo for: " + lf);
     },
     type: 'GET',
     async: false,
@@ -687,7 +687,7 @@ function fnFormatDetails(oTable, nTr) {
             if(((filename.indexOf("icon") != -1 || filename.indexOf("fontawesome") != -1  || lcfontname.indexOf("icon") != -1) && filename.indexOf("woff2") == -1 ) )
             {
 
-                var jsondata = $.parseJSON(getWoffFontDetails(objLocFileCnv));
+                var jsondata = (getWoffFontDetails(objLocFileCnv));
 //console.log(jsondata);
                 $.each(jsondata, function (index, data) {
 //console.log(index, data)
@@ -4420,7 +4420,7 @@ function initImageOptimisation(container) {
             });
 
         var d = JSON.stringify(TableData);
-        console.log(d);
+//console.log(d);
         //console.log(location.protocol + '//' + location.host);
         $opturl = "/toaster/optimise_images.php?" + toasterid;
         // if(location.host == "www.webpagetoaster.com");
@@ -4435,7 +4435,7 @@ function initImageOptimisation(container) {
             dataType: 'json',
             success: function (json) {
                 //alert(json.size);
-                console.log("Opt Image AJAX request was successful");
+//console.log("Opt Image AJAX request was successful");
 
                 // work through JSON array and update for each
                 //console.log($row.find("td.jpg-et-nmd").text());
@@ -7369,6 +7369,10 @@ function isHeaderATextFile(mimetype) {
             boolTextType = true;
             break;
         case "image/svg+xml":
+            boolTextType = true;
+            break;
+        case "font/woff":
+        case "application/font-woff":
             boolTextType = true;
             break;
         default:
