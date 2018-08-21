@@ -3054,7 +3054,7 @@ function downloadObject($key,$valuearray)
                             if($OS == "Windows")
 							    exec($perlbasedir . 'perl win_tools\ExifToolPerl\exiftool.pl -icc_profile -b ' . $lfn,$res);
                             else
-                                exec('exiftool -icc_profile -b ' . $lfn,$res);
+                                exec('./ExifTool/exiftool -icc_profile -b ' . $lfn,$res);
 							$iccinfo = $res;
                             //if($iccinfo !== null)
 							  //  addImageData($sourcefile,"ICC",$iccinfo);

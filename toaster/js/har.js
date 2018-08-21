@@ -22,7 +22,7 @@ var analysisURL = '';
 var analysisDisplayDate = new Date();
 var analysisYear = analysisDisplayDate.getFullYear();
 function loadConfigFile(configFile) {
-    $.getJSON('config.json', function(data) {
+    $.getJSON('/toaster/config.json', function(data) {
 //console.log("owner",data.owner);
         analysisOwner = data.owner;
         analysisSite = data.site;

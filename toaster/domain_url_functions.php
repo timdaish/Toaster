@@ -2353,7 +2353,7 @@ function metricsCheckSameDomainsForSubDomains($domain,$host_domain)
 
 function lookup3PDescriptionDirect($domain)
 {
-	global $host_domain, $b3pdbPublic;
+	global $host_domain, $b3pdbPublic,$hostname;
     $domaindesc = '';
     $domainprovider = '';
     $domaincat = '';
@@ -2363,7 +2363,7 @@ function lookup3PDescriptionDirect($domain)
 	$author = '';
 	$datetime = '';
 	$domain3P = '';
-
+	$domainnoqs = '';
 	// strip query string
 	if (strpos($domain, "?") > 0)
 	{
@@ -2382,24 +2382,38 @@ function lookup3PDescriptionDirect($domain)
 //echo ("looking up 3p domain " . $domainnoqs  . "; domtype: " . $domtype . "; host= " . $host_domain .  "<br/>");
     // make a curl request to the API directly
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	if($b3pdbPublic)
-		curl_setopt($ch, CURLOPT_URL, 'https://www.webpagetoaster.com/lookup3pdb.php?host=//'.$domainnoqs . "/&domain="  . $host_domain); // public 3pdb
+	{
+		if( strpos($hostname,"gridhost.co.uk") != false)
+		{
+//echo ("looking up 3p domain " . $domainnoqs  . "; domtype: " . $domtype . "; host= " . $host_domain .  "<br/>");
+			curl_setopt($ch, CURLOPT_URL, 'http://www.webpagetoaster.com/lookup3pdb.php?host=//'.$domainnoqs . "/&domain="  . $host_domain); // public 3pdb
+		}
+			else
+			curl_setopt($ch, CURLOPT_URL, 'http://www.webpagetoaster.com/lookup3pdb.php?host=//'.$domainnoqs . "/&domain="  . $host_domain); // public 3pdb
+	}
 	else
 		curl_setopt($ch, CURLOPT_URL, 'https://tagdb.nccgroup-webperf.com/2/find?host='.$domainnoqs); // private database - internal NCC Group/Eggplant use only
 	
-    $result = curl_exec($ch);
+	$result = curl_exec($ch);#
+//echo $result;
+// Check for errors and display the error message
+if($errno = curl_errno($ch)) {
+    $error_message = curl_strerror($errno);
+//echo "cURL error ({$errno}):\n {$error_message}";
+}
+
     curl_close($ch);
     // check if result is empty
-//
-//    if(count(json_decode($result,1))==0)
-//
-//    {
-//
-//echo ("The domain '" . $domain  . "' is not recognised");
-//
-//    }
+
+   if(count(json_decode($result,1))==0)
+
+   {
+
+//echo ("The domain '" . $domain  . "' is not recognised<br/>");
+
+   }
 	$x = 0;
 	// decode json object
 	if($result)

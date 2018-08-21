@@ -56,7 +56,7 @@ var analysisURL = '';
 var analysisDisplayDate = new Date();
 var analysisYear = analysisDisplayDate.getFullYear();
 function loadConfigFile(configFile) {
-    $.getJSON('config.json', function(data) {
+    $.getJSON('/toaster/config.json', function(data) {
 console.log("config.json read: owner",data.owner);
         analysisOwner = data.owner;
         analysisSite = data.site;
@@ -921,10 +921,10 @@ function fnFormatOptImgDetails(oTable, nTr) {
     //var filename = getFileName(escapedFilepath);
     var filename = escapedFilepath.substring(escapedFilepath.lastIndexOf("/") + 1, escapedFilepath.lastIndexOf("."));
 //console.log("opt fp: "+escapedFilepath);
-console.log("opt fn: "+filename);
+//console.log("opt fn: "+filename);
     // imgsplit2 iframe
     sOut += '<iframe id="imgsplit_' + objID + '" class="imgsplit2" src="/toaster/iframe_splitimage.php?path=' + toasturlfolder + '&originalimg=' + originalimage + '&fn=' + filename + '"></iframe>';
-console.log("sOut: "+ sOut);
+//console.log("sOut: "+ sOut);
     return sOut;
 }
 
@@ -1434,6 +1434,9 @@ function mainDisplay(browserenginever) {
     displayTableOptObj('optWEBPimg');
     displayTableOptObj('optBMPimg');
     displayTableOptObj('optGIFanim');
+    // crate thumbnails for images
+    gen_thumbnails();
+    $('#genthumbnails').click();
     displayTable3PObjects(browserenginever);
     displayTable3PTagManagers();
 
@@ -1826,7 +1829,6 @@ function mainDisplay(browserenginever) {
         }); // Ajax Call
     }); //event handler
 
-    gen_thumbnails();
     //GOOGLE MAPS
     // init google maps
     gm_initialize();
@@ -3331,7 +3333,7 @@ function displayTableOptObj(tbltype) {
                                 shortname = getShortName(v);
                                 //console.log("shortname:"+shortname);
                                 //   tbl_row += '<td title=\"" + k + "\">'+v+'</td>'; // full column3 to be hidden
-                                tbl_row += '<td title=\"" + k + "\"><a href="' + v + '" target="_blank">' + shortname + '</td>';
+                                tbl_row += '<td title=\"" + k + "\"><a href="' + v + '" target="_blank">' + v + '</td>';
                             }
                             else {
                                 var fn = getFileName(v);
@@ -3663,7 +3665,7 @@ function displayTableOptObj(tbltype) {
                 //console.log("image url: " + objsource);
                 //console.log("status: " + httpstatus);
                 //console.log("Poss Image table row: " + id + "; status = " + httpstatus.substr(0,3));
-                if (objtype == 'Image' && actualsize != "1 x 1 px" && mimetype == 'image/x-ms-bmp' && bytesize >= 0 && ((httpstatus.substr(0, 3) == '200' || httpstatus.substr(0, 6) == "Base64" || httpstatus.substr(0, 8) == "Embedded"))) {
+                if (objtype == 'Image' && actualsize != "1 x 1 px" && (mimetype == 'image/x-ms-bmp' || mimetype == 'image/bmp' || mimetype == 'image/x-windows-bmp') && bytesize >= 0 && ((httpstatus.substr(0, 3) == '200' || httpstatus.substr(0, 6) == "Base64" || httpstatus.substr(0, 8) == "Embedded"))) {
                     tbl_body += "<tr id =\"" + id + "\" class=\"img\">" + tbl_row + "</tr>";
                     //console.log("New Image table row: " + tbl_row);
                     //console.log("New Image table body: " + tbl_body);
@@ -3966,7 +3968,7 @@ function displayTableOptObj(tbltype) {
             var npngqCloneTh = document.createElement('th');
             var npngqCloneTd = document.createElement('td');
             npngqCloneTd.innerHTML = '';
-            npngqCloneTd.className = "center pngq";
+            npngqCloneTd.className = "center pngqs9";
             npngqCloneTh.innerHTML = 'PNGnq-s9';
             $(container + ' thead tr').each(function () {
                 this.insertBefore(npngqCloneTh, this.childNodes[colcounter]);
@@ -4133,7 +4135,7 @@ function displayTableOptObj(tbltype) {
             var nmCloneTh = document.createElement('th');
             var nmCloneTd = document.createElement('td');
             nmCloneTd.innerHTML = '';
-            nmCloneTd.className = "center";
+            nmCloneTd.className = "center et-nmd";
             nmCloneTh.innerHTML = 'No MetaData';
             $(container + ' thead tr').each(function () {
                 this.insertBefore(nmCloneTh, this.childNodes[colcounter]);
@@ -4142,6 +4144,20 @@ function displayTableOptObj(tbltype) {
                 this.insertBefore(nmCloneTd.cloneNode(true), this.childNodes[colcounter]);
             });
             colcounter++;
+            // SavedAsJPG
+            var ngifasjpgCloneTh = document.createElement('th');
+            var ngifasjpgCloneTd = document.createElement('td');
+            ngifasjpgCloneTd.innerHTML = '';
+            ngifasjpgCloneTd.className = "center jpg-q75";
+            ngifasjpgCloneTh.innerHTML = 'JPG';
+            $(container + ' thead tr').each(function () {
+                this.insertBefore(ngifasjpgCloneTh, this.childNodes[colcounter]);
+            });
+            $(container + ' tbody tr').each(function () {
+                this.insertBefore(ngifasjpgCloneTd.cloneNode(true), this.childNodes[colcounter]);
+            });
+            colcounter++;
+
             var lastcol = colcounter;
             break;
 
@@ -4159,20 +4175,45 @@ function displayTableOptObj(tbltype) {
                 this.insertBefore(nbCloneTd.cloneNode(true), this.childNodes[colcounter]);
             });
             colcounter++;
-            // no metadata
-            var nmCloneTh = document.createElement('th');
-            var nmCloneTd = document.createElement('td');
-            nmCloneTd.innerHTML = '';
-            nmCloneTd.className = "center bmp-et-nmd";
-            nmCloneTh.innerHTML = 'No MetaData';
+            // SavedAsJPEG75PCT
+            var njpgasjpg75CloneTh = document.createElement('th');
+            var njpgasjpg75CloneTd = document.createElement('td');
+            njpgasjpg75CloneTd.innerHTML = '';
+            njpgasjpg75CloneTd.className = "center jpg-q75";
+            njpgasjpg75CloneTh.innerHTML = 'JPEG quality 75%';
             $(container + ' thead tr').each(function () {
-                this.insertBefore(nmCloneTh, this.childNodes[colcounter]);
+                this.insertBefore(njpgasjpg75CloneTh, this.childNodes[colcounter]);
             });
             $(container + ' tbody tr').each(function () {
-                this.insertBefore(nmCloneTd.cloneNode(true), this.childNodes[colcounter]);
+                this.insertBefore(njpgasjpg75CloneTd.cloneNode(true), this.childNodes[colcounter]);
             });
             colcounter++;
-            var lastcol = colcounter;
+            // SavedAsWEBP
+            var ngifaswebpCloneTh = document.createElement('th');
+            var ngifaswebpCloneTd = document.createElement('td');
+            ngifaswebpCloneTd.innerHTML = '';
+            ngifaswebpCloneTd.className = "center webp";
+            ngifaswebpCloneTh.innerHTML = 'WEBP';
+            $(container + ' thead tr').each(function () {
+                this.insertBefore(ngifaswebpCloneTh, this.childNodes[colcounter]);
+            });
+            $(container + ' tbody tr').each(function () {
+                this.insertBefore(ngifaswebpCloneTd.cloneNode(true), this.childNodes[colcounter]);
+            });
+            colcounter++;
+            // SavedAsPNG, optimised by pngquant
+            var ngifaspngqCloneTh = document.createElement('th');
+            var ngifaspngqCloneTd = document.createElement('td');
+            ngifaspngqCloneTd.innerHTML = '';
+            ngifaspngqCloneTd.className = "center pngq";
+            ngifaspngqCloneTh.innerHTML = 'PNG (optimised PNGQuant)';
+            $(container + ' thead tr').each(function () {
+                this.insertBefore(ngifaspngqCloneTh, this.childNodes[colcounter]);
+            });
+            $(container + ' tbody tr').each(function () {
+                this.insertBefore(ngifaspngqCloneTd.cloneNode(true), this.childNodes[colcounter]);
+            });
+            colcounter++;
             break;
 
         case 'optGIFanim':
@@ -4297,19 +4338,19 @@ function displayTableOptObj(tbltype) {
             });
             colcounter++;
 
-            // SavedAsBPG
-            var ngifasbpgCloneTh = document.createElement('th');
-            var ngifasbpgCloneTd = document.createElement('td');
-            ngifasbpgCloneTd.innerHTML = '';
-            ngifasbpgCloneTd.className = "center abpg";
-            ngifasbpgCloneTh.innerHTML = 'aBPG';
-            $(container + ' thead tr').each(function () {
-                this.insertBefore(ngifasbpgCloneTh, this.childNodes[colcounter]);
-            });
-            $(container + ' tbody tr').each(function () {
-                this.insertBefore(ngifasbpgCloneTd.cloneNode(true), this.childNodes[colcounter]);
-            });
-            colcounter++
+            // // SavedAsBPG
+            // var ngifasbpgCloneTh = document.createElement('th');
+            // var ngifasbpgCloneTd = document.createElement('td');
+            // ngifasbpgCloneTd.innerHTML = '';
+            // ngifasbpgCloneTd.className = "center abpg";
+            // ngifasbpgCloneTh.innerHTML = 'aBPG';
+            // $(container + ' thead tr').each(function () {
+            //     this.insertBefore(ngifasbpgCloneTh, this.childNodes[colcounter]);
+            // });
+            // $(container + ' tbody tr').each(function () {
+            //     this.insertBefore(ngifasbpgCloneTd.cloneNode(true), this.childNodes[colcounter]);
+            // });
+            // colcounter++
             var lastcol = colcounter;
             break;
     }
@@ -4388,7 +4429,6 @@ function displayTableOptObj(tbltype) {
     });
     // init table button for the generated datatable
     initImageOptimisation(container);
-    // init thumbnails
     addThumbnails(container);
 } // end datatables - image optimisation
 
@@ -4432,29 +4472,44 @@ function initImageOptimisation(container) {
         var d = JSON.stringify(TableData);
 //console.log(d);
         //console.log(location.protocol + '//' + location.host);
-        $opturl = "/toaster/optimise_images.php?" + toasterid;
-        // if(location.host == "www.webpagetoaster.com");
-        //     $opturl = "https://www.webpagetoaster.com/toaster/optimise_images.php"
+        $opturl = "/toaster/optimise_images.php";
+        //$opturl = "http://toaster.dyndns.biz:8079";
+        var toastpath = localpath;
+        var thisserver = "http://localhost";
+        if(location.host == "www.webpagetoaster.com")
+        {
+            $opturl = "http://toaster.dyndns.biz:8079"
+            thisserver  = "location.host";
+        }
+        else
+        {
+            // windows
+            thisserver = location.protocol + "//" + location.host;
+            toastpath = localpath.substr(2);
+        }
+        console.log("thisserver",thisserver);
+        console.log("optimising image via " + $opturl);
         $.ajax({
             url: $opturl ,
             beforeSend: function () {
                 $('#tab_imageoptimisation').addClass('wait');
             },
-            type: 'POST',
-            data: { 'ids': d },
+            type: 'GET',
+            data: { "tid": toasterid, 'd': d, 'f': toastpath, "s": thisserver, "action": "opt"},
             dataType: 'json',
-            success: function (json) {
+            contentType: false,
+            crossDomain: true,
+             success: function (json) {
                 //alert(json.size);
-//console.log("Opt Image AJAX request was successful");
-
+console.log("Opt Image AJAX request was successful - via " + $opturl);
                 // work through JSON array and update for each
                 //console.log($row.find("td.jpg-et-nmd").text());
                 //    //$row.find("td.jpg-et-nmd").text(data.size);
                 //     $row.find("td.et-nmd").html('<span title="'+ data.tool + ": " + data.operation +' ('+ fDT +')' +'">'+data.size+'</span>');
                 $.each(json, function (key, data) {
-                    //console.log(key,data)
+//console.log(key,data);
                     $.each(data, function (index, data) {
-                        //console.log(index, data.tool, data.operation, data.object, data.size)
+//console.log(index, data.id, data.tool, data.operation, data.size);
                         tooltip = '<span title="' + data.tool + ": " + data.operation + ' (' + data.settings + ')' + '">' + data.size + '</span>';
                         switch (data.id) {
                             case 'no_metadata':
@@ -4508,6 +4563,9 @@ function initImageOptimisation(container) {
                             case 'OPTIPNG':
                                 $row.find("td.opng").html(tooltip);
                                 break;
+                            case 'PNGNQ-S9':
+                                $row.find("td.pngqs9").html(tooltip);
+                                break;
                             case 'PNGOUT':
                                 $row.find("td.pngo").html(tooltip);
                                 break;
@@ -4542,13 +4600,10 @@ function initImageOptimisation(container) {
             },
             error: function (response) {
 console.log("Opt Image AJAX request was a failure");
-//console.log(response.responseText);
-                $.each(json, function (key, data) {
-//console.log(key)
-                $.each(data, function (index, data) {
-//console.log('index', data)
-                 })
-                });
+console.log(response);
+                //$("button.btnoptimise").attr("disabled", true);
+                $("button.btnoptimise").css('color','red');
+                alert ("Sorry, image optimisation is not available via HTTPS at present; please allow mixed-mode content and try again.");
                 $('#tab_imageoptimisation').removeClass('wait');
             }
         });
@@ -4579,17 +4634,30 @@ function addThumbnails(container) {
                     var lc = jssavedir.slice(-1);
                     if (lc != "/")
                         jssavedir = jssavedir + '/';
-                    //console.log('retrieving thumbnail: '+ objfile + ': ' + name_without_ext);
-                    //console.log('linking to thumbnail: '+ jssavedir + '_Thumbnails/' + name_without_ext + '.gif');
+//console.log('retrieving thumbnail: '+ objfile + ': ' + name_without_ext);
+//console.log('linking to optimisation thumbnail (a 404 error might return if it has not been generated: '+ jssavedir + '_Thumbnails/' + name_without_ext + '.gif');
                     //var rowindex = $('#row'+id).index();
+                    var i = '';
+                    //if(fileExists(jssavedir + '_Thumbnails/' + name_without_ext + '.gif') != 0)
                     var i = '<img title="' + imgdimensions + '" src="' + jssavedir + '_Thumbnails/' + name_without_ext + '.gif"></img>';
-                    //console.log(i);
+//console.log(i);
                     $('#row' + id).find("td.imtn").html(i);
 
                 }
             }
         });
     });
+}
+
+function fileExists(url) {
+    if(url){
+        var req = new XMLHttpRequest();
+        req.open('GET', url, false);
+        req.send();
+        return req.status==200;
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -5323,17 +5391,12 @@ function displayTable3PChain(chartOpt) {
         }) // end each row in third party chain
 
         // gtm calls
-console.log("Google Tag Manager analysis...");
-console.log(gtmCount + " GTM tags found");
+//console.log("Google Tag Manager analysis...");
+//console.log(gtmCount + " GTM tags found");
         if(gtmCount > 0)
         {
-            console.log(arrayGTMCalls);
-
-
-
-
+//console.log(arrayGTMCalls);
         }
-
 
         //populate call chain table
         $("#TPChain_table thead").html(tbl_head);
@@ -8039,6 +8102,7 @@ function formatXml(xml) {
 function gen_thumbnails() {
     $('#genthumbnails').click(function () {
         //alert('generating thumbnails');
+ console.log('generating thumbnails');
         var TableData = new Array();
         //alert( oTable.rows('.selected').data().length +' row(s) selected' );
         $.each(NewObj, function () {
@@ -8068,7 +8132,7 @@ function gen_thumbnails() {
             }); // end for each attribute
         }); // end for each object
         var d = JSON.stringify(TableData);
-        //console.log(d);
+//console.log(d);
 
         $.ajax({
             url: '/toaster/gen_thumbnails.php',
@@ -8079,17 +8143,17 @@ function gen_thumbnails() {
             data: { 'ids': d },
             dataType: 'json',
             success: function (response) {
-                //console.log("AJAX request was successful:" + response.responseText);
+//console.log("AJAX request was successful:" + JSON.stringify(response));
                 $('#tab_imageoptimisation').removeClass('wait');
                 addThumbnails("#optJPGimages_table");
                 addThumbnails("#optPNGimages_table");
                 addThumbnails("#optGIFimages_table");
                 addThumbnails("#optWEBPimages_table");
                 addThumbnails("#optBMPimages_table");
-                addThumbnails("#optGIDanimations_table");
+                addThumbnails("#optGIFanimations_table");
             },
             error: function (response) {
-                //console.log("AJAX request was a failure: " + response.responseText);
+//console.log("AJAX request was a failure: " + response.responseText);
                 $('#tab_imageoptimisation').removeClass('wait');
             }
         });
@@ -8220,13 +8284,13 @@ function displayFonts() {
                         //console.log("WIN objLocFile="+ objLocFile +"; objLocFileCnv="+ objLocFileCnv);
                     }
                     else { // linux
-                        if(objLocFile.indexOf("/usr/share") !== -1)
+                        if(objLocFileurl.indexOf("/usr/share") !== -1)
                         { // local
-                        objLocFileurl = objLocFile.substr(10); // strip the /usr/share from the front
+                        objLocFileurl = objLocFileurl.substr(10); // strip the /usr/share from the front
                         objLocFileCnv = objLocFileurl.replace(/[/\\*]/g, '\/');
                         }
                         else // webpagetoaster.com
-                            objLocFileCnv = objLocFile;
+                            objLocFileCnv = objLocFileurl;
                     }
 
                     //console.log("objLocFileconv= " +objLocFileCnv);

@@ -1,7 +1,10 @@
 <?php
 session_start();
 date_default_timezone_set('UTC');
+//header('Content-Type: plain/text');
+header('Content-Type: application/json');
 $hostname = gethostname();
+$toasterid = $_REQUEST["tid"];
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
   $windows = defined('PHP_WINDOWS_VERSION_MAJOR');
     //echo 'This is a server using Windows! '. $windows."<br/>";
@@ -14,64 +17,61 @@ else {
         //set path for webpagetoaster server and others
 	if( strpos($hostname,"gridhost.co.uk") != false)
     {
-		$debuglog = "/var/sites/w/webpagetoaster.com/public_html/toast/".$toasterid."_debug_optimg.txt";
+        $debuglog = "/var/sites/w/webpagetoaster.com/public_html/toast/".$toasterid."_debug_optimg.txt";
+        $binpath = "/usr/bin";
 	}
 	else{
-		$debuglog = "/usr/share/toast/".$toasterid."_debug_optimg.txt";
+        $debuglog = "/usr/share/toast/".$toasterid."_debug_optimg.txt";
+        $binpath = "/usr/local/bin";
 	}
 }
 ini_set("log_errors", 1);
 ini_set("error_log", $debuglog);
 file_put_contents($debuglog, "IMAGE OPTIMISATION DEBUG LOG started" . PHP_EOL);
 
-$data = file_get_contents('php://input');
+$data = $_REQUEST["d"];
 $d = urldecode($data);
-$djson = json_decode(substr($d,4));
-
+$djson = json_decode($d);
 $ilen = count($djson);
-
+$arr = array();
 //echo "first item: ".$djson[0]->ObjNo."</br>";
 //error_log("opt image first item: ".$djson[0]->ObjNo);
 foreach ($djson as $value) {
-
 //$value is an object of stdclass
-
-  $mt =  $value->mimetype;
-  $url = $value->url;
-  $file = str_replace("\\\\", "\\",$value->localfile);
-  echo ("optmising image: " . $file.PHP_EOL);
-  // update localfilepath for linux
-    if( $OS != "Windows")
+    $mt =  $value->mimetype;
+    $url = $value->url;
+    $file = str_replace("\\\\", "\\",$value->localfile);
+    $savepath = $value->savepath;
+    $animflag = $value->animflag;
+//echo ("optimising image: " . $file.PHP_EOL);
+  
+// update localfilepath
+    if($OS == 'Windows')
+        $savepath = str_replace("/","\\",$savepath);
+    else
     {
-                //set path for webpagetoaster server and others
-	if( strpos($hostname,"gridhost.co.uk") != false)
-    {
-		$file = str_replace ("https://www.webpagetoaster.com", "/var/sites/w/webpagetoaster.com/public_html/toast",$file);
-	}
-	else{
-        $file = str_replace ("https://www.webpagetoaster.com", "/usr/share/toast",$file);
-	    }
+         //set path for webpagetoaster server and others
+        // modify filename for local server
+        if( strpos($hostname,"gridhost.co.uk") != false)
+        {
+            $file = str_replace("https://www.webpagetoaster.com/",'/var/sites/w/webpagetoaster.com/public_html/',$file);
+            $savepath = str_replace('/var/sites/w/webpagetoaster.com/public_html/toast/','/var/sites/w/webpagetoaster.com/public_html/toast/',$savepath);
+//echo ("init savepath: " . $savepath .PHP_EOL);
+            $binpath = "/usr/bin/";
+        }
+        else{
+            $debuglog = "/usr/share/toast/".$toasterid."_debug_optimg.txt";
+            $binpath = "/usr/local/bin/";
+            $savepath = "/usr/share/toast/";
+        }
     }
 
-
-  $savepath = $value->savepath;
-  $animflag = $value->animflag;
   //$tinyjpgkey = $value->tinyjpgapikey;
   error_log("opt image: ".$file);
 
   $path_parts = pathinfo($file);
   $filename = $path_parts['filename'];
-  echo ("saving optmised image to the path: " . $savepath .PHP_EOL);
-  if($OS == 'Windows')
-    $savepath = str_replace("/","\\",$savepath);
-  else
-    if( strpos($hostname,"gridhost.co.uk") != false)
-    {
-		$savepath= "/var/sites/w/webpagetoaster.com/public_html/toast/";
-	}
-	else{
-		$savepath = "/usr/share/toast/";
-	}
+//echo ("saving optmised image to the path: " . $savepath .PHP_EOL);
 
 
  error_log("opt image save path: ".$savepath);
@@ -99,14 +99,23 @@ foreach ($djson as $value) {
 
         $arr = array();
         $arr = $jpgoptres;
-
         break;
+
+    case "image/bmp":
+    case "image/x-ms-bmp":
+    case "image/x-windows-bmp":
+        $bmpoptres = array();
+        $bmpoptres = optimiseBMP($savepath, $file);
+
+        $arr = array();
+        $arr = $bmpoptres;
+
+
   }
 
 
 } // end foreach $djson
 
-  header('Content-Type: application/json');
   echo json_encode($arr, JSON_FORCE_OBJECT);
   exit;
 
@@ -145,33 +154,33 @@ function optimisePNG($savepath, $lfn)
     if (!file_exists($PNGImgfolder))
         mkdir($PNGImgfolder, 0777, true);
     //echo "optimising PNG: ".$lfn."</br>";
-    echo ("optimising PNGs to savepath folder: ".$PNGImgfolder."</br>");
+//echo ("optimising PNGs to savepath folder: ".$PNGImgfolder."</br>");
 
     // init array to return
     $pngdata = array();
     $pngopt = array();
 
-    //// OPTIMISATION - EXIFTOOOL - REMOVE METADATA
-    $folder = 'png_no_metatdata'.DIRECTORY_SEPARATOR;
+    //// OPTIMISATION - EXIFTOOL - REMOVE METADATA
+    $folder = 'png_no_metadata'.DIRECTORY_SEPARATOR;
     $SaveImgfolder = $PNGImgfolder.$folder;
     if (!file_exists($SaveImgfolder))
         mkdir($SaveImgfolder, 0777, true);
     $PNGImgfile = $SaveImgfolder . $filename . '.png';
     $ImgWithoutMetadata = $PNGImgfile;
 
-    echo "optimising PNG as: ".$PNGImgfile."</br>";
+//echo "optimising PNG as: ".$PNGImgfile."</br>";
     if($OS == 'Windows')
         $os_cmd = 'win_tools\exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
     else
     
         $os_cmd = './lnx_tools/ExifTool/exiftool -all= -o '.escapeshellarg($ImgWithoutMetadata) . ' ' . escapeshellarg($lfn);
-    echo 'cmd = '.$os_cmd;
+//echo 'cmd = '.$os_cmd;
     //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($PNGImgfile);
+    $size = getFileSize($PNGImgfile);
 
     $pngopt = array('tool' => 'Exiftool', 'id' => 'no_metadata',  'operation' => 'Remove Metadata', 'settings' => '', 'object' => $lfn, 'size' => $size);
     $pngdata[] = array('optimisation' => $pngopt);
@@ -210,7 +219,7 @@ function optimisePNG($savepath, $lfn)
         $res = array();
 	exec($os_cmd,$res);
     //get size of file
-    $size = filesize($PNGImgfile);
+    $size = getFileSize($PNGImgfile);
 
     $pngopt = array('tool' => 'pngquant', 'id' => 'PNGQUANT',  'operation' => 'Optimise', 'settings' => 'Optimised PNGQuant', 'object' => $lfn, 'size' => $size);
     $pngdata[] = array('optimisation' => $pngopt);
@@ -237,7 +246,7 @@ function optimisePNG($savepath, $lfn)
     $res = array();
 	exec($os_cmd,$res);
     //get size of file
-    $size = filesize($PNGImgfile);
+    $size = getFileSize($PNGImgfile);
 
     $pngopt = array('tool' => 'pngcrush', 'id' => 'PNGCRUSH',  'operation' => 'Optimise', 'settings' => 'Optimised PNGCrush', 'object' => $lfn, 'size' => $size);
     $pngdata[] = array('optimisation' => $pngopt);
@@ -265,7 +274,7 @@ function optimisePNG($savepath, $lfn)
     $res = array();
 	exec($os_cmd,$res);
     //get size of file
-    $size = filesize($PNGImgfile);
+    $size = getFileSize($PNGImgfile);
 
     $pngopt = array('tool' => 'pngcrushBrute', 'id' => 'PNGCRUSHbrute',  'operation' => 'Brute force optimsisation', 'settings' => 'pngcrush -brute', 'object' => $lfn, 'size' => $size);
     $pngdata[] = array('optimisation' => $pngopt);
@@ -289,7 +298,7 @@ function optimisePNG($savepath, $lfn)
     $res = array();
 	exec($os_cmd,$res);
     //get size of file
-    $size = filesize($PNGImgfile);
+    $size = getFileSize($PNGImgfile);
 
     $pngopt = array('tool' => 'OPTIPNG', 'id' => 'OPTIPNG',  'operation' => 'Optimise', 'settings' => 'Optimised OptiPNG', 'object' => $lfn, 'size' => $size);
     $pngdata[] = array('optimisation' => $pngopt);
@@ -306,16 +315,16 @@ function optimisePNG($savepath, $lfn)
         mkdir($SaveImgfolder, 0777, true);
 
     if($OS == 'Windows')
-        $os_cmd = "win_tools\pngnq-s9" .' -f -d ' . $SaveImgfolder . ' -e .png ' .escapeshellarg($PNGImgfileUnoptimised);
+        $os_cmd = "win_tools\pngnq-s9" .' -f -d ' . $SaveImgfolder . ' -e .png -a0.5 -u8.0' .escapeshellarg($PNGImgfileUnoptimised);
     else
-        $os_cmd = "pngnq-s9" .' -f -d ' . $SaveImgfolder . ' -e .png ' .escapeshellarg($PNGImgfileUnoptimised);
+        $os_cmd = "pngnq-s9" .' -f -d ' . $SaveImgfolder . ' -e .png -a0.5 -u8.0' .escapeshellarg($PNGImgfileUnoptimised);
     //echo 'cmd = '.$os_cmd;
     $res = array();
 	exec($os_cmd,$res);
 
 
     //get size of file
-    $size = filesize($PNGImgfile);
+    $size = getFileSize($PNGImgfile);
 
     $pngopt = array('tool' => 'PNGNQ-S9', 'id' => 'PNGnq',  'operation' => 'Optimise', 'settings' => 'Optimised PNGnq-s9', 'object' => $lfn, 'size' => $size);
     $pngdata[] = array('optimisation' => $pngopt);
@@ -336,7 +345,7 @@ function optimisePNG($savepath, $lfn)
     $res = array();
 	exec($os_cmd,$res);
     //get size of file
-    $size = filesize($PNGImgfile);
+    $size = getFileSize($PNGImgfile);
 
     $pngopt = array('tool' => 'PNGOUT', 'id' => 'PNGOUT',  'operation' => 'Optimise', 'settings' => 'Optimised PNGout', 'object' => $lfn, 'size' => $size);
     //$pngdata[] = array('optimisation' => $pngopt);
@@ -361,7 +370,7 @@ function optimisePNG($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
     $pngopt = array('tool' => 'IJG9a', 'id' => 'q75', 'operation' => 'Save as JPEG', 'settings' => 'quality 75%', 'object' => $lfn, 'size' => $size);
     $pngdata[] = array('optimisation' => $pngopt);
@@ -371,7 +380,7 @@ function optimisePNG($savepath, $lfn)
 
 
    //// OPTIMISATION - CWEBP = SAVE AS WEBP
-     $folder = 'webp'.DIRECTORY_SEPARATOR;
+    $folder = 'webp'.DIRECTORY_SEPARATOR;
     $SaveImgfolder = $PNGImgfolder.$folder;
     if (!file_exists($SaveImgfolder))
         mkdir($SaveImgfolder, 0777, true);
@@ -388,7 +397,7 @@ function optimisePNG($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($WEBPImgfile);
+    $size = getFileSize($WEBPImgfile);
 
     $pngopt = array('tool' => 'cwebp', 'id' => 'WEBP',  'operation' => 'Convert to WEBP', 'settings' => '', 'object' => $lfn, 'size' => $size);
     $pngdata[] = array('optimisation' => $pngopt);
@@ -415,7 +424,7 @@ function optimisePNG($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($BPGImgfile);
+    $size = getFileSize($BPGImgfile);
 
     $pngopt = array('tool' => 'bpgenc', 'id' => 'BPG',  'operation' => 'Convert to BPG', 'settings' => '', 'object' => $lfn, 'size' => $size);
     $pngdata[] = array('optimisation' => $pngopt);
@@ -434,7 +443,7 @@ function optimisePNG($savepath, $lfn)
 
 function optimiseJPG($savepath,$lfn)
 {
-    global $OS;
+    global $OS,$binpath;
     $path_parts = pathinfo($lfn);
     $filename = $path_parts['filename'];
     if($OS == 'Windows')
@@ -453,40 +462,42 @@ function optimiseJPG($savepath,$lfn)
     if (!file_exists($JPGImgfolder))
         mkdir($JPGImgfolder, 0777, true);
     error_log( "optimising JPG: ".$lfn);
-    //echo "optimising JPG savepath: ".$JPGImgfolder."</br>";
+//echo "optimising JPG savepath: ".$JPGImgfolder."</br>";
 
     // init array to return
     $jpgdata = array();
 
     //// OPTIMISATION 1 - EXIFTOOOL - REMOVE METADATA
-    $folder = 'jpeg_no_metatdata'.DIRECTORY_SEPARATOR;
+    $folder = 'jpeg_no_metadata'.DIRECTORY_SEPARATOR;
     $SaveImgfolder = $JPGImgfolder.$folder;
     if (!file_exists($SaveImgfolder))
         mkdir($SaveImgfolder, 0777, true);
     $JPGImgfile = $SaveImgfolder . $filename . '.jpg';
     $ImgWithoutMetadata = $JPGImgfile;
 
-    //echo "optimising JPG as: ".$JPGImgfile."</br>";
+//echo "optimising JPG without metadata output: ".$JPGImgfile."</br>";
+//echo "optimising JPG without metadata input: ".$lfn."</br>";
     if($OS == 'Windows')
         $os_cmd = 'win_tools\exiftool -all= -o '.escapeshellarg($JPGImgfile). ' ' . escapeshellarg($lfn);
     else
         $os_cmd = './lnx_tools/ExifTool/exiftool -all= -o '.escapeshellarg($JPGImgfile). ' ' . escapeshellarg($lfn);
+//echo $os_cmd . PHP_EOL;
     error_log('cmd = '.$os_cmd);
     //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
-
+//echo implode($res);
     //get size of file
 
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
-    $jpgopt = array('tool' => 'Exiftool', 'id' => 'no_metadata',  'operation' => 'Remove Metadata', 'settings' => '', 'object' => $lfn, 'size' => $size);
+    $jpgopt = array('tool' => 'Exiftool', 'id' => 'no_metadata',  'operation' => 'Remove Metadata', 'settings' => '', 'object' => $lfn, 'size' => $size, 'savepathfolder'=> $JPGImgfolder);
     $jpgdata[] = array('optimisation' => $jpgopt);
 
 
-    //set deccoded jpeg as ppm file
+    //set decoded jpeg as ppm file
     $decoded_pixmap = $JPGImgfolder.'decoded_' . $filename.'.pnm';
-
+//echo ("djpegging to pnm: " . $decoded_pixmap . PHP_EOL);
     //// OPTIMISATION - DJPEG and CJPEG - SAVE AS QUALITY 75%
     $folder = 'jpeg_quality_75'.DIRECTORY_SEPARATOR;
     $SaveImgfolder = $JPGImgfolder.$folder;
@@ -497,31 +508,30 @@ function optimiseJPG($savepath,$lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\djpeg '.escapeshellarg($ImgWithoutMetadata). ' '. escapeshellarg($decoded_pixmap);
     else
-        $os_cmd = 'djpeg '.escapeshellarg($ImgWithoutMetadata). ' > '. escapeshellarg($decoded_pixmap);
-    //echo 'cmd = '.$os_cmd;
-    //exiftool - remove metadata
+        $os_cmd = $binpath . 'djpeg -pnm -outfile ' . escapeshellarg($decoded_pixmap) . ' ' .escapeshellarg($ImgWithoutMetadata);
+//echo 'cmd = '.$os_cmd;
     $res = array();
-	exec($os_cmd,$res);
+    exec($os_cmd,$res);
+//echo $res;
 
     if($OS == 'Windows')
         $os_cmd = 'win_tools\cjpeg -optimize ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
     else
-        $os_cmd = 'cjpeg -optimize ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
+        $os_cmd = $binpath . 'cjpeg -optimize ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
-    //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
     $jpgopt = array('tool' => 'IJG9a', 'id' => 'q75', 'operation' => 'Save as JPEG', 'settings' => 'quality 75%', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
 
-    ////////////end jpeg opt
+    //////////end jpeg opt
 
     //// OPTIMISATION - DJPEG and CJPEG - SAVE AS QUALITY 75% PROGRESSIVE
-     $folder = 'jpeg_quality_75_progressive'.DIRECTORY_SEPARATOR;
+    $folder = 'jpeg_quality_75_progressive'.DIRECTORY_SEPARATOR;
     $SaveImgfolder = $JPGImgfolder.$folder;
     if (!file_exists($SaveImgfolder))
         mkdir($SaveImgfolder, 0777, true);
@@ -532,14 +542,14 @@ function optimiseJPG($savepath,$lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\cjpeg -optimize -progressive ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
     else
-        $os_cmd = 'cjpeg -optimize -progressive ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
+        $os_cmd = $binpath . 'cjpeg -optimize -progressive ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
     //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
     $jpgopt = array('tool' => 'IJG9a', 'id' => 'q75P',  'operation' => 'Save as JPEG ', 'settings' => 'quality 75% Progressive', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -557,14 +567,14 @@ function optimiseJPG($savepath,$lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\cjpeg -optimize -quality 85 ' .escapeshellarg($decoded_pixmap). ' ' . escapeshellarg($JPGImgfile);
     else
-        $os_cmd = 'cjpeg -optimize -quality 85 ' .escapeshellarg($decoded_pixmap). ' > ' . escapeshellarg($JPGImgfile);
+        $os_cmd = $binpath . 'cjpeg -optimize -quality 85 ' .escapeshellarg($decoded_pixmap). ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
     //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
     $jpgopt = array('tool' => 'IJG9a', 'id' => 'q85',  'operation' => 'Save as JPEG', 'settings' => 'quality 85%', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -582,14 +592,14 @@ function optimiseJPG($savepath,$lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\cjpeg -optimize -progressive -quality 85 ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
     else
-        $os_cmd = 'cjpeg -optimize -progressive -quality 85 ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
+        $os_cmd = $binpath . 'cjpeg -optimize -progressive -quality 85 ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
     //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
     $jpgopt = array('tool' => 'IJG9a', 'id' => 'q85P',  'operation' => 'Save as JPEG ', 'settings' => 'quality 85% Progressive', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -607,14 +617,14 @@ function optimiseJPG($savepath,$lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\cjpeg -optimize -quality 65 ' .escapeshellarg($decoded_pixmap). ' ' . escapeshellarg($JPGImgfile);
     else
-        $os_cmd = 'cjpeg -optimize -quality 65 ' .escapeshellarg($decoded_pixmap). ' > ' . escapeshellarg($JPGImgfile);
+        $os_cmd = $binpath . 'cjpeg -optimize -quality 65 ' .escapeshellarg($decoded_pixmap). ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
     //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
     $jpgopt = array('tool' => 'IJG9a', 'id' => 'q65',  'operation' => 'Save as JPEG', 'settings' => 'quality 65%', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -632,14 +642,14 @@ function optimiseJPG($savepath,$lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\cjpeg -optimize -progressive -quality 65 ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
     else
-        $os_cmd = 'cjpeg -optimize -progressive -quality 65 ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
+        $os_cmd = $binpath . 'cjpeg -optimize -progressive -quality 65 ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
     //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
     $jpgopt = array('tool' => 'IJG9a', 'id' => 'q65P',  'operation' => 'Save as JPEG ', 'settings' => 'quality 65% Progressive', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -657,14 +667,14 @@ function optimiseJPG($savepath,$lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\cjpeg -optimize -quality 55 ' .escapeshellarg($decoded_pixmap). ' ' . escapeshellarg($JPGImgfile);
     else
-        $os_cmd = 'cjpeg -optimize -quality 55 ' .escapeshellarg($decoded_pixmap). ' > ' . escapeshellarg($JPGImgfile);
+        $os_cmd = $binpath . 'cjpeg -optimize -quality 55 ' .escapeshellarg($decoded_pixmap). ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
     //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
     $jpgopt = array('tool' => 'IJG9a', 'id' => 'q55',  'operation' => 'Save as JPEG', 'settings' => 'quality 55%', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -682,14 +692,14 @@ function optimiseJPG($savepath,$lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\cjpeg -optimize -progressive -quality 55 ' .escapeshellarg($decoded_pixmap) . ' ' . escapeshellarg($JPGImgfile);
     else
-        $os_cmd = 'cjpeg -optimize -progressive -quality 55 ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
+        $os_cmd = $binpath . 'cjpeg -optimize -progressive -quality 55 ' .escapeshellarg($decoded_pixmap) . ' > ' . escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
     //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
     $jpgopt = array('tool' => 'IJG9a', 'id' => 'q55P',  'operation' => 'Save as JPEG ', 'settings' => 'quality 55% Progressive', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -707,14 +717,14 @@ function optimiseJPG($savepath,$lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\jpegtran -copy none -optimize'  . ' -outfile ' . escapeshellarg($JPGImgfile) . ' ' .escapeshellarg($ImgWithoutMetadata);
     else
-        $os_cmd = 'jpegtran -copy none -optimize '  . escapeshellarg($ImgWithoutMetadata) . ' > ' .escapeshellarg($JPGImgfile);
+        $os_cmd = $binpath . 'jpegtran -copy none -optimize '  . escapeshellarg($ImgWithoutMetadata) . ' > ' .escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;1011
     //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
     $jpgopt = array('tool' => 'jpegTran', 'id' => 'jpegtran',  'operation' => 'JPEG Optimise ', 'settings' => '-copy none -optimize', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -733,14 +743,14 @@ function optimiseJPG($savepath,$lfn)
     if($OS == 'Windows')
         $os_cmd = 'win_tools\jpegtran -copy none -optimize -progressive' . ' -outfile ' . escapeshellarg($JPGImgfile) .' ' .escapeshellarg($ImgWithoutMetadata);
     else
-        $os_cmd = 'jpegtran -copy none -optimize -progressive ' . escapeshellarg($ImgWithoutMetadata) .' > ' .escapeshellarg($JPGImgfile);
+        $os_cmd = $binpath . 'jpegtran -copy none -optimize -progressive ' . escapeshellarg($ImgWithoutMetadata) .' > ' .escapeshellarg($JPGImgfile);
     //echo 'cmd = '.$os_cmd;
     //exiftool - remove metadata
     $res = array();
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
     $jpgopt = array('tool' => 'jpegTran', 'id' => 'jpegtranP',  'operation' => 'JPEG Optimise Progressive ', 'settings' => '-copy none -optimize -progressive', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -768,7 +778,12 @@ function optimiseJPG($savepath,$lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($WEBPImgfile);
+    $size = getFileSize($WEBPImgfile);
+    if($size == 0)
+    {
+        // try alternative remote optimisation
+        
+    }
 
     $jpgopt = array('tool' => 'cwebp', 'id' => 'WEBP',  'operation' => 'Convert to WEBP', 'settings' => '', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -791,7 +806,7 @@ function optimiseJPG($savepath,$lfn)
     $res = array();
 	exec($os_cmd,$res);
     //print_r($res);
-    $size = filesize($PNGImgfileUnoptimised);
+    $size = getFileSize($PNGImgfileUnoptimised);
 
     $jpgopt = array('tool' => 'im-convert', 'id' => 'PNG',  'operation' => 'Convert to PNG', 'settings' => 'Unoptimised', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -811,7 +826,7 @@ function optimiseJPG($savepath,$lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($PNGImgfile);
+    $size = getFileSize($PNGImgfile);
 
     $jpgopt = array('tool' => 'pngquant', 'id' => 'PNGQUANT',  'operation' => 'Convert to PNG', 'settings' => 'Optimised PNGQuant', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -838,7 +853,7 @@ function optimiseJPG($savepath,$lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($BPGImgfile);
+    $size = getFileSize($BPGImgfile);
 
     $jpgopt = array('tool' => 'bpgenc', 'id' => 'BPG',  'operation' => 'Convert to BPG', 'settings' => '', 'object' => $lfn, 'size' => $size);
     $jpgdata[] = array('optimisation' => $jpgopt);
@@ -865,7 +880,7 @@ function optimiseJPG($savepath,$lfn)
         curl_TinyJPG($tinyjpgkey, $ImgWithoutMetadata,$JPGImgfile);
 
       //get size of file
-      $size = filesize($JPGImgfile);
+      $size = getFileSize($JPGImgfile);
 
       $jpgopt = array('tool' => 'TinyJPG', 'id' => 'TINYJPG',  'operation' => 'Optimise JPEG', 'settings' => 'optimised TinyJPG', 'object' => $lfn, 'size' => $size);
       $jpgdata[] = array('optimisation' => $jpgopt);
@@ -879,6 +894,45 @@ function optimiseJPG($savepath,$lfn)
 
 }
 
+function optimiseBMP($savepath,$lfn)
+{
+    global $OS,$binpath;
+    $path_parts = pathinfo($lfn);
+    $filename = $path_parts['filename'];
+    if($OS == 'Windows')
+        $savepath = str_replace("/","\\",$savepath);
+
+    $folder = '_Optimised_Images';
+    error_log( "making folder: ".$savepath.$folder);
+    $baseImgfolder =  $savepath.$folder;
+    if (!file_exists($baseImgfolder))
+    {
+        $r = mkdir($baseImgfolder, 0777, true);
+        error_log( "making folder result: ".$r);
+    }
+    $folder = DIRECTORY_SEPARATOR;
+    $BMPImgfolder = $baseImgfolder.$folder;
+    if (!file_exists($BMPImgfolder))
+        mkdir($BMPImgfolder, 0777, true);
+    error_log( "optimising JPG: ".$lfn);
+//echo "optimising JPG savepath: ".$BMPImgfolder."</br>";
+    // init array to return
+    $bmpdata = array();
+
+    // convert to Pixmap ppm
+
+    // convert to PNG
+
+    // optimise PNG with PNGQuant
+
+    // convert to JPEG 75%
+
+    // convert to WEBP
+
+    // convert to BPG
+
+    
+}
 
 
 
@@ -907,7 +961,7 @@ function optimiseGIF($savepath, $lfn)
     $gifopt = array();
 
     //// OPTIMISATION 1 - EXIFTOOOL - REMOVE METADATA
-    $folder = 'gif_no_metatdata'.DIRECTORY_SEPARATOR;
+    $folder = 'gif_no_metadata'.DIRECTORY_SEPARATOR;
     $SaveImgfolder = $GIFImgfolder.$folder;
     if (!file_exists($SaveImgfolder))
         mkdir($SaveImgfolder, 0777, true);
@@ -925,7 +979,7 @@ function optimiseGIF($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($GIFImgfile);
+    $size = getFileSize($GIFImgfile);
 
     $gifopt = array('tool' => 'Exiftool', 'id' => 'no_metadata',  'operation' => 'Remove Metadata', 'settings' => '', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -960,7 +1014,7 @@ function optimiseGIF($savepath, $lfn)
     $res = array();
 	exec($os_cmd,$res);
     //print_r($res);
-    $size = filesize($PNGImgfileUnoptimised);
+    $size = getFileSize($PNGImgfileUnoptimised);
 
  //// OPTIMISATION 3 - unoptimised PNG to PNGquant
     $folder = 'pngquant'.DIRECTORY_SEPARATOR;
@@ -977,7 +1031,7 @@ function optimiseGIF($savepath, $lfn)
     $res = array();
 	exec($os_cmd,$res);
     //get size of file
-    $size = filesize($PNGImgfile);
+    $size = getFileSize($PNGImgfile);
 
     $gifopt = array('tool' => 'pngquant', 'id' => 'PNGQUANT',  'operation' => 'Optimise', 'settings' => 'Optimised PNGQuant', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -1003,7 +1057,7 @@ function optimiseGIF($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($JPGImgfile);
+    $size = getFileSize($JPGImgfile);
 
     $gifopt = array('tool' => 'IJG9a', 'id' => 'q75', 'operation' => 'Save as JPEG', 'settings' => 'quality 75%', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -1027,7 +1081,7 @@ function optimiseGIF($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($BPGImgfile);
+    $size = getFileSize($BPGImgfile);
 
     $gifopt = array('tool' => 'bpgenc', 'id' => 'BPG',  'operation' => 'Convert to BPG', 'settings' => '', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -1053,7 +1107,7 @@ function optimiseGIF($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($WEBPImgfile);
+    $size = getFileSize($WEBPImgfile);
 
     $gifopt = array('tool' => 'cwebp', 'id' => 'WEBP',  'operation' => 'Convert to WEBP', 'settings' => '', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -1092,7 +1146,7 @@ function optimiseGIFAnimation($savepath, $lfn)
     $gifopt = array();
 
     //// OPTIMISATION 1 - EXIFTOOOL - REMOVE METADATA
-    $folder = 'gif_no_metatdata'.DIRECTORY_SEPARATOR;
+    $folder = 'gif_no_metadata'.DIRECTORY_SEPARATOR;
     $SaveImgfolder = $GIFImgfolder.$folder;
     if (!file_exists($SaveImgfolder))
         mkdir($SaveImgfolder, 0777, true);
@@ -1110,7 +1164,7 @@ function optimiseGIFAnimation($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($GIFImgfile);
+    $size = getFileSize($GIFImgfile);
 
     $gifopt = array('tool' => 'Exiftool', 'id' => 'no_metadata',  'operation' => 'Remove Metadata', 'settings' => '', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -1140,7 +1194,7 @@ function optimiseGIFAnimation($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($GIFImgfile);
+    $size = getFileSize($GIFImgfile);
 
     $gifopt = array('tool' => 'Gifsicle', 'id' => 'gifsicleO1',  'operation' => 'Optimise', 'settings' => 'Level 1', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -1169,7 +1223,7 @@ function optimiseGIFAnimation($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($GIFImgfile);
+    $size = getFileSize($GIFImgfile);
 
     $gifopt = array('tool' => 'Gifsicle', 'id' => 'gifsicleO2',  'operation' => 'Optimise', 'settings' => 'Level 2', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -1199,7 +1253,7 @@ function optimiseGIFAnimation($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($GIFImgfile);
+    $size = getFileSize($GIFImgfile);
 
     $gifopt = array('tool' => 'Gifsicle', 'id' => 'gifsicleO3',  'operation' => 'Optimise', 'settings' => 'Level 3', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -1226,7 +1280,7 @@ function optimiseGIFAnimation($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($GIFImgfile);
+    $size = getFileSize($GIFImgfile);
 
     $gifopt = array('tool' => 'gif2apng', 'id' => 'gif2apng',  'operation' => 'Convert', 'settings' => '', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -1253,7 +1307,7 @@ function optimiseGIFAnimation($savepath, $lfn)
 
 
     //get size of file
-    $size = filesize($GIFImgfile);
+    $size = getFileSize($GIFImgfile);
 
     $gifopt = array('tool' => 'gif2apng', 'id' => 'gif2apngq',  'operation' => 'Convert and Optimise', 'settings' => 'zopfli compression algorithm', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -1280,7 +1334,7 @@ function optimiseGIFAnimation($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($GIFImgfile);
+    $size = getFileSize($GIFImgfile);
 
     $gifopt = array('tool' => 'gif2webp', 'id' => 'gif2webp',  'operation' => 'Convert', 'settings' => '', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -1307,7 +1361,7 @@ function optimiseGIFAnimation($savepath, $lfn)
 	exec($os_cmd,$res);
 
     //get size of file
-    $size = filesize($GIFImgfile);
+    $size = getFileSize($GIFImgfile);
 
     $gifopt = array('tool' => 'gif2webp', 'id' => 'gif2webp80',  'operation' => 'Convert and Optimise', 'settings' => 'Quality = 80', 'object' => $lfn, 'size' => $size);
     $gifdata[] = array('optimisation' => $gifopt);
@@ -1319,13 +1373,18 @@ function optimiseGIFAnimation($savepath, $lfn)
     return $gifdata;
 }
 
+function getFileSize($img)
+{
+    $size = 0;
+    if(file_exists($img))
+        $size = FileSize($img);
+    return $size;
+} // end function getFileSize
 
-
-function curl_TinyJPG($key, $input,$output){
-
-
-$request = curl_init();
-curl_setopt_array($request, array(
+function curl_TinyJPG($key, $input,$output)
+{
+    $request = curl_init();
+    curl_setopt_array($request, array(
   CURLOPT_URL => "https://api.tinypng.com/shrink",
   CURLOPT_USERPWD => "api:" . $key,
   CURLOPT_POSTFIELDS => file_get_contents($input),

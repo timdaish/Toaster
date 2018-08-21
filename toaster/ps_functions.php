@@ -216,6 +216,8 @@ function getStyleIDandClasess($initurl)
 {
     debug(__FUNCTION__ . ' ' . __LINE__ . " parms", $initurl);
     global $html, $debug, $rootStyleID, $rootStyleClass;
+    if($html == "<i></i>")
+        return;
     debug("<br/>PROCESSING STYLE ID", "");
 //echo("<br/>PROCESSING STYLE TAGS<br/>");
     foreach ($html->find('*[id]') as $id)
@@ -2444,6 +2446,8 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
     function getListOfInlineStyleLinks()
     {
         global $html, $cssimgs;
+        if($html == "<i></i>")
+            return;
 //echo("checking for inline styles<br/>");
         $h = $html->save();
         $dom = new DOMDocument();
@@ -2677,11 +2681,18 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
     {
         global $html;
         $title = '';
+        if($html == "<i></i>")
+            return $title;
+        try{
         @ $titleraw = $html->find('title', 0);
         if (isset($titleraw))
             $title = $titleraw->innertext;
         else
             $title = "";
+
+        } catch (Exception $e) {
+            echo 'Caught exception: ',  $e->getMessage(), "\n";
+        }
 //echo ("page title = ". $title."<br/>");
         return $title;
     }
@@ -2739,6 +2750,8 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
     function getViewState()
     {
         global $html;
+        if($html == "<i></i>")
+            return;
         $viewstatesize = 0;
         foreach ($html->find('#__VIEWSTATE') as $element)
         {
@@ -3036,7 +3049,8 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
     function getListOfImages()
     {
         global $html, $arrayListOfImages, $arrayListOf3PImages, $roothost, $arrayOfObjects, $arrayOf3PObjects, $objcount, $fullurlpath, $basescheme, $wptHAR, $chhHAR;
-
+        if($html == "<i></i>")
+            return;
         if($wptHAR or $chhHAR)
             return; // don't process for a WPT or Chrome Headless HAR file
 
@@ -3184,6 +3198,8 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
     function getListOfResponsiveImages($elementname, $srcsetattr, $subelement)
     {
         global $html, $arrayListOfImages, $arrayListOf3PImages, $roothost, $arrayOfObjects, $arrayOf3PObjects, $objcount, $fullurlpath, $noofresponvesrcsetimgs, $cssimgs;
+        if($html == "<i></i>")
+            return;
         $elementcount = 0;
         $noofresponvesrcsetimgs = 0;
 // Find all responsive images
@@ -3356,6 +3372,8 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
     function getListOfHTML5Elements($mediatype, $attr)
     {
         global $html, $arrayOfObjects, $objcount, $fullurlpath, $noofHTML5MediaElements, $roothost, $cssimgs;
+        if($html == "<i></i>")
+            return;
         debug("<br/>PROCESSING HTML5 MEDIA ELEMENTS", "");
         debug("Absolute path of parent page", $fullurlpath);
         if (empty($html))
@@ -3450,6 +3468,8 @@ function readFromHARandSaveToFilePath($requrl,$sourcefileNoSpaces,$sfn)
     function getListOfScriptLinks()
     {
         global $html, $arrayListOfScriptFiles, $arrayListOf3PScriptFiles, $roothost, $arrayOfObjects, $arrayOf3PObjects, $objcount, $fullurlpath, $jsfiles,$wptHAR, $chhHAR;
+        if($html == "<i></i>")
+            return;
         if($wptHAR or $chhHAR)
             return; // don't process for a WPT or Chrome Headless HAR file
         
@@ -4087,6 +4107,8 @@ $jsasync = "ASYNC";
     function getListOfStyleLinks($stage)
     {
         global $html, $arrayListOfStylesheets, $arrayListOf3PStylesheets, $arrayOfObjects, $arrayListOfImages, $fullurlpath, $parname, $cssimgs, $width, $height;
+        if($html == "<i></i>")
+            return;
         debug("<br/>Absolute path of parent page", $fullurlpath);
         debug($stage . " PROCESSING STYLESHEETS - REL LINKS", "");
 //debug("<br/>PROCESSING STYLESHEETS - REL LINKS html", '<pre>'.$html.'</pre>');
@@ -4273,6 +4295,8 @@ $jsasync = "ASYNC";
     function processStyleLinks($str, $cssref, $from, $parentfile)
     {
         global $html, $arrayListOfStylesheets, $arrayListOf3PStylesheets, $roothost, $arrayOfObjects, $arrayOf3PObjects, $objcount, $arrayListOfImages, $host_domain, $host_domain_path, $ua, $fullurlpath, $parname, $cssimgs, $username, $password, $filepath_domainsavedir, $RootRedirURL, $boolakamaiDebug, $cookie_jar,$encodingoptions;
+        if($html == "<i></i>")
+            return;
 //echo("processStyleLinks called from '" . $from. "' for External StyleSheet URL: ".$str."<br/>");
         debug($from . ": External StyleSheet URL", $str);
         debug("External StyleSheet URL", $str);
@@ -4811,6 +4835,8 @@ $jsasync = "ASYNC";
 // Find all links
         if (empty($html))
             return (false);
+        if($html == "<i></i>")
+            return;
         debug("<br/>PROCESSING LINKS", "");
         foreach ($html->find('a') as $element)
         {
@@ -4927,6 +4953,8 @@ $jsasync = "ASYNC";
     function getListOfListImages()
     {
         global $html, $arrayListOfImages, $arrayListOf3PImages, $roothost, $arrayOfObjects, $arrayOf3PObjects, $objcount, $objcountimg;
+        if($html == "<i></i>")
+            return;
 // Find all images
         debug("<br>PROCESSING LIST IMAGES<br/>", "");
         foreach ($html->find(strtolower('li')) as $element)
@@ -7005,6 +7033,8 @@ debug("Found image to copy", $local);
     function getCSSJSOrdering($mode)
     {
         global $html, $arrayOrderedCSSJS, $url, $headcss, $headjs, $bodycss, $bodyjs, $roothost, $objcount;
+        if($html == "<i></i>")
+            return;
         if ($mode == 'source')
         {
             $headcss = 0;

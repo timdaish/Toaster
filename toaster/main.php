@@ -2554,7 +2554,7 @@ if($har != '')
    	<div id="tab_imageoptimisation" class="pane">
     <div style="clear: both;"></div>
     <h2>Image Optimisation</h2>
-    <button class="btn btn-default" type="button" id="genthumbnails" value="Generate Thumbnails"><span class="glyphicon glyphicon-play" aria-hidden="true"></span>View Thumbnails</button>
+    <button class="btn btn-default" type="button" id="genthumbnails" value="Generate Thumbnails"><span class="glyphicon glyphicon-play" aria-hidden="true" hidden></span>View Thumbnails</button>
         <h3>JPEG Image Optimisation</h3>
         <label>TinyJPG API Key</label><input type="text" id="tinyjpgapikey" name="tinyjpgapikey" size="60" width="60" value="" class="long">
         <table id="optJPGimages_table" class="dataTable table-striped" border="1"><thead></thead><tbody></tbody></table>

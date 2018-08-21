@@ -139,9 +139,9 @@ $( document ).ready(function() {
   var toasturlfolder = '<?php echo $_REQUEST ["path"];?>';
   var originalimage  = '<?php echo $_REQUEST ["originalimg"];?>';
   var imgfn          = '<?php echo $_REQUEST ["fn"];?>';
-  console.log('toasterurlfolder =' + toasturlfolder );
-  console.log('original image = ' + originalimage);
-  console.log('img filename = ' + imgfn);
+//   console.log('toasterurlfolder =' + toasturlfolder );
+//   console.log('original image = ' + originalimage);
+//   console.log('img filename = ' + imgfn);
   $("#fileSel").delay(500)
   $('#fileSel option[value="default"]').text(imgfn);  // changes text
   $('#fileSel option[value="default"]').val(imgfn);
